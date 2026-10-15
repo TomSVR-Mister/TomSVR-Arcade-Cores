@@ -224,7 +224,7 @@ always @(posedge clk) begin
     end else begin
         if (oki_bank_we && !uds_n) begin
             oki_bank <= cpu_dout[11:8];
-            fb_keep  <=~cpu_dout[15];
+            fb_keep  <= 1'b0;             // Comad fork: expro02 boards always redraw the sprite layer
             flip     <= cpu_dout[14];
         end
     end
