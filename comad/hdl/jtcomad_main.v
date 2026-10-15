@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Date: 12-7-2026
- * Comad fork (5 MB ROM + 1 MB extension at B00000, OKI at A80000, palette-based fg transparency): 2026 Tom Sveen */
+ * Comad fork (5 MB ROM + 1 MB extension at B00000, work RAM at C80000, OKI at A80000, palette-based fg transparency): 2026 Tom Sveen */
 
 module jtcomad_main(
     input              rst,
@@ -24,7 +24,7 @@ module jtcomad_main(
     output reg  [15:0] cpu_din,
     output             cpu_rnw,
 
-    output      [16:1] ram_addr,
+    output      [17:1] ram_addr,
     output      [ 1:0] ram_dsn,
     output reg         ram_cs,
     input       [15:0] ram_data,
@@ -77,6 +77,7 @@ wire [ 2:0] ipl_n;
 wire        bus_cs, bus_busy, int_ack, calc_wdog_clr;
 wire        irq3_clr, irq5_clr, irq3_trig, irq5_trig, vdump32;
 wire [15:0] dsw1_dout, dsw2_dout, system_dout, calc_dout;
+reg         wram_cs;
 reg         fg_cs, bg_cs, pal_cs, objram_cs, objaux_cs,
             dsw1_cs, dsw2_cs, system_cs, calc_cs;
 reg         lvbl_l, wdog_rst, main_rst;
@@ -108,7 +109,8 @@ assign irq5_trig     = vdump32;
 assign irq3_clr      = int_ack && !irq3_n;
 assign irq5_clr      = int_ack &&  irq3_n;
 
-assign ram_addr      = A[16:1];
+// SDRAM-backed CPU RAM: bg mirror (520000-53ffff) and native Comad work RAM at C80000-C8FFFF
+assign ram_addr      = wram_cs ? { 2'b10, A[15:1] } : { 1'b0, A[16:1] };
 assign ram_dsn       = dsn;
 assign fg_addr       = A[16:1];
 assign bg_addr       = A[16:1];
@@ -137,6 +139,7 @@ always @* begin
     fg_cs     = 1'b0;
     bg_cs     = 1'b0;
     ram_cs    = 1'b0;
+    wram_cs   = 1'b0;
     pal_cs    = 1'b0;
     objram_cs = 1'b0;
     objaux_cs = 1'b0;
@@ -150,7 +153,8 @@ always @* begin
         rom_cs    = A[23:20] <= 4'h4 || ext_rom;     // 000000-4fffff + b00000-bfffff
         fg_cs     = A[23:17] == 7'b0101000;         // 500000-51ffff
         bg_cs     = A[23:17] == 7'b0101001;         // 520000-53ffff
-        ram_cs    = bg_cs;                          // bg RAM also works as CPU RAM
+        wram_cs   = A[23:16] == 8'hc8;               // c80000-c8ffff: work RAM (Comad boards)
+        ram_cs    = bg_cs | wram_cs;                // bg RAM also works as CPU RAM
         pal_cs    = A[23:11] == 13'b0110000000000;  // 600000-6007ff
         objram_cs = A[23:13] == 11'b01110000000;    // 700000-701fff
         objaux_cs = A[23:12] >= 12'h702 && A[23:12] <= 12'h704;
@@ -302,7 +306,7 @@ jtframe_68kdtack_cen u_dtack(
 assign cpu_addr    = 23'd0;
 assign cpu_dout    = 16'd0;
 assign cpu_rnw     = 1'b1;
-assign ram_addr    = 16'd0;
+assign ram_addr    = 17'd0;
 assign ram_dsn     = 2'd3;
 assign fg_addr     = 16'd0;
 assign fg_we       = 2'd0;

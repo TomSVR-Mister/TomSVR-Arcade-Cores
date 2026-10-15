@@ -15,7 +15,7 @@ sdram:
   banks:
     - buses:
       - name: ram
-        addr_width: 17
+        addr_width: 18
         data_width: 16
         din: cpu_dout
         offset: RAM_OFFSET
