@@ -1,0 +1,21 @@
+comad:
+  - get:
+    - jtcomad_game.v
+    - jtcomad_main.v
+    - jtcomad_calc.v
+    - jtcomad_obj.v
+    - jtcomad_sound.v
+    - jtcomad_video.v
+    - jtcomad_colmix.v
+jtframe:
+  - get:
+      - jtframe_edge.v
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_virq.v
+  - from: video
+    get:
+      - jtframe_vtimer.v
+      - jtframe_obj.yaml
+jt6295:

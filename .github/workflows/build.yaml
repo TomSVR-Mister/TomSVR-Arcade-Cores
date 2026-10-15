@@ -1,0 +1,49 @@
+name: Build Comad core
+
+on:
+  workflow_dispatch:
+
+jobs:
+  mister:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space for the Quartus image
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/checkout@v4
+        with:
+          path: mine
+
+      - name: Get JTFRAME and CPU/sound modules (jotego/jtcores, fixed commit)
+        run: |
+          git init -q jtcores
+          cd jtcores
+          git remote add origin https://github.com/jotego/jtcores.git
+          git fetch -q --depth 1 origin bfced64dad833daa3864e601e9c0e90614c56df8
+          git checkout -q FETCH_HEAD
+          git submodule update --init modules/fx68k modules/jt6295
+          cp -r ../mine/comad cores/comad
+
+      - name: Compile for MiSTer (Quartus 20.1 Lite in jotego/jtcore20)
+        run: |
+          docker run --network host -v "$PWD/jtcores":/jtcores jotego/jtcore20 bash -c '
+            set -e
+            git config --global --add safe.directory "*"
+            cd /jtcores
+            export JTROOT=$(pwd) JTFRAME=$(pwd)/modules/jtframe JTUTIL=/jtutil
+            mkdir -p $JTUTIL
+            source $JTFRAME/bin/setprj.sh > /dev/null
+            export PATH=$PATH:/usr/local/go/bin
+            jtutil seed --max-trials 4 comad -mister --nodbg --nolinter
+          '
+
+      - name: Upload the core
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jtcomad-mister
+          path: |
+            jtcores/release
+            jtcores/log
+          if-no-files-found: warn
+          retention-days: 30
