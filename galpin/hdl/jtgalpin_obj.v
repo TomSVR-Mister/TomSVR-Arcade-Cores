@@ -33,7 +33,8 @@ wire   [CW+6:2] raw_addr;
 wire   [19:2]   full_addr;
 wire [PXLW-1:0] pre_pxl;
 reg  [PXLW-1:0] dly[0:15];
-wire          hflip, vflip, dr_draw, dr_busy, prio;
+wire          hflip, vflip, dr_draw, dr_busy, prio, obj8;
+wire   [31:0] masked;
 wire   [ 9:0] hpos;
 wire   [12:0] code;
 wire   [31:0] sorted;
@@ -45,9 +46,11 @@ integer       i;
 assign attr     = {2'd0,prio,pal};
 assign rom_addr = full_addr[17:2];
 assign pxl      = dly[hoffset][8:0];
+// 8x8 sprites: the column fetched with H=0 is not part of the sprite
+assign masked   = (obj8 && !raw_addr[6]) ? 32'd0 : rom_data;
 
 jtframe_8x8x4_packed_msb u_conv(
-    .raw    ( rom_data  ),
+    .raw    ( masked    ),
     .sorted ( sorted    )
 );
 
@@ -74,7 +77,8 @@ jtgalpin_objscan u_scan(
     .prio       ( prio      ),
     .hpos       ( hpos      ),
     .dr_draw    ( dr_draw   ),
-    .dr_busy    ( dr_busy   )
+    .dr_busy    ( dr_busy   ),
+    .obj8      ( obj8     )
 );
 
 jtframe_objdraw #(.AW(10),.CW(CW),.PW(PXLW),.LATCH(1),.HFIX(0)) u_draw(

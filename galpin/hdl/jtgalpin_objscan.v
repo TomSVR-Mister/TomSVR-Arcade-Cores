@@ -33,7 +33,8 @@ module jtgalpin_objscan(
     output reg [ 9:0] hpos,
     output reg [ 3:0] ysub,
     output            dr_draw,
-    input             dr_busy
+    input             dr_busy,
+    output            obj8         // 8x8 sprite being drawn: only one 8-pixel column is valid
 );
 
 wire [12:1] scan_addr;
@@ -57,6 +58,7 @@ assign skip      = st==1 && !en;
 assign ydf       = ydiff^{9{vflip}};
 assign scan_addr[12] = 0;
 assign ram_addr  = scan_addr[11:1];
+assign obj8     = hsize==0;
 
 always @* begin
     ydiff = vlatch - y - 9'd1;
@@ -77,9 +79,11 @@ end
 
 always @* begin
     rom_addr = {raw_addr[19:7],raw_addr[5],~raw_addr[6],raw_addr[4:2]};
-    hpos     = x + {3'd0,hsub,4'd0};
+    // 8x8 sprites are drawn as 16-pixel wide objects whose second column is blanked (jtgalpin_obj),
+    // so the tile goes 8 pixels to the left when mirrored
+    hpos     = x + {3'd0,hsub,4'd0} - ((size==0 && attr[0]) ? 10'd8 : 10'd0);
     case( hsize )
-        0: rom_addr[6]    = code_lsb[1];
+        0: rom_addr[6:5]  = code_lsb;   // full 8x8 tile number (MAME tecmo_spr)
         2: rom_addr[ 8:7] = {vaddr[0],haddr[0]};     //32
         3: rom_addr[10:7] = {vaddr[1],hadj,vaddr[0],haddr[0]};   //64
         default:;
