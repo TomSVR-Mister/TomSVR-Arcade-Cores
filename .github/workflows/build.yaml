@@ -3,6 +3,9 @@ name: Build Comad core
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   mister:
     runs-on: ubuntu-latest
@@ -68,3 +71,16 @@ jobs:
             jtcores/log
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Also keep the .rbf on the 'builds' branch
+        if: success()
+        shell: bash
+        run: |
+          rbf=$(find jtcores/release -name '*.rbf' | head -1)
+          [ -n "$rbf" ] || exit 0
+          mkdir pub && cd pub
+          git init -q
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          cp "../$rbf" .
+          git add -A && git commit -q -m "jtcomad build ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:builds
