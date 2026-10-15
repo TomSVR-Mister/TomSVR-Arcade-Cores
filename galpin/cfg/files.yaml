@@ -1,0 +1,33 @@
+galpin:
+  - get:
+    - jtgalpin_game.v
+    - jtgalpin_main.v
+    - jtgalpin_sound.v
+    - jtgalpin_video.v
+    - jtgalpin_fg.v
+    - jtgalpin_obj.v
+    - jtgalpin_objscan.v
+    - jtgalpin_colmix.v
+jtframe:
+  - get:
+      - jtframe_edge.v
+  - from: ram
+    get:
+      - jtframe_obj_buffer.v
+  - from: video
+    get:
+      - jtframe_objscan.v
+      - jtframe_objdraw.v
+      - jtframe_objdraw_gate.v
+      - jtframe_draw.v
+  - from: video/layouts
+    get:
+      - jtframe_8x8x4_packed_msb.v
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jt6295:
+jtopl:
+  - get:
+    - jtopl2.yaml

@@ -1,7 +1,12 @@
-name: Build Comad core
+name: Build core
 
 on:
   workflow_dispatch:
+    inputs:
+      core:
+        description: "core folder (comad or galpin)"
+        default: comad
+        required: true
 
 permissions:
   contents: write
@@ -24,14 +29,14 @@ jobs:
           git remote add origin https://github.com/jotego/jtcores.git
           git fetch -q --depth 1 origin bfced64dad833daa3864e601e9c0e90614c56df8
           git checkout -q FETCH_HEAD
-          git submodule update --init modules/fx68k modules/jt6295
-          cp -r ../mine/comad cores/comad
+          git submodule update --init modules/fx68k modules/jt6295 modules/jtopl
+          cp -r ../mine/${{ inputs.core }} cores/${{ inputs.core }}
 
       - name: Compile for MiSTer (Quartus 20.1 Lite in jotego/jtcore20)
         shell: bash
         run: |
           set -o pipefail
-          cat > jtcores/build-comad.sh <<'EOS'
+          cat > jtcores/build-core.sh <<'EOS'
           #!/bin/bash
           set -e
           git config --global --add safe.directory "*"
@@ -40,12 +45,12 @@ jobs:
           mkdir -p $JTUTIL
           source $JTFRAME/bin/setprj.sh > /dev/null
           export PATH=$PATH:/usr/local/go/bin
-          jtutil seed --max-trials 4 comad -mister --nodbg --nolinter
+          jtutil seed --max-trials 4 ${{ inputs.core }} -mister --nodbg --nolinter
           EOS
-          sed -i 's/^          //' jtcores/build-comad.sh
-          chmod +x jtcores/build-comad.sh
+          sed -i 's/^          //' jtcores/build-core.sh
+          chmod +x jtcores/build-core.sh
           # same invocation style as jotego's own workflow (image entrypoint runs the given script)
-          docker run --network host -v "$PWD/jtcores":/jtcores jotego/jtcore20 /jtcores/build-comad.sh 2>&1 | tee build.log
+          docker run --network host -v "$PWD/jtcores":/jtcores jotego/jtcore20 /jtcores/build-core.sh 2>&1 | tee build.log
 
       - name: Report the end of the build log as annotations
         if: always()
@@ -53,7 +58,7 @@ jobs:
         run: |
           {
             tail -n 120 build.log 2>/dev/null
-            for f in $(find jtcores/log jtcores/cores/comad -name '*.log' 2>/dev/null | head -5); do echo "== $f"; tail -n 60 "$f"; done
+            for f in $(find jtcores/log jtcores/cores/${{ inputs.core }} -name '*.log' 2>/dev/null | head -5); do echo "== $f"; tail -n 60 "$f"; done
           } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
           split -l 25 tail.txt part_ || true
           for f in part_*; do
@@ -65,7 +70,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jtcomad-mister
+          name: jt${{ inputs.core }}-mister
           path: |
             jtcores/release
             jtcores/log
@@ -82,5 +87,5 @@ jobs:
           git init -q
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           cp "../$rbf" .
-          git add -A && git commit -q -m "jtcomad build ${GITHUB_SHA::7}"
-          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:builds
+          git add -A && git commit -q -m "jt${{ inputs.core }} build ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${{ inputs.core == 'comad' && 'builds' || format('builds-{0}', inputs.core) }}

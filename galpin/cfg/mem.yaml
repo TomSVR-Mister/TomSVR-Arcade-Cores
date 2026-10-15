@@ -1,0 +1,67 @@
+params:
+  - { name: PCM_OFFSET, value: "(`PCM_START-`JTFRAME_BA1_START)>>1" }
+
+clocks:
+  clk:
+    - freq: 4M
+      outputs:
+        - cen4
+        - cen2
+        - cen1
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl2, rsum: 10k }
+    - { name: pcm, module: jt6295, rsum: 20k, fir: fir_192k_4k.csv }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 22, data_width: 16, cache_size: 1kB }
+    - buses:
+      - { name: snd, addr_width: 16, data_width: 8 }
+      - { name: pcm, addr_width: 18, data_width: 8, offset: PCM_OFFSET }
+    - buses:
+      - { name: obj, addr_width: 18, data_width: 32 }
+    - buses:
+      - { name: fgt, addr_width: 19, data_width: 32 }
+
+bram:
+  - name: wram
+    size: 64kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+  - name: objram
+    size: 4kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: objram_video_addr, dout: objram_video_dout, rw: false }
+  - name: colram
+    size: 4kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: colram_video_addr, dout: colram_video_dout, rw: false }
+  - name: vidram
+    size: 4kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vidram_video_addr, dout: vidram_video_dout, rw: false }
+  - name: bg
+    size: 256kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    ioctl: { save: true, restore: true, order: 0, unless: [ JTFRAME_RELEASE ] }
+    dual_port: { name: video, addr: bg_video_addr, dout: bg_video_dout, rw: false }
+  - name: pal
+    size: 2kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    ioctl: { save: true, restore: true, order: 1, unless: [ JTFRAME_RELEASE ] }
+    dual_port: { name: video, addr: pal_video_addr, dout: pal_video_dout, rw: false }

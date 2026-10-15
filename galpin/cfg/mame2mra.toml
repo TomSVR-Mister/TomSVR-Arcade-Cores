@@ -1,0 +1,10 @@
+[global]
+author=["tosius2026"]
+
+[parse]
+sourcefile=[ "galspnbl.cpp" ]
+
+[buttons]
+names=[
+    { names="Left Flippers,Right Flippers,Launch Left,Launch Right" }
+]
