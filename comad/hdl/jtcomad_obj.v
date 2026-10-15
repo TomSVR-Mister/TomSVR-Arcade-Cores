@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
  * SPDX-License-Identifier: GPL-3.0-or-later
- * Date: 12-7-2026 */
+ * Date: 12-7-2026
+ * Comad fork: end-of-list marker (byte 3 bit 3): 2026 Tom Sveen */
 
 module jtcomad_obj(
     input              rst,
@@ -182,6 +183,11 @@ always @(posedge clk) begin
             R5: begin
                 b5       <= ram_byte;
                 s_st     <= R4;
+                if (b3[3]) begin            // Comad fork: byte 3 bit 3 marks the end of the list
+                    scan_active <= 1'b0;    // (lets converters with long lists finish each line in time)
+                    done_st     <= D_WAIT;
+                    s_st        <= IDLE;
+                end
             end
             R4: begin
                 obj_x <= scan_next_x_now;
