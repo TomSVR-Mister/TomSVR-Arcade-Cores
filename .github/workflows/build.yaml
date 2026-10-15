@@ -25,17 +25,38 @@ jobs:
           cp -r ../mine/comad cores/comad
 
       - name: Compile for MiSTer (Quartus 20.1 Lite in jotego/jtcore20)
+        shell: bash
         run: |
-          docker run --network host -v "$PWD/jtcores":/jtcores jotego/jtcore20 bash -c '
-            set -e
-            git config --global --add safe.directory "*"
-            cd /jtcores
-            export JTROOT=$(pwd) JTFRAME=$(pwd)/modules/jtframe JTUTIL=/jtutil
-            mkdir -p $JTUTIL
-            source $JTFRAME/bin/setprj.sh > /dev/null
-            export PATH=$PATH:/usr/local/go/bin
-            jtutil seed --max-trials 4 comad -mister --nodbg --nolinter
-          '
+          set -o pipefail
+          cat > jtcores/build-comad.sh <<'EOS'
+          #!/bin/bash
+          set -e
+          git config --global --add safe.directory "*"
+          cd /jtcores
+          export JTROOT=/jtcores JTFRAME=/jtcores/modules/jtframe JTUTIL=/jtutil
+          mkdir -p $JTUTIL
+          source $JTFRAME/bin/setprj.sh > /dev/null
+          export PATH=$PATH:/usr/local/go/bin
+          jtutil seed --max-trials 4 comad -mister --nodbg --nolinter
+          EOS
+          sed -i 's/^          //' jtcores/build-comad.sh
+          chmod +x jtcores/build-comad.sh
+          # same invocation style as jotego's own workflow (image entrypoint runs the given script)
+          docker run --network host -v "$PWD/jtcores":/jtcores jotego/jtcore20 /jtcores/build-comad.sh 2>&1 | tee build.log
+
+      - name: Report the end of the build log as annotations
+        if: always()
+        shell: bash
+        run: |
+          {
+            tail -n 120 build.log 2>/dev/null
+            for f in $(find jtcores/log jtcores/cores/comad -name '*.log' 2>/dev/null | head -5); do echo "== $f"; tail -n 60 "$f"; done
+          } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
+          split -l 25 tail.txt part_ || true
+          for f in part_*; do
+            msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' "$f")
+            echo "::notice title=log $f::$msg"
+          done
 
       - name: Upload the core
         if: always()
