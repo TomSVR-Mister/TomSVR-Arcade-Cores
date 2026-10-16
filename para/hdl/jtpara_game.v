@@ -27,7 +27,26 @@ assign vram2_addr = vram_addr;
 assign p1  = { cab_1p[0], 2'b11, joystick1[4:0] };
 assign p2  = { cab_1p[1], 2'b11, joystick2[4:0] };
 // coin 1, coin 2, ..., bit 6 = vblank (active low)
-assign sys = { 1'b1, lvbl_raw, 4'hf, coin[1:0] };
+// Coins are sent as 5-frame pulses per press (MAME PORT_IMPULSE(5)): Paradise Deluxe ignores a coin held down longer.
+reg  [1:0] coin_l, coin_p;
+reg  [2:0] coin_cnt[0:1];
+reg        lvbl_l;
+integer    ci;
+always @(posedge clk) begin
+    lvbl_l <= lvbl_raw;
+    coin_l <= coin[1:0];
+    for( ci=0; ci<2; ci=ci+1 ) begin
+        if( rst ) begin
+            coin_cnt[ci] <= 0;
+            coin_p[ci]   <= 1;
+        end else begin
+            if( !coin[ci] && coin_l[ci] ) coin_cnt[ci] <= 3'd5;   // new press (active low)
+            else if( !lvbl_raw && lvbl_l && coin_cnt[ci]!=0 ) coin_cnt[ci] <= coin_cnt[ci] - 3'd1;
+            coin_p[ci] <= coin_cnt[ci]==0;
+        end
+    end
+end
+assign sys = { 1'b1, lvbl_raw, 4'hf, coin_p };
 
 jtpara_main u_main(
     .rst         ( rst          ),
