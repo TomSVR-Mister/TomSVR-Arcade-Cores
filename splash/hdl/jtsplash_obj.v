@@ -121,7 +121,7 @@ jtframe_objdraw #(.AW(9),.CW(12),.PW(8),.LATCH(1),.KEEP_OLD(0),.ALPHA(0)) u_draw
     .draw       ( draw          ),
     .busy       ( busy          ),
     .code       ( code          ),
-    .xpos       ( { attr2[7], xlo } - 9'd8 ),
+    .xpos       ( { attr2[7], xlo } - 9'd9 ),   // MAME: X - 8; one more for the line buffer delay (measured)
     .ysub       ( ydiff         ),
     .hzoom      ( 6'd0          ),
     .hz_keep    ( 1'b0          ),

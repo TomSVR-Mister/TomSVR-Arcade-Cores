@@ -3,7 +3,7 @@
  * Splash! tilemaps (MAME splash_v.cpp). Both are transparent on pen 0.
  *   B16=0, tilemap 0: 64x32 tiles of 8x8, word = { colour, code[11:8], code[7:0] },
  *                     tile = code + 0x2000, X scroll fixed at 4, Y scroll = scr
- *   B16=1, tilemap 1: 32x32 tiles of 16x16 at video RAM word 0x800, word = { colour, code[9:6], code[5:0], flipy, flipx },
+ *   B16=1, tilemap 1: 32x32 tiles of 16x16 at video RAM word 0x800, word = { colour, code[9:6], code[5:0], flipx, flipy },
  *                     tile = code + 0xc00, no X scroll, Y scroll = scr
  * Graphics in SDRAM: 32-bit words, byte k = bit plane k (byte 0 = pen bit 3), leftmost pixel in the MSB.
  *   8x8: word { code, row }; 16x16: word { code, right half, row }.
@@ -39,8 +39,8 @@ reg  [ 1:0] wcnt;
 reg  [31:0] w;
 reg  [ 2:0] px;
 reg         start, hzero_l;
-wire        flipx = B16 && attr[0];
-wire        flipy = B16 && attr[1];
+wire        flipx = B16 && attr[1];     // MAME TILE_FLIPXY: bit 1 = X, bit 0 = Y
+wire        flipy = B16 && attr[0];
 wire [ 3:0] row   = B16 ? (mapy[3:0] ^ {4{flipy}}) : { 1'b0, mapy[2:0] };
 wire [ 2:0] bx    = flipx ? px : ~px;          // bit inside each plane byte
 wire [ 4:0] b5    = { 2'd0, bx };
@@ -72,7 +72,7 @@ always @(posedge clk) begin
                 if( wcnt==2 ) begin attr <= vram_dout; half <= 0; st <= FETCH; end
             end
             FETCH: begin
-                rom_addr <= B16 ? { 2'b11, attr[11:8], attr[7:2], half ^ attr[0], row }
+                rom_addr <= B16 ? { 2'b11, attr[11:8], attr[7:2], half ^ flipx, row }
                                 : { 2'b10, attr[11:0], row[2:0] };
                 rom_cs   <= 1;
                 wcnt     <= 0;
