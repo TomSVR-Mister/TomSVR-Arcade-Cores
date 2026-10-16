@@ -5,6 +5,7 @@
  *           d000-d7ff bg tilemap, d800-d8ff RAM, d900-e0ff sprites, e100-ffff RAM
  *   I/O:    0000-17ff palette (R, G, B), 1800 priority, 2001 flip, 2004 palette banks, 2006 ROM bank,
  *           2007 OKI 2 bank, 2010 OKI 1, 2030 OKI 2, 2020-2024 inputs, 8000-ffff pixel layer
+ * Torus map (tmap): d800-dfff sprites, e000-ffff RAM.
  * Built on JTFRAME by Jose Tejada (jotego). */
 
 module jtpara_main(
@@ -13,6 +14,9 @@ module jtpara_main(
     input              cen6,
     input              irq,          // strobe, 4 per frame
     input              lvbl,
+    input              tmap,         // Torus/Penky/Mad Ball map: sprites d800-dfff, RAM e000-ffff
+    input              tflip,        // Target Ball family: flip polarity inverted
+    input       [ 3:0] bank_mask,    // number of 16 kB ROM pages - 1
 
     input       [ 7:0] p1, p2, sys,
     input       [15:0] dipsw,
@@ -58,7 +62,7 @@ wire        mem = !mreq_n && rfsh_n;
 wire        io  = !iorq_n && m1_n;
 wire        pal_cs = io && A < 16'h1800;
 wire        pix_cs = io && A[15];
-wire [15:0] objofs = A - 16'hd900;
+wire [15:0] objofs = A - (tmap ? 16'hd800 : 16'hd900);
 reg         rstn;
 
 assign rom_addr    = A[15] ? { bank, A[13:0] } : { 3'd0, A[14:0] };
@@ -82,8 +86,8 @@ always @* begin
     vram2_cs  = mem && A[15:11] == 5'b1100_0;       // c000-c7ff
     vram1_cs  = mem && A[15:11] == 5'b1100_1;       // c800-cfff
     vram0_cs  = mem && A[15:11] == 5'b1101_0;       // d000-d7ff
-    objram_cs = mem && A >= 16'hd900 && A < 16'he100;
-    ram_cs    = mem && A >= 16'hd800 && !objram_cs; // d800-d8ff, e100-ffff
+    objram_cs = mem && (tmap ? (A[15:11]==5'b1101_1) : (A >= 16'hd900 && A < 16'he100));
+    ram_cs    = mem && A >= 16'hd800 && !objram_cs; // d800-d8ff, e100-ffff (Torus map: e000-ffff)
 end
 
 always @(posedge clk) begin
@@ -111,9 +115,9 @@ always @(posedge clk) begin
     end else if( io && !wr_n ) begin
         case( A )
             16'h1800: prio      <= cpu_dout;
-            16'h2001: flip      <= cpu_dout==0;     // MAME: flip_screen_set(data ? 0 : 1)
+            16'h2001: flip      <= (cpu_dout!=0) ^ ~tflip; // MAME: data ? 0 : 1 (Target Ball family: data ? 1 : 0)
             16'h2004: begin bg_bank <= { 1'b0, cpu_dout[3:1] }; pix_bank <= cpu_dout[7:4]; end
-            16'h2006: bank      <= cpu_dout[3:0];   // 16 pages of 16 kB
+            16'h2006: bank      <= cpu_dout[3:0] & bank_mask;   // up to 16 pages of 16 kB (MAME: bank % pages)
             16'h2007: oki2_bank <= cpu_dout[1];
             default:;
         endcase

@@ -27,11 +27,11 @@ sdram:
       - { name: oki2, addr_width: 19, data_width: 8, offset: OKI2_OFFSET }
     - buses:
       - { name: bgt,  addr_width: 18, data_width: 32 }
-      - { name: fgt,  addr_width: 18, data_width: 32, offset: FG_OFFSET }
+      - { name: fgt,  addr_width: 20, data_width: 32, offset: FG_OFFSET }
     - buses:
       - { name: mgt,  addr_width: 20, data_width: 32 }
     - buses:
-      - { name: obj,  addr_width: 19, data_width: 32 }
+      - { name: obj,  addr_width: 20, data_width: 32 }
 
 bram:
   - name: vram0

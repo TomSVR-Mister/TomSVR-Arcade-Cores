@@ -10,6 +10,8 @@ module jtpara_video(
     input              flip,
     input       [ 7:0] prio,
     input       [ 3:0] bg_bank, pix_bank,
+    input       [ 1:0] mode,         // 0 Paradise, 1 Torus, 2 Mad Ball
+    input              inc4, many, tlay, spr1m, fg1m,
 
     output      [10:0] vram0_video_addr, vram1_video_addr, vram2_video_addr,
     input       [ 7:0] vram0_video_dout, vram1_video_dout, vram2_video_dout,
@@ -24,7 +26,7 @@ module jtpara_video(
     output             bgt_cs,
     input       [31:0] bgt_data,
     input              bgt_ok,
-    output      [17:2] fgt_addr,
+    output      [19:2] fgt_addr,
     output             fgt_cs,
     input       [31:0] fgt_data,
     input              fgt_ok,
@@ -32,7 +34,7 @@ module jtpara_video(
     output             mgt_cs,
     input       [31:0] mgt_data,
     input              mgt_ok,
-    output      [18:2] obj_addr,
+    output      [19:2] obj_addr,
     output             obj_cs,
     input       [31:0] obj_data,
     input              obj_ok,
@@ -95,22 +97,23 @@ always @(posedge clk) begin
 end
 
 jtpara_tile #(.B8(0),.AW(18)) u_bg(
-    .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump),
+    .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump), .hsize(18'h3ffff),
     .vram_addr(vram0_video_addr), .vram_dout(vram0_video_dout),
     .rom_addr(bgt_addr), .rom_cs(bgt_cs), .rom_data(bgt_data), .rom_ok(bgt_ok), .pxl(bg) );
 
 jtpara_tile #(.B8(1),.AW(20),.HALF(20'h80000)) u_mid(
-    .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump),
+    .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump), .hsize(20'h7ffff),
     .vram_addr(vram1_video_addr), .vram_dout(vram1_video_dout),
     .rom_addr(mgt_addr), .rom_cs(mgt_cs), .rom_data(mgt_data), .rom_ok(mgt_ok), .pxl(mid) );
 
-jtpara_tile #(.B8(1),.AW(18),.HALF(18'h20000)) u_fg(
-    .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump),
+jtpara_tile #(.B8(1),.AW(20),.HALF(20'h80000)) u_fg(
+    .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump), .hsize(fg1m ? 20'h7ffff : 20'h1ffff),
     .vram_addr(vram2_video_addr), .vram_dout(vram2_video_dout),
     .rom_addr(fgt_addr), .rom_cs(fgt_cs), .rom_data(fgt_data), .rom_ok(fgt_ok), .pxl(fg) );
 
 jtpara_obj u_obj(
     .rst(rst), .clk(clk), .flip(flip), .hdump(hdump), .vrender(vrender), .vdump(vdump),
+    .inc4(inc4), .many(many), .tlay(tlay), .spr1m(spr1m),
     .ram_addr(objram_video_addr), .ram_dout(objram_video_dout),
     .rom_addr(obj_addr), .rom_cs(obj_cs), .rom_data(obj_data), .rom_ok(obj_ok), .pxl(obj) );
 
@@ -119,6 +122,7 @@ jtpara_colmix u_colmix(
     .pxl_cen    ( pxl_cen        ),
     .gfx_en     ( gfx_en         ),
     .prio       ( prio           ),
+    .mode       ( mode           ),
     .bg_bank    ( bg_bank        ),
     .pix_bank   ( pix_bank       ),
     .bg         ( bg             ),

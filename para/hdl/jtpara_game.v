@@ -12,6 +12,22 @@ wire [10:0] vram_addr;
 wire        flip, irq, lvbl_raw, oki1_wrn, oki2_wrn, oki2_bank;
 wire [17:0] oki1_raw;
 wire [17:0] oki2_raw;
+// header (MRA): byte 0 = { tgt_vbl, fg1m, spr1m, tlay, tmap, inc4, tflip }, byte 1 = { mode, ... , bank_mask }
+reg  [ 7:0] hdr0 = 0, hdr1 = 8'h0f;
+wire        tflip   = hdr0[0];   // Target Ball family flip polarity
+wire        inc4    = hdr0[1];   // sprites every 4 bytes
+wire        tmap    = hdr0[2];   // Torus memory map, 512 sprites
+wire        tlay    = hdr0[3];   // Torus sprite layout
+wire        spr1m   = hdr0[4];   // 1 MB of sprites (Penky)
+wire        fg1m    = hdr0[5];   // 1 MB fg tiles
+wire        tgt_vbl = hdr0[6];   // vblank in system bit 3 (Target Ball)
+wire [ 3:0] bank_mask = hdr1[3:0];
+wire [ 1:0] vmode   = hdr1[5:4]; // 0 Paradise, 1 Torus, 2 Mad Ball
+
+always @(posedge clk) if( header && prog_we ) begin
+    if( prog_addr[1:0]==0 ) hdr0 <= prog_data;
+    if( prog_addr[1:0]==1 ) hdr1 <= prog_data;
+end
 
 assign dip_flip   = flip;
 assign debug_view = prio;
@@ -23,9 +39,9 @@ assign vram0_addr = vram_addr;
 assign vram1_addr = vram_addr;
 assign vram2_addr = vram_addr;
 
-// P1/P2 (active low): up, down, left, right, button 1, -, -, start
-assign p1  = { cab_1p[0], 2'b11, joystick1[4:0] };
-assign p2  = { cab_1p[1], 2'b11, joystick2[4:0] };
+// P1/P2 (active low): up, down, left, right, button 1, button 2, -, start
+assign p1  = { cab_1p[0], 1'b1, joystick1[5:0] };
+assign p2  = { cab_1p[1], 1'b1, joystick2[5:0] };
 // coin 1, coin 2, ..., bit 6 = vblank (active low)
 // Coins are sent as 5-frame pulses per press (MAME PORT_IMPULSE(5)): Paradise Deluxe ignores a coin held down longer.
 reg  [1:0] coin_l, coin_p;
@@ -46,7 +62,7 @@ always @(posedge clk) begin
         end
     end
 end
-assign sys = { 1'b1, lvbl_raw, 4'hf, coin_p };
+assign sys = tgt_vbl ? { 4'hf, lvbl_raw, 1'b1, coin_p } : { 1'b1, lvbl_raw, 4'hf, coin_p };
 
 jtpara_main u_main(
     .rst         ( rst          ),
@@ -54,6 +70,9 @@ jtpara_main u_main(
     .cen6        ( cen6         ),
     .irq         ( irq          ),
     .lvbl        ( lvbl_raw     ),
+    .tmap        ( tmap         ),
+    .tflip       ( tflip        ),
+    .bank_mask   ( bank_mask    ),
     .p1          ( p1           ),
     .p2          ( p2           ),
     .sys         ( sys          ),
@@ -141,6 +160,12 @@ jtpara_video u_video(
     .prio               ( prio              ),
     .bg_bank            ( bg_bank           ),
     .pix_bank           ( pix_bank          ),
+    .mode               ( vmode             ),
+    .inc4               ( inc4              ),
+    .many               ( tmap              ),
+    .tlay               ( tlay              ),
+    .spr1m              ( spr1m             ),
+    .fg1m               ( fg1m              ),
     .vram0_video_addr   ( vram0_video_addr  ),
     .vram1_video_addr   ( vram1_video_addr  ),
     .vram2_video_addr   ( vram2_video_addr  ),

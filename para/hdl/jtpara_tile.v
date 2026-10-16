@@ -3,6 +3,7 @@
  * Paradise fixed 32x32 tilemap of 8x8 tiles (MAME paradise.cpp). Code = vram[i] | vram[i+0x400] << 8.
  *   B8=0: 8x8x4 packed (gfx_8x8x4_packed_msb), 32 bytes per tile, one 32-bit word per row
  *   B8=1: 8x8x8 (layout_8x8x8): low nibble from the first half of the region, high nibble from the second half
+ *         (halves are HALF bytes apart in SDRAM; hsize = size of each half's data - 1, codes wrap within it)
  * Graphics ROMs are stored inverted (ROMREGION_INVERT): data is complemented here.
  * The next line is rendered into a ping-pong line buffer during the current line. */
 
@@ -13,6 +14,7 @@ module jtpara_tile #(parameter B8=0, AW=18, HALF=18'h20000)(
     input       [ 8:0] hdump,
     input       [ 8:0] vrender,
     input       [ 8:0] vdump,
+    input   [AW-1:0]   hsize,
 
     output      [10:0] vram_addr,
     input       [ 7:0] vram_dout,
@@ -72,7 +74,7 @@ always @(posedge clk) begin
             end
             FETCH: begin
                 // codes wrap within one half (MAME RGN_FRAC(1,2))
-                rom_addr <= B8 ? ((part ? HALFW : {AW-2{1'b0}}) | ({ code, line[2:0] } & (HALFW - 1'd1)))
+                rom_addr <= B8 ? ((part ? HALFW : {AW-2{1'b0}}) | ({ code, line[2:0] } & hsize[AW-1:2]))
                                : { code, line[2:0] };
                 rom_cs   <= 1;
                 wcnt     <= 0;

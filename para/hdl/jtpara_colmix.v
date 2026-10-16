@@ -3,6 +3,8 @@
  * Paradise layer order (MAME screen_update_paradise), bottom to top:
  *   [sprites if prio.0], bg (4bpp, pen 15 clear), mid (pen ff clear), pixel layer (0 clear),
  *   prio.1 ? ([sprites if !prio.0], fg) : (fg, [sprites if !prio.0]);  prio.2 = 0 blanks the screen
+ * Torus (mode 1): blank if !prio.1; [sprites if prio.0], mid, prio.2 ? ([sprites if !prio.0], fg) : (fg, [sprites if !prio.0])
+ * Mad Ball (mode 2): bg, mid, fg, sprites (sprites at palette 500 + pen)
  * Palette indexes: fg 000+pen, sprites 100+pen, pixel 200+bank*16+15-v, mid 300+pen, bg 400+bank*16+pen */
 
 module jtpara_colmix(
@@ -10,6 +12,7 @@ module jtpara_colmix(
     input              pxl_cen,
     input       [ 3:0] gfx_en,
     input       [ 7:0] prio,
+    input       [ 1:0] mode,        // 0 Paradise, 1 Torus, 2 Mad Ball
     input       [ 3:0] bg_bank,
     input       [ 3:0] pix_bank,
     input       [ 7:0] bg, mid, fg, obj,
@@ -41,6 +44,26 @@ always @* begin
         if( !prio[0] && obj_op ) begin idx = { 3'b001, obj }; opaque = 1; end
     end
     if( !prio[2] ) opaque = 0;
+    if( mode==1 ) begin
+        idx = 0; opaque = 0;
+        if( prio[0] && obj_op ) begin idx = { 3'b001, obj }; opaque = 1; end
+        if( mid_op ) begin idx = { 3'b011, mid }; opaque = 1; end
+        if( prio[2] ) begin
+            if( !prio[0] && obj_op ) begin idx = { 3'b001, obj }; opaque = 1; end
+            if( fg_op ) begin idx = { 3'b000, fg }; opaque = 1; end
+        end else begin
+            if( fg_op ) begin idx = { 3'b000, fg }; opaque = 1; end
+            if( !prio[0] && obj_op ) begin idx = { 3'b001, obj }; opaque = 1; end
+        end
+        if( !prio[1] ) opaque = 0;
+    end
+    if( mode==2 ) begin
+        idx = 0; opaque = 0;
+        if( bg_op  ) begin idx = { 3'b100, bg_bank[2:0], 1'b1, bg[3:0] }; opaque = 1; end
+        if( mid_op ) begin idx = { 3'b011, mid }; opaque = 1; end
+        if( fg_op  ) begin idx = { 3'b000, fg }; opaque = 1; end
+        if( obj_op ) begin idx = { 3'b101, obj }; opaque = 1; end
+    end
 end
 
 always @(posedge clk) if( pxl_cen ) begin
