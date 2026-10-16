@@ -14,7 +14,7 @@ audio:
   rsum: 10k
   channels:
     - { name: fm,  module: jtopl2, rsum: 10k }
-    - { name: pcm, module: jt5205, rsum: 10k }
+    - { name: pcm, module: jt5205, rsum: 10k, dcrm: true }   # the idle MSM5205 sits at full scale (as in MAME)
 
 sdram:
   banks:
