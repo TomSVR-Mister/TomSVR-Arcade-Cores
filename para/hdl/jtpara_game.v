@@ -1,0 +1,168 @@
+/* SPDX-FileCopyrightText: 2026 Tom Sveen
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Yun Sung Paradise / Paradise Deluxe / Paradise 2 Deluxe on JTFRAME (Jose Tejada, jotego). Personal build. */
+
+module jtpara_game(
+    `include "jtframe_game_ports.inc"
+);
+
+wire [ 7:0] prio, p1, p2, sys, oki1_dout, oki2_dout;
+wire [ 3:0] bg_bank, pix_bank;
+wire [10:0] vram_addr;
+wire        flip, irq, lvbl_raw, oki1_wrn, oki2_wrn, oki2_bank;
+wire [17:0] oki1_raw;
+wire [17:0] oki2_raw;
+
+assign dip_flip   = flip;
+assign debug_view = prio;
+`ifdef JTFRAME_IOCTL_RD
+assign ioctl_din  = 8'd0;
+`endif
+
+assign vram0_addr = vram_addr;
+assign vram1_addr = vram_addr;
+assign vram2_addr = vram_addr;
+
+// P1/P2 (active low): up, down, left, right, button 1, -, -, start
+assign p1  = { cab_1p[0], 2'b11, joystick1[4:0] };
+assign p2  = { cab_1p[1], 2'b11, joystick2[4:0] };
+// coin 1, coin 2, ..., bit 6 = vblank (active low)
+assign sys = { 1'b1, lvbl_raw, 4'hf, coin[1:0] };
+
+jtpara_main u_main(
+    .rst         ( rst          ),
+    .clk         ( clk          ),
+    .cen6        ( cen6         ),
+    .irq         ( irq          ),
+    .lvbl        ( lvbl_raw     ),
+    .p1          ( p1           ),
+    .p2          ( p2           ),
+    .sys         ( sys          ),
+    .dipsw       ( dipsw[15:0]  ),
+    .cpu_dout    ( cpu_dout     ),
+    .rom_addr    ( main_addr    ),
+    .rom_cs      ( main_cs      ),
+    .rom_data    ( main_data    ),
+    .rom_ok      ( main_ok      ),
+    .vram_addr   ( vram_addr    ),
+    .vram0_we    ( vram0_we     ),
+    .vram1_we    ( vram1_we     ),
+    .vram2_we    ( vram2_we     ),
+    .vram0_dout  ( vram0_dout   ),
+    .vram1_dout  ( vram1_dout   ),
+    .vram2_dout  ( vram2_dout   ),
+    .objram_addr ( objram_addr  ),
+    .objram_we   ( objram_we    ),
+    .objram_dout ( objram_dout  ),
+    .pix_addr    ( pix_addr     ),
+    .pix_we      ( pix_we       ),
+    .pix_dout    ( pix_dout     ),
+    .pal_addr    ( palr_addr    ),
+    .palr_we     ( palr_we      ),
+    .palg_we     ( palg_we      ),
+    .palb_we     ( palb_we      ),
+    .palr_dout   ( palr_dout    ),
+    .palg_dout   ( palg_dout    ),
+    .palb_dout   ( palb_dout    ),
+    .prio        ( prio         ),
+    .flip        ( flip         ),
+    .bg_bank     ( bg_bank      ),
+    .pix_bank    ( pix_bank     ),
+    .oki1_wrn    ( oki1_wrn     ),
+    .oki2_wrn    ( oki2_wrn     ),
+    .oki1_dout   ( oki1_dout    ),
+    .oki2_dout   ( oki2_dout    ),
+    .oki2_bank   ( oki2_bank    )
+);
+assign palg_addr = palr_addr;
+assign palb_addr = palr_addr;
+
+// two OKI M6295 at 1 MHz, pin 7 high. OKI 2 has two 256 kB banks.
+assign oki1_cs   = 1'b1;
+assign oki2_cs   = 1'b1;
+assign oki1_addr = oki1_raw;
+assign oki2_addr = { oki2_bank, oki2_raw };
+
+jt6295 #(.INTERPOL(0)) u_oki1(
+    .rst      ( rst       ),
+    .clk      ( clk       ),
+    .cen      ( cen1      ),
+    .ss       ( 1'b1      ),
+    .wrn      ( oki1_wrn  ),
+    .din      ( cpu_dout  ),
+    .dout     ( oki1_dout ),
+    .rom_addr ( oki1_raw  ),
+    .rom_data ( oki1_data ),
+    .rom_ok   ( oki1_ok   ),
+    .sound    ( pcm1      ),
+    .sample   (           )
+);
+
+jt6295 #(.INTERPOL(0)) u_oki2(
+    .rst      ( rst       ),
+    .clk      ( clk       ),
+    .cen      ( cen1      ),
+    .ss       ( 1'b1      ),
+    .wrn      ( oki2_wrn  ),
+    .din      ( cpu_dout  ),
+    .dout     ( oki2_dout ),
+    .rom_addr ( oki2_raw  ),
+    .rom_data ( oki2_data ),
+    .rom_ok   ( oki2_ok   ),
+    .sound    ( pcm2      ),
+    .sample   (           )
+);
+
+jtpara_video u_video(
+    .rst                ( rst               ),
+    .clk                ( clk               ),
+    .pxl_cen            ( pxl_cen           ),
+    .gfx_en             ( gfx_en            ),
+    .flip               ( flip              ),
+    .prio               ( prio              ),
+    .bg_bank            ( bg_bank           ),
+    .pix_bank           ( pix_bank          ),
+    .vram0_video_addr   ( vram0_video_addr  ),
+    .vram1_video_addr   ( vram1_video_addr  ),
+    .vram2_video_addr   ( vram2_video_addr  ),
+    .vram0_video_dout   ( vram0_video_dout  ),
+    .vram1_video_dout   ( vram1_video_dout  ),
+    .vram2_video_dout   ( vram2_video_dout  ),
+    .objram_video_addr  ( objram_video_addr ),
+    .objram_video_dout  ( objram_video_dout ),
+    .pix_video_addr     ( pix_video_addr    ),
+    .pix_video_dout     ( pix_video_dout    ),
+    .pal_video_addr     ( palr_video_addr   ),
+    .palr_video_dout    ( palr_video_dout   ),
+    .palg_video_dout    ( palg_video_dout   ),
+    .palb_video_dout    ( palb_video_dout   ),
+    .bgt_addr           ( bgt_addr          ),
+    .bgt_cs             ( bgt_cs            ),
+    .bgt_data           ( bgt_data          ),
+    .bgt_ok             ( bgt_ok            ),
+    .fgt_addr           ( fgt_addr          ),
+    .fgt_cs             ( fgt_cs            ),
+    .fgt_data           ( fgt_data          ),
+    .fgt_ok             ( fgt_ok            ),
+    .mgt_addr           ( mgt_addr          ),
+    .mgt_cs             ( mgt_cs            ),
+    .mgt_data           ( mgt_data          ),
+    .mgt_ok             ( mgt_ok            ),
+    .obj_addr           ( obj_addr          ),
+    .obj_cs             ( obj_cs            ),
+    .obj_data           ( obj_data          ),
+    .obj_ok             ( obj_ok            ),
+    .irq                ( irq               ),
+    .lvbl_raw           ( lvbl_raw          ),
+    .LHBL               ( LHBL              ),
+    .LVBL               ( LVBL              ),
+    .HS                 ( HS                ),
+    .VS                 ( VS                ),
+    .red                ( red               ),
+    .green              ( green             ),
+    .blue               ( blue              )
+);
+assign palg_video_addr = palr_video_addr;
+assign palb_video_addr = palr_video_addr;
+
+endmodule

@@ -1,0 +1,84 @@
+params:
+  - { name: OKI1_OFFSET, value: "`OKI1_START>>1" }
+  - { name: OKI2_OFFSET, value: "`OKI2_START>>1" }
+  - { name: FG_OFFSET,   value: "(`FG_START-`JTFRAME_BA1_START)>>1" }
+
+clocks:
+  clk:
+    - freq: 6M
+      outputs:
+        - cen6
+        - cen3
+    - freq: 1M
+      outputs:
+        - cen1
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: pcm1, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+    - { name: pcm2, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 18, data_width: 8, cache_size: 1kB }
+      - { name: oki1, addr_width: 18, data_width: 8, offset: OKI1_OFFSET }
+      - { name: oki2, addr_width: 19, data_width: 8, offset: OKI2_OFFSET }
+    - buses:
+      - { name: bgt,  addr_width: 18, data_width: 32 }
+      - { name: fgt,  addr_width: 18, data_width: 32, offset: FG_OFFSET }
+    - buses:
+      - { name: mgt,  addr_width: 20, data_width: 32 }
+    - buses:
+      - { name: obj,  addr_width: 19, data_width: 32 }
+
+bram:
+  - name: vram0
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram0_video_addr, dout: vram0_video_dout, rw: false }
+  - name: vram1
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram1_video_addr, dout: vram1_video_dout, rw: false }
+  - name: vram2
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram2_video_addr, dout: vram2_video_dout, rw: false }
+  - name: objram
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: objram_video_addr, dout: objram_video_dout, rw: false }
+  - name: pix
+    addr_width: 15
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pix_video_addr, dout: pix_video_dout, rw: false }
+  - name: palr
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: palr_video_addr, dout: palr_video_dout, rw: false }
+  - name: palg
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: palg_video_addr, dout: palg_video_dout, rw: false }
+  - name: palb
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: palb_video_addr, dout: palb_video_dout, rw: false }
