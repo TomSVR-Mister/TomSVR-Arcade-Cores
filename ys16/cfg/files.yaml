@@ -1,0 +1,24 @@
+ys16:
+  - get:
+    - jtys16_game.v
+    - jtys16_main.v
+    - jtys16_sound.v
+    - jtys16_video.v
+    - jtys16_scr.v
+    - jtys16_obj.v
+    - jtys16_colmix.v
+jtframe:
+  - get:
+      - jtframe_edge.v
+  - from: ram
+    get:
+      - jtframe_obj_buffer.v
+  - from: video
+    get:
+      - jtframe_objdraw.v
+      - jtframe_objdraw_gate.v
+      - jtframe_draw.v
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+jt6295:
