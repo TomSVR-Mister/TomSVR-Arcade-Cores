@@ -1,0 +1,48 @@
+params:
+  - { name: OKI_OFFSET, value: "`OKI_START>>1" }
+
+clocks:
+  clk:
+    - freq: 894886
+      outputs:
+        - cen_oki
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: pcm, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 19, data_width: 16, cache_size: 1kB }
+      - { name: oki,  addr_width: 18, data_width: 8, offset: OKI_OFFSET }
+    - buses:
+      - { name: bgt,  addr_width: 21, data_width: 32 }
+    - buses:
+      - { name: fgt,  addr_width: 19, data_width: 32 }
+
+bram:
+  - name: wram
+    size: 16kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+  - name: bgram
+    size: 8kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: bgram_video_addr, dout: bgram_video_dout, rw: false }
+  - name: fgram
+    size: 32kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: fgram_video_addr, dout: fgram_video_dout, rw: false }
+  - name: pal
+    size: 1kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pal_video_addr, dout: pal_video_dout, rw: false }

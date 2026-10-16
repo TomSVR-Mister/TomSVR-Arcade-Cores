@@ -1,0 +1,11 @@
+gumbo:
+  - get:
+    - jtgumbo_game.v
+    - jtgumbo_main.v
+    - jtgumbo_video.v
+    - jtgumbo_tile.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+jt6295:
