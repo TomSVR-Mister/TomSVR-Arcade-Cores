@@ -103,7 +103,7 @@ jtgalpin_obj u_obj(
     .frame      ( frame             ),
     .hdump      ( hdump             ),
     .vrender    ( vrender           ),
-    .yoffset    ( 9'd0              ),
+    .yoffset    ( 9'h1fe            ),   // -2 lines (measured against MAME)
     .hoffset    ( OBJ_HOFFSET ^ debug_bus[3:0] ),
     .ram_addr   ( objram_video_addr ),
     .ram_dout   ( objram_video_dout ),

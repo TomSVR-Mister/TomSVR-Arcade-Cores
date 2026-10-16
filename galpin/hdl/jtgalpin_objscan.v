@@ -81,7 +81,7 @@ always @* begin
     rom_addr = {raw_addr[19:7],raw_addr[5],~raw_addr[6],raw_addr[4:2]};
     // 8x8 sprites are drawn as 16-pixel wide objects whose second column is blanked (jtgalpin_obj),
     // so the tile goes 8 pixels to the left when mirrored
-    hpos     = x + {3'd0,hsub,4'd0} - ((size==0 && attr[0]) ? 10'd8 : 10'd0);
+    hpos     = x + {3'd0,hsub,4'd0} - ((size==0 && attr[0]) ? 10'd9 : 10'd1);  // -1: measured against MAME
     case( hsize )
         0: rom_addr[6:5]  = code_lsb;   // full 8x8 tile number (MAME tecmo_spr)
         2: rom_addr[ 8:7] = {vaddr[0],haddr[0]};     //32
