@@ -1,0 +1,65 @@
+params:
+  - { name: SND_OFFSET, value: "`SND_START>>1" }
+
+clocks:
+  clk:
+    - freq: 3750000
+      outputs:
+        - cen_snd
+    - freq: 384000
+      outputs:
+        - cen_adpcm
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl2, rsum: 10k }
+    - { name: pcm, module: jt5205, rsum: 10k }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 22, data_width: 16, cache_size: 1kB }
+      - { name: snd,  addr_width: 16, data_width: 8, offset: SND_OFFSET }
+    - buses:
+      - { name: tm0,  addr_width: 19, data_width: 32 }
+      - { name: tm1,  addr_width: 19, data_width: 32 }
+    - buses:
+      - { name: obj,  addr_width: 19, data_width: 32 }
+
+bram:
+  - name: wram
+    size: 16kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+  - name: vram
+    size: 8kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram_video_addr, dout: vram_video_dout, rw: false }
+  - name: vramb
+    size: 8kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vramb_video_addr, dout: vramb_video_dout, rw: false }
+  - name: pal
+    size: 4kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pal_video_addr, dout: pal_video_dout, rw: false }
+  - name: objram
+    size: 4kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: objram_video_addr, dout: objram_video_dout, rw: false }
+  - name: pix
+    size: 128kB
+    data_width: 8
+    rw: true
+    din: cpu_dout[7:0]
+    dual_port: { name: video, addr: pix_video_addr, dout: pix_video_dout, rw: false }
