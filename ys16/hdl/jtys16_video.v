@@ -7,6 +7,7 @@ module jtys16_video(
     input              clk,
     input              pxl_cen,
     input       [ 3:0] gfx_en,
+    input              mb,          // Magic Bubble YS1302: visible X 32-351 (MAME)
     input       [ 7:0] debug_bus,
 
     input       [15:0] scr0x, scr0y, scr1x, scr1y, prio,
@@ -64,7 +65,8 @@ always @(posedge clk) if( pxl_cen ) begin
         vrender <= vrender==VTOTAL ? 9'd0 : vrender+9'd1;
         lvbl    <= vrender < VB_START;
     end
-    lhbl <= hdump < 9'd379 || hdump==HTOTAL;
+    // value for the next hdump
+    lhbl <= mb ? (hdump >= 9'd31 && hdump < 9'd351) : (hdump < 9'd379 || hdump==HTOTAL);
     if( hdump==HS_START ) begin
         HS <= 1;
         if( vdump==VS_START ) VS <= 1;

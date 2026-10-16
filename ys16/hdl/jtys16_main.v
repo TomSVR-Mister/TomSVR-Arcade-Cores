@@ -38,7 +38,7 @@ module jtys16_main(
     // video registers
     output reg  [15:0] scr0x, scr0y, scr1x, scr1y, prio,
     // OKI
-    output             oki_wrn,
+    output             snd_wr,      // byte write to 800189 (OKI or sound latch)
     input       [ 7:0] oki_dout,
     output reg  [ 1:0] oki_bank
 );
@@ -73,7 +73,7 @@ assign int_ack    = fc == 3'b111 && !as_n;
 assign vpa_n      = !int_ack;
 assign ipl_n      = irq_n ? 3'b111 : 3'b101;     // level 2
 assign bus_busy   = rom_cs && !rom_ok;
-assign oki_wrn    = !(io_wr && A[8:1]==8'hc4 && !lds_n);   // 800189
+assign snd_wr     = io_wr && A[8:1]==8'hc4 && !lds_n;      // 800189
 
 always @* begin
     rom_cs    = 0;
@@ -185,7 +185,7 @@ jtframe_68kdtack_cen u_dtack(
 `else
 initial begin rom_cs=0; scr0x=0; scr0y=0; scr1x=0; scr1y=0; prio=0; oki_bank=0; end
 assign cpu_dout=0, rom_addr=0, wram_addr=0, wram_we=0, pal_addr=0, pal_we=0, vram0_addr=0, vram0_we=0,
-       vram1_addr=0, vram1_we=0, objram_addr=0, objram_we=0, oki_wrn=1;
+       vram1_addr=0, vram1_we=0, objram_addr=0, objram_we=0, snd_wr=0;
 `endif
 
 endmodule

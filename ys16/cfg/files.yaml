@@ -21,4 +21,8 @@ jtframe:
   - from: cpu
     get:
       - jtframe_m68k.yaml
+      - jtframe_z80.yaml
 jt6295:
+jtopl:
+  - get:
+    - jtopl2.yaml

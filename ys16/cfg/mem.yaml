@@ -1,22 +1,27 @@
 params:
   - { name: OKI_OFFSET, value: "`OKI_START>>1" }
+  - { name: SND_OFFSET, value: "`SND_START>>1" }
 
 clocks:
   clk:
-    - freq: 1M
+    - freq: 4M
       outputs:
+        - cen4
+        - cen2
         - cen_oki
 
 audio:
   rsum: 10k
   channels:
     - { name: pcm, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+    - { name: fm,  module: jtopl2, rsum: 12k }
 
 sdram:
   banks:
     - buses:
       - { name: main, addr_width: 19, data_width: 16, cache_size: 1kB }
       - { name: oki,  addr_width: 19, data_width: 8, offset: OKI_OFFSET }
+      - { name: snd,  addr_width: 16, data_width: 8, offset: SND_OFFSET }
     - buses:
       - { name: obj,  addr_width: 20, data_width: 32 }
     - buses:
