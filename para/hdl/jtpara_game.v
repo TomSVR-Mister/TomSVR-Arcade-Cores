@@ -29,7 +29,7 @@ always @(posedge clk) if( header && prog_we ) begin
     if( prog_addr[1:0]==1 ) hdr1 <= prog_data;
 end
 
-assign dip_flip   = flip;
+assign dip_flip   = 1'b0;     // flip is done in the layers; JTFRAME would flip the frame a second time
 assign debug_view = prio;
 `ifdef JTFRAME_IOCTL_RD
 assign ioctl_din  = 8'd0;
