@@ -1,0 +1,12 @@
+zero:
+  - get:
+    - jtzero_game.v
+    - jtzero_main.v
+    - jtzero_sound.v
+    - jtzero_video.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jt6295:
