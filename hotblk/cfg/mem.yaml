@@ -12,7 +12,7 @@ audio:
 sdram:
   banks:
     - buses:
-      - { name: main, addr_width: 20, data_width: 8 }
+      - { name: main, addr_width: 20, data_width: 8, cache_size: 1kB }
 
 bram:
   - name: wram

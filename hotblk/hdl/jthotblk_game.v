@@ -23,6 +23,10 @@ wire        iom  = !(iord_n & iowr_n);
 reg  [19:0] A_l;
 reg         ce_pos, ce_neg;
 reg  [ 3:0] ccnt;
+// The V20 runs the game's code ~1.5x faster than an 8088 at the same clock: the 8088 core runs at 12 MHz
+// (pin clock 96/8, cycle counter scaled to match) so the game keeps MAME's pace.
+localparam [3:0] CDIV=4'd6;
+localparam [7:0] CC_RATIO=8'd4, CC_DEC=8'd20;
 reg         cpu_clk;
 wire        vbl_irq;
 wire        mem_cs  = !iom && (!rd_n || !wr_n);
@@ -62,12 +66,12 @@ assign pallo_we   = vid_cs && port0[5] && !A[0] && wr;
 assign palhi_addr = A[8:1];
 assign palhi_we   = vid_cs && port0[5] &&  A[0] && wr;
 
-// 8 MHz CPU pin clock from 96 MHz (the CPU core runs on clk)
+// CPU pin clock from 96 MHz (the CPU core runs on clk)
 always @(posedge clk) begin
-    ccnt    <= ccnt==11 ? 4'd0 : ccnt + 1'd1;
-    cpu_clk <= ccnt < 6;
+    ccnt    <= ccnt==CDIV-1 ? 4'd0 : ccnt + 1'd1;
+    cpu_clk <= ccnt < CDIV/2;
     ce_pos  <= ccnt==0;     // same edge as cpu_clk rising
-    ce_neg  <= ccnt==6;
+    ce_neg  <= ccnt==CDIV/2;
 end
 
 always @(posedge clk) if( ale ) A_l <= ad;
@@ -111,7 +115,7 @@ always @(posedge clk) begin
 end
 `endif
 
-// the microcode counts 8088 cycles in units of a 100 MHz core at 4.77 MHz: 4 core clocks per tick, 7 per tick -> 8 MHz at 96 MHz
+// the microcode counts 8088 cycles in units of a 100 MHz core at 4.77 MHz: 13 every 5 core clocks -> 12 MHz at 96 MHz
 i8088 u_cpu(
     .CORE_CLK   ( clk       ),
     .CLK        ( cpu_clk   ),
@@ -128,8 +132,8 @@ i8088 u_cpu(
     .SEGMENT    (           ),
     .biu_done   (           ),
     .cycle_accrate                      ( 1'b1  ),
-    .clock_cycle_counter_division_ratio ( 8'd3  ),
-    .clock_cycle_counter_decrement_value( 8'd7  ),
+    .clock_cycle_counter_division_ratio ( CC_RATIO ),
+    .clock_cycle_counter_decrement_value( CC_DEC   ),
     .shift_read_timing                  ( 1'b0  ),
     .is8086                             ( 1'b0  ),
     .fake286_flags                      ( 1'b0  ),
