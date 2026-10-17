@@ -1,0 +1,72 @@
+params:
+  - { name: SND_OFFSET, value: "`SND_START>>1" }
+  - { name: OKI_OFFSET, value: "`OKI_START>>1" }
+  - { name: OB5_OFFSET, value: "22'h100000" }
+
+clocks:
+  clk:
+    - freq: 4000000
+      outputs:
+        - cen_snd
+    - freq: 1000000
+      outputs:
+        - cen_oki
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl2, rsum: 10k }
+    - { name: pcm, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 20, data_width: 16, cache_size: 1kB }
+      - { name: snd,  addr_width: 16, data_width: 8, offset: SND_OFFSET }
+      - { name: oki,  addr_width: 19, data_width: 8, offset: OKI_OFFSET }
+    - buses:
+      - { name: obj,  addr_width: 21, data_width: 32 }
+      - { name: ob5,  addr_width: 19, data_width: 8, offset: OB5_OFFSET }
+    - buses:
+      - { name: t0l,  addr_width: 23, data_width: 32 }
+      - { name: t1l,  addr_width: 23, data_width: 32 }
+    - buses:
+      - { name: t0h,  addr_width: 23, data_width: 32 }
+      - { name: t1h,  addr_width: 23, data_width: 32 }
+
+bram:
+  - name: wram
+    size: 64kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+  - name: pal
+    size: 2kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pal_video_addr, dout: pal_video_dout, rw: false }
+  - name: objram
+    size: 2kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: objram_video_addr, dout: objram_video_dout, rw: false }
+  - name: vram0
+    size: 8kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram0_video_addr, dout: vram0_video_dout, rw: false }
+  - name: vram1
+    size: 8kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram1_video_addr, dout: vram1_video_dout, rw: false }
+  - name: pix
+    size: 64kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pix_video_addr, dout: pix_video_dout, rw: false }

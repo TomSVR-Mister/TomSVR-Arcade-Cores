@@ -1,0 +1,17 @@
+nmg5:
+  - get:
+    - jtnmg5_game.v
+    - jtnmg5_main.v
+    - jtnmg5_sound.v
+    - jtnmg5_video.v
+    - jtnmg5_tile.v
+    - jtnmg5_obj.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jtopl2.yaml
+jt6295:
