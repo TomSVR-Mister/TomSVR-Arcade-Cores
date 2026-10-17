@@ -1,6 +1,6 @@
 /* SPDX-FileCopyrightText: 2026 Tom Sveen
  * SPDX-License-Identifier: GPL-3.0-or-later
- * YS-1300 video: 8 MHz pixel clock, 512x260 total (60 Hz), MAME visible area 320x240 at (0,0).
+ * YS-1300 video: 8 MHz pixel clock, 512x260 total (60 Hz; 512x284 = 55 Hz for Search Eye Plus), MAME visible area 320x240 at (0,0).
  * Palette: 1024 words xBGR_555. Tilemap 0 (opaque): 0x100 + pen; tilemap 1: pen (0 transparent);
  *   sprites: 0x200 + colour * 32 + pen; pixel layer: 0x300 + pixel (0 transparent), screen (x, y) = layer (x + 12, y + 9).
  * Scroll: tilemap 0 (x + 3, y + 9), tilemap 1 (x - 1, y + 9).
@@ -14,6 +14,8 @@ module jtnmg5_video(
     input       [ 3:0] gfx_en,
     input              tbig,
     input              obig,
+    input              osmall,
+    input              hz55,
     input       [ 1:0] gfx_bank,
     input       [ 2:0] prio,
     input       [ 8:0] scr0x, scr0y, scr1x, scr1y,
@@ -65,7 +67,7 @@ module jtnmg5_video(
 );
 
 localparam [8:0] HTOTAL=9'd511, HS_START=9'd400, HS_END=9'd432;
-localparam [8:0] VTOTAL=9'd259, VB_START=9'd240, VS_START=9'd246, VS_END=9'd249;
+localparam [8:0] VTOTAL=9'd259, VTOTAL55=9'd283, VB_START=9'd240, VS_START=9'd246, VS_END=9'd249;
 
 reg  [ 8:0] hdump=0, vdump=0, vrender=1;
 reg         lhbl, lvbl, odd;
@@ -88,9 +90,9 @@ always @(posedge clk) if( pxl_cen ) begin
     hdump <= hdump==HTOTAL ? 9'd0 : hdump+9'd1;
     if( hdump==HTOTAL ) begin
         vdump   <= vrender;
-        vrender <= vrender==VTOTAL ? 9'd0 : vrender+9'd1;
+        vrender <= vrender==(hz55 ? VTOTAL55 : VTOTAL) ? 9'd0 : vrender+9'd1;
         lvbl    <= vrender < VB_START;
-        if( vrender==VTOTAL ) odd <= ~odd;
+        if( vrender==(hz55 ? VTOTAL55 : VTOTAL) ) odd <= ~odd;
     end
     lhbl <= hdump==HTOTAL || hdump < 9'd319;   // value for the next hdump
     if( hdump==HS_START ) begin
@@ -154,6 +156,7 @@ jtnmg5_obj u_obj(
     .clk        ( clk               ),
     .pxl_cen    ( pxl_cen           ),
     .big        ( obig              ),
+    .small      ( osmall            ),
     .odd        ( odd               ),
     .hdump      ( hdump             ),
     .vrender    ( vrender           ),

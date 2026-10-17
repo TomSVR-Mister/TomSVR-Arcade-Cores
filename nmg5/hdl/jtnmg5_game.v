@@ -2,7 +2,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Yun Sung YS-1300 / YS-2111 (Multi 5, Puzzle Club, Wonder Stick) on JTFRAME (Jose Tejada, jotego). Personal build.
  * Header byte 0: bit 0 Puzzle Club memory map, bit 1 16 MB tile ROM (bank select), bit 2 16384 sprite tiles,
- *   bit 3 Multi 5: SYSTEM bits 4 and 6 read 0 (MAME IPT_CUSTOM, the boot code waits for them).
+ *   bit 3 Multi 5: SYSTEM bits 4 and 6 read 0 (MAME IPT_CUSTOM, the boot code waits for them),
+ *   bit 4 4096 sprite tiles (Search Eye), bit 5 55 Hz (Search Eye Plus), bit 6 Puzzle Club sound map with the Multi 5 main map (7 Ordi),
+ *   bit 7 7 Ordi inputs (six buttons, no joystick).
  * Header byte 1: protection value. */
 
 module jtnmg5_game(
@@ -15,13 +17,13 @@ wire [ 1:0] gfx_bank;
 wire [ 2:0] prio;
 wire [15:0] inputs, system;
 wire        snd_wr, vbl_irq;
-reg         pc = 0, tbig = 0, obig = 0, cust = 0;
+reg         pc = 0, tbig = 0, obig = 0, cust = 0, osmall = 0, hz55 = 0, psnd = 0, ordi = 0;
 reg  [ 7:0] prot_val = 0;
 
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 always @(posedge clk) if( header && prog_we ) begin
-    if( prog_addr[1:0]==0 ) { cust, obig, tbig, pc } <= prog_data[3:0];
+    if( prog_addr[1:0]==0 ) { ordi, psnd, hz55, osmall, cust, obig, tbig, pc } <= prog_data;
     if( prog_addr[1:0]==1 ) prot_val <= prog_data;
 end
 
@@ -30,7 +32,10 @@ assign ioctl_din  = 8'd0;
 `endif
 
 // active low: up, down, left, right, button 1-3, start (P1 low byte, P2 high byte)
-assign inputs = { cab_1p[1], joystick2[6:4], joystick2[0], joystick2[1], joystick2[2], joystick2[3],
+// 7 Ordi: 0 button 5, 1 button 4, 2 button 1, 3 button 2, 4 button 3, 7 start, 9 reset credits (service), 10 button 6, 15 service 1
+assign inputs = ordi ?
+                { service, 4'hf, joystick1[9], 1'b1, 1'b1, cab_1p[0], 2'b11, joystick1[6], joystick1[5], joystick1[4], joystick1[7], joystick1[8] } :
+                { cab_1p[1], joystick2[6:4], joystick2[0], joystick2[1], joystick2[2], joystick2[3],
                   cab_1p[0], joystick1[6:4], joystick1[0], joystick1[1], joystick1[2], joystick1[3] };
 assign system = { 9'h1ff, ~cust, 1'b1, ~cust, 2'b11, coin[1], coin[0] };
 
@@ -104,6 +109,8 @@ jtnmg5_video u_video(
     .gfx_en             ( gfx_en            ),
     .tbig               ( tbig              ),
     .obig               ( obig              ),
+    .osmall             ( osmall            ),
+    .hz55               ( hz55              ),
     .gfx_bank           ( gfx_bank          ),
     .prio               ( prio              ),
     .scr0x              ( scr0x             ),
