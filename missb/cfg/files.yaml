@@ -1,0 +1,32 @@
+missb:
+  - get:
+    - jtmissb_game.v
+    - jtmissb_main.v
+    - jtmissb_colmix.v
+    - jtmissb_video.v
+    - jtmissb_gfx.v
+    - jtmissb_bg.v
+    - jtmissb_sound.v
+jtframe:
+  - get:
+      - jtframe_ff.v
+  - from: clocking
+    get:
+      - jtframe_cen48.v
+      - jtframe_cen24.v
+  - from: ram
+    get:
+      - jtframe_ram.v
+      - jtframe_obj_buffer.v
+      - jtframe_prom.v
+  - from: video
+    get:
+      - jtframe_vtimer.v
+      - jtframe_blank.v
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jt26.yaml
+jt6295:

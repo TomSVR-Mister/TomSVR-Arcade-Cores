@@ -1,0 +1,164 @@
+/* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Date: 29-05-2020 */
+
+module jtmissb_video(
+    input               rst,
+    input               clk,
+    input               clk_cpu,
+    input               pxl2_cen,
+    input               pxl_cen,
+    output              LHBL,
+    output              LVBL,
+    output              HS,
+    output              VS,
+    input               flip,
+    input               dip_pause,
+    input               cab_1p,
+    // PROMs
+    input      [ 7:0]   prog_addr,
+    input      [ 3:0]   prog_data,
+    input               prom_we,
+    // CPU      interface
+    input               pal_cs,
+    output     [ 7:0]   pal_dout,
+    input               black_n,
+    input               cpu_rnw,
+    input      [12:0]   cpu_addr,
+    input      [ 7:0]   cpu_dout,
+    input               vram_cs,
+    output     [ 7:0]   vram_dout,
+    //output              cpu_irqn,
+    // SDRAM interface
+    output     [18:2]   rom_addr,
+    input      [31:0]   rom_data,
+    input               rom_ok,
+    output              rom_cs,
+    input      [31:0]   rom2_data,
+    input               rom2_ok,
+    // background
+    input               alt,
+    input      [ 7:0]   bgvram,
+    output     [20:1]   bg_addr,
+    output              bg_cs,
+    input      [15:0]   bg_data,
+    input               bg_ok,
+    input               bgpal_we,
+    input      [ 8:0]   sub_addr,
+    input      [ 7:0]   sub_dout,
+    output     [ 7:0]   bgpal_dout,
+    // Colours
+    output     [ 3:0]   red,
+    output     [ 3:0]   green,
+    output     [ 3:0]   blue,
+    // Test
+    input      [ 3:0]   gfx_en
+);
+
+wire [ 8:0] vrender, vrender1, vdump, hdump;
+wire [ 7:0] col_addr, bg_pxl;
+wire        preLHBL, preLVBL;
+
+jtframe_vtimer #(
+    .HB_START( 9'd255 ),
+    .HS_START( 9'd297 ),
+    .HB_END  ( 9'd383 ),
+    .V_START ( 9'd016 ),
+    .VS_START( 9'd254 ),
+    .VB_START( 9'd239 ),
+    .VB_END  ( 9'd279 )
+)
+u_timer(
+    .clk        ( clk           ),
+    .pxl_cen    ( pxl_cen       ),
+    .vdump      ( vdump         ),
+    .vrender    ( vrender       ),
+    .vrender1   ( vrender1      ),
+    .H          ( hdump         ),
+    .Hinit      (               ),
+    .Vinit      (               ),
+    .LHBL       ( preLHBL       ),
+    .LVBL       ( preLVBL       ),
+    .HS         ( HS            ),
+    .VS         ( VS            )
+);
+
+jtmissb_gfx u_gfx(
+    .rst        ( rst            ),
+    .clk        ( clk            ),
+    .clk_cpu    ( clk_cpu        ),
+    .pxl_cen    ( pxl_cen        ),
+    .pxl2_cen   ( pxl2_cen       ),
+    // PROMs
+    .prog_addr  ( prog_addr      ),
+    .prog_data  ( prog_data      ),
+    .prom_we    ( prom_we        ),
+    // Screen
+    .flip       ( flip           ),
+    .LHBL       ( LHBL           ),
+    .LVBL       ( LVBL           ),
+    .vdump      ( vdump[7:0]     ),
+    .hdump      ( hdump          ),
+    // CPU interface
+    .vram_cs    ( vram_cs        ),
+    .vram_dout  ( vram_dout      ),
+    .cpu_addr   ( cpu_addr       ),
+    .cpu_rnw    ( cpu_rnw        ),
+    .cpu_dout   ( cpu_dout       ),
+    // SDRAM
+    .rom_addr   ( rom_addr       ),
+    .rom_data   ( rom_data       ),
+    .rom_ok     ( rom_ok         ),
+    .rom_cs     ( rom_cs         ),
+    .rom2_data  ( rom2_data      ),
+    .rom2_ok    ( rom2_ok        ),
+    // Color address to palette
+    .col_addr   ( col_addr       )
+);
+
+jtmissb_bg u_bg(
+    .rst        ( rst            ),
+    .clk        ( clk            ),
+    .alt        ( alt            ),
+    .bgvram     ( bgvram         ),
+    .hdump      ( hdump          ),
+    .vrender    ( vrender        ),
+    .vdump      ( vdump          ),
+    .rom_addr   ( bg_addr        ),
+    .rom_cs     ( bg_cs          ),
+    .rom_data   ( bg_data        ),
+    .rom_ok     ( bg_ok          ),
+    .pxl        ( bg_pxl         )
+);
+
+
+jtmissb_colmix u_colmix(
+    .clk        ( clk            ),
+    .clk_cpu    ( clk_cpu        ),
+    .pxl_cen    ( pxl_cen        ),
+    // Screen
+    .preLHBL    ( preLHBL        ),
+    .preLVBL    ( preLVBL        ),
+    .LHBL       ( LHBL           ),
+    .LVBL       ( LVBL           ),
+    // Colour address to palette
+    .col_addr   ( col_addr       ),
+    .bg_pxl     ( bg_pxl         ),
+    .bgpal_we   ( bgpal_we       ),
+    .sub_addr   ( sub_addr       ),
+    .sub_dout   ( sub_dout       ),
+    .bgpal_dout ( bgpal_dout     ),
+    // CPU interface
+    .cpu_addr   ( cpu_addr[8:0]  ),
+    .cpu_rnw    ( cpu_rnw        ),
+    .cpu_dout   ( cpu_dout       ),
+    .pal_cs     ( pal_cs         ),
+    .pal_dout   ( pal_dout       ),
+    .black_n    ( black_n        ),
+    // Colour output
+    .red        ( red            ),
+    .green      ( green          ),
+    .blue       ( blue           )
+);
+
+endmodule

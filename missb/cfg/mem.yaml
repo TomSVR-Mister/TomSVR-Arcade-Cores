@@ -1,0 +1,49 @@
+params:
+  - { name: SUB_OFFSET, value: "22'h2_8000 >> 1" }
+  - { name: OKI_OFFSET, value: "(`OKI_START-`JTFRAME_BA1_START)>>1" }
+  - { name: BG_OFFSET,  value: "(`BG_START-`JTFRAME_BA1_START)>>1" }
+clocks:
+  clk48:
+    - freq: 6M
+      gate: [ "main", "sub", "snd" ]
+      outputs:
+        - cen6
+        - cen3
+    - freq: 1056000
+      outputs:
+        - cen_oki
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl,  rsum: 10k }
+    - { name: pcm, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+sdram:
+  banks:
+    - buses:
+        - name: main
+          addr_width: 18
+          data_width: 8
+        - name: sub
+          addr_width: 16
+          data_width: 8
+          offset: SUB_OFFSET
+    - buses:
+        - name: snd
+          addr_width: 15
+          data_width: 8
+        - name: oki
+          addr_width: 18
+          data_width: 8
+          offset: OKI_OFFSET
+        - name: bg
+          addr_width: 21
+          data_width: 16
+          offset: BG_OFFSET
+    - buses:
+        - name: gfx
+          addr_width: 19
+          data_width: 32
+    - buses:
+        - name: gfx2
+          addr_width: 19
+          data_width: 32

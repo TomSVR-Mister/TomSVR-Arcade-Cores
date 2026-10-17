@@ -58,6 +58,12 @@ reg  [31:0] wa;
 reg  [ 7:0] w5;
 reg  [ 2:0] px;
 reg         start, hzero_l, got, got5;
+// one-entry cache of the last graphics fetch: games park unused sprites on the same blank tile, and
+// fetching it 200+ times would overrun the line time. Blank 8-pixel halves skip the pixel loop.
+reg  [19:0] ckey;
+reg  [31:0] cwa;
+reg  [ 7:0] cw5;
+reg         cvalid;
 wire [10:0] q1;
 
 // hit test on the Y word arriving from the RAM
@@ -85,7 +91,7 @@ end
 
 always @(posedge clk) begin
     if( rst ) begin
-        st <= IDLE; rom_cs <= 0; p5_cs <= 0; p1_v <= 0; p2_v <= 0;
+        st <= IDLE; rom_cs <= 0; p5_cs <= 0; p1_v <= 0; p2_v <= 0; cvalid <= 0;
     end else begin
         case( st )
             IDLE: if( start ) begin
@@ -125,9 +131,15 @@ always @(posedge clk) begin
                 st     <= FETCH;
             end
             FETCH: begin
-                rom_cs <= 1; p5_cs <= !jp; got <= 0; got5 <= jp;
-                wcnt   <= 0;
-                st     <= FWAIT;
+                if( cvalid && ckey==rom_addr ) begin
+                    wa <= cwa; w5 <= cw5;
+                    px <= (cwa==0 && (jp || cw5==0)) ? 3'd7 : 3'd0;
+                    st <= WRITE;
+                end else begin
+                    rom_cs <= 1; p5_cs <= !jp; got <= 0; got5 <= jp;
+                    wcnt   <= 0;
+                    st     <= FWAIT;
+                end
             end
             FWAIT: begin
                 if( wcnt!=3 ) wcnt <= wcnt + 1'd1;
@@ -137,6 +149,11 @@ always @(posedge clk) begin
                     if( (got || (rom_ok && rom_cs)) && (got5 || (p5_ok && p5_cs)) ) begin
                         px <= 0;
                         st <= WRITE;
+                        ckey   <= rom_addr;
+                        cvalid <= 1;
+                        cwa    <= got  ? wa : rom_data;
+                        cw5    <= got5 ? w5 : p5_data;
+                        if( (got ? wa : rom_data)==0 && (jp || (got5 ? w5 : p5_data)==0) ) px <= 3'd7;
                     end
                 end
             end
