@@ -5,6 +5,8 @@
  *   84000a coin latch (ignored) 84000f sound latch                    880000-8817ff video RAM
  *   881800-881803 scroll Y      881804-881fff RAM                      8c0000-8c0fff palette
  *   900000-900fff sprites       ffc000-ffffff RAM
+ * Return of Lady Frog (rf=1): 400000-407fff protection data ROM, 408000-4087ff RAM, a00000 bombs (toggles 0x100 per read),
+ *   sprites at d00000, e00000 bitmap mode.
  * Built on JTFRAME by Jose Tejada (jotego). */
 
 module jtsplash_main(
@@ -12,17 +14,21 @@ module jtsplash_main(
     input              clk,
     input              lvbl,
     input              dip_pause,
+    input              rf,
 
     input       [ 7:0] p1, p2,
     input       [15:0] dipsw,
 
     output      [15:0] cpu_dout,
     // SDRAM ROM
-    output      [21:1] rom_addr,
+    output      [22:1] rom_addr,
     output reg         rom_cs,
     input       [15:0] rom_data,
     input              rom_ok,
     // BRAM
+    output      [10:1] xram_addr,
+    output      [ 1:0] xram_we,
+    input       [15:0] xram_dout,
     output      [13:1] wram_addr,
     output      [ 1:0] wram_we,
     input       [15:0] wram_dout,
@@ -40,6 +46,7 @@ module jtsplash_main(
     input       [ 7:0] pix_dout,
     // video registers
     output reg  [15:0] scr0, scr1,
+    output reg  [15:0] bmode,
     // sound latch
     output reg         snd_wr
 );
@@ -53,13 +60,16 @@ wire [ 1:0] dsn, wen;
 wire [ 2:0] ipl_n;
 reg  [15:0] cpu_din;
 reg         irq_n;
-reg         wram_cs, vram_cs, pal_cs, objram_cs, pix_cs, io_cs;
+reg         wram_cs, vram_cs, pal_cs, objram_cs, pix_cs, io_cs, xram_cs, bomb_cs, bmode_cs;
+reg  [15:0] bomb;
 wire        io_wr = io_cs && !wr_n;
 
 assign dsn        = { uds_n, lds_n };
 assign bus_n      = as_n | (lds_n & uds_n);
 assign wen        = {2{~wr_n}} & ~dsn;
-assign rom_addr   = A[21:1];
+assign rom_addr   = A[22:1];
+assign xram_addr  = A[10:1];
+assign xram_we    = xram_cs   ? wen : 2'b00;
 assign wram_addr  = A[13:1];
 assign vram_addr  = A[12:1];
 assign pal_addr   = A[11:1];
@@ -83,13 +93,19 @@ always @* begin
     pal_cs    = 0;
     objram_cs = 0;
     wram_cs   = 0;
+    xram_cs   = 0;
+    bomb_cs   = 0;
+    bmode_cs  = 0;
     if( !bus_n ) begin
-        rom_cs    = A[23:22] == 0;                  // 000000-3fffff
+        rom_cs    = A[23:22] == 0 || (rf && A[23:15] == 9'h080);    // 000000-3fffff, 400000-407fff
+        xram_cs   = rf && A[23:11] == 13'h0081;      // 408000-4087ff
+        bomb_cs   = rf && A[23:20] == 4'ha;
+        bmode_cs  = rf && A[23:20] == 4'he;
         pix_cs    = A[23:18] == 6'b1000_00;         // 800000-83ffff
         io_cs     = A[23:4]  == 20'h84000;          // 840000-84000f
         vram_cs   = A[23:13] == 11'h440;            // 880000-881fff
         pal_cs    = A[23:12] == 12'h8c0;            // 8c0000-8c0fff
-        objram_cs = A[23:12] == 12'h900;            // 900000-900fff
+        objram_cs = A[23:12] == (rf ? 12'hd00 : 12'h900);   // 900000-900fff, d00000-d00fff
         wram_cs   = A[23:14] == 10'h3ff;            // ffc000-ffffff
     end
 end
@@ -101,6 +117,8 @@ always @(posedge clk) begin
                pal_cs    ? pal_dout    :
                objram_cs ? objram_dout :
                wram_cs   ? wram_dout   :
+               xram_cs   ? xram_dout   :
+               bomb_cs   ? bomb        :
                io_cs     ? ( A[3:1]==0 ? { 8'hff, dipsw[ 7:0] } :
                              A[3:1]==1 ? { 8'hff, dipsw[15:8] } :
                              A[3:1]==2 ? { 8'hff, p1 } :
@@ -112,8 +130,12 @@ end
 always @(posedge clk) begin
     snd_wr <= 0;
     if( rst ) begin
-        scr0 <= 0; scr1 <= 0;
+        scr0 <= 0; scr1 <= 0; bmode <= 0;
     end else begin
+        if( bmode_cs && !wr_n ) begin
+            if( !uds_n ) bmode[15:8] <= cpu_dout[15:8];
+            if( !lds_n ) bmode[ 7:0] <= cpu_dout[ 7:0];
+        end
         if( vram_cs && !wr_n && A[12:1]==12'hc00 ) begin
             if( !uds_n ) scr0[15:8] <= cpu_dout[15:8];
             if( !lds_n ) scr0[ 7:0] <= cpu_dout[ 7:0];
@@ -124,6 +146,13 @@ always @(posedge clk) begin
         end
         if( io_wr && A[3:1]==7 && !lds_n ) snd_wr <= 1;
     end
+end
+
+reg bomb_l;
+always @(posedge clk) begin
+    bomb_l <= bomb_cs;
+    if( rst ) bomb <= 16'h0000;    // MAME: 0x100 at reset, toggled before the first read
+    else if( !bomb_cs && bomb_l ) bomb <= bomb ^ 16'h0100;   // after each read
 end
 
 // IRQ 6 asserted at the start of vblank, cleared on acknowledge
@@ -182,8 +211,8 @@ jtframe_68kdtack_cen u_dtack(
     .fworst    (          )
 );
 `else
-initial begin rom_cs=0; scr0=0; scr1=0; snd_wr=0; end
-assign cpu_dout=0, rom_addr=0, wram_addr=0, wram_we=0, vram_addr=0, vram_we=0, pal_addr=0, pal_we=0,
+initial begin rom_cs=0; scr0=0; scr1=0; snd_wr=0; bmode=0; end
+assign cpu_dout=0, rom_addr=0, xram_addr=0, xram_we=0, wram_addr=0, wram_we=0, vram_addr=0, vram_we=0, pal_addr=0, pal_we=0,
        objram_addr=0, objram_we=0, pix_addr=0, pix_we=0;
 `endif
 

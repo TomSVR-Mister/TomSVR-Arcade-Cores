@@ -41,7 +41,7 @@ reg  [ 1:0] wcnt;
 reg  [31:0] wa, wb;
 reg  [ 2:0] px;
 reg         start, hzero_l;
-wire [ 9:0] ydiff = { 1'b0, line } - ({ 1'b0, ram_dout[15:7] } - 10'd5);   // MAME: Y - 6 (one more line measured)
+wire [ 9:0] ydiff = { 1'b0, line } - ({ 1'b0, ram_dout[15:7] } - 10'd6);   // MAME: Y - 6
 wire [ 2:0] b = ~px;
 wire [ 7:0] pen = { wa[b], wa[8+b], wa[16+b], wa[24+b], wb[b], wb[8+b], wb[16+b], wb[24+b] };
 wire [ 7:0] q1;
@@ -89,7 +89,7 @@ always @(posedge clk) begin
             R2: begin tile <= ram_dout; st <= R3; end
             R3: begin
                 xsz  <= ram_dout[3:0];
-                x    <= ram_dout[15:7] - 9'd7;     // MAME: X - 8 (one more pixel measured)
+                x    <= ram_dout[15:7] - 9'd8;     // MAME: X - 8
                 tile <= tile + by * ({ 1'b0, ram_dout[3:0] } + 5'd1);
                 bx   <= 0;
                 wsel <= 0;

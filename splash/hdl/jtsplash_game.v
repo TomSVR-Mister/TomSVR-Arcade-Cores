@@ -1,6 +1,6 @@
 /* SPDX-FileCopyrightText: 2026 Tom Sveen
  * SPDX-License-Identifier: GPL-3.0-or-later
- * Gaelco Splash! / Painted Lady / New Splash on JTFRAME (Jose Tejada, jotego). Personal build. */
+ * Gaelco Splash! / Painted Lady / The Return of Lady Frog on JTFRAME (Jose Tejada, jotego). Personal build. */
 
 module jtsplash_game(
     `include "jtframe_game_ports.inc"
@@ -10,10 +10,18 @@ wire [15:0] scr0, scr1;
 wire [ 7:0] p1, p2;
 wire        snd_wr, vbl_irq;
 reg         lo_attr = 0;    // header byte 0 bit 0: Splash! 1.0 sprite attribute in the low byte
+reg         rf = 0;         // header byte 0 bit 1: The Return of Lady Frog (Microhard)
+wire [15:0] bmode;
+wire [15:0] sp_addr;
+wire [17:0] rf_addr;
+wire        sp_cs, rf_cs;
 
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
-always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) lo_attr <= prog_data[0];
+always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) begin lo_attr <= prog_data[0]; rf <= prog_data[1]; end
+
+assign snd_addr = rf ? rf_addr : { 2'd0, sp_addr };
+assign snd_cs   = rf ? rf_cs : sp_cs;
 
 `ifdef JTFRAME_IOCTL_RD
 assign ioctl_din  = 8'd0;
@@ -32,6 +40,7 @@ jtsplash_main u_main(
     .clk         ( clk          ),
     .lvbl        ( vbl_irq      ),
     .dip_pause   ( dip_pause    ),
+    .rf          ( rf           ),
     .p1          ( p1           ),
     .p2          ( p2           ),
     .dipsw       ( dipsw[15:0]  ),
@@ -40,6 +49,9 @@ jtsplash_main u_main(
     .rom_cs      ( main_cs      ),
     .rom_data    ( main_data    ),
     .rom_ok      ( main_ok      ),
+    .xram_addr   ( xram_addr    ),
+    .xram_we     ( xram_we      ),
+    .xram_dout   ( xram_dout    ),
     .wram_addr   ( wram_addr    ),
     .wram_we     ( wram_we      ),
     .wram_dout   ( wram_dout    ),
@@ -57,22 +69,38 @@ jtsplash_main u_main(
     .pix_dout    ( pix_dout     ),
     .scr0        ( scr0         ),
     .scr1        ( scr1         ),
+    .bmode       ( bmode        ),
     .snd_wr      ( snd_wr       )
 );
 
 jtsplash_sound u_sound(
-    .rst        ( rst           ),
+    .rst        ( rst | rf      ),
     .clk        ( clk           ),
     .cen_snd    ( cen_snd       ),
     .cen_adpcm  ( cen_adpcm     ),
     .main_dout  ( cpu_dout[7:0] ),
     .snd_wr     ( snd_wr        ),
-    .rom_addr   ( snd_addr      ),
-    .rom_cs     ( snd_cs        ),
+    .rom_addr   ( sp_addr       ),
+    .rom_cs     ( sp_cs         ),
     .rom_data   ( snd_data      ),
     .rom_ok     ( snd_ok        ),
     .fm         ( fm            ),
     .pcm        ( pcm           )
+);
+
+jtsplash_rfsnd u_rfsnd(
+    .rst        ( rst | ~rf     ),
+    .clk        ( clk           ),
+    .cen        ( cen_rf        ),
+    .lvbl       ( vbl_irq       ),
+    .main_dout  ( cpu_dout[7:0] ),
+    .snd_wr     ( snd_wr        ),
+    .rom_addr   ( rf_addr       ),
+    .rom_cs     ( rf_cs         ),
+    .rom_data   ( snd_data      ),
+    .rom_ok     ( snd_ok        ),
+    .fm         ( opn           ),
+    .psg        ( psg           )
 );
 
 jtsplash_video u_video(
@@ -82,6 +110,8 @@ jtsplash_video u_video(
     .gfx_en             ( gfx_en            ),
     .debug_bus          ( debug_bus         ),
     .lo_attr            ( lo_attr           ),
+    .rf                 ( rf                ),
+    .bmode              ( bmode             ),
     .scr0               ( scr0              ),
     .scr1               ( scr1              ),
     .vram_video_addr    ( vram_video_addr   ),

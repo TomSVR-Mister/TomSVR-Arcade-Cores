@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Tom Sveen
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Splash! video: 8 MHz pixel clock, 512x269 total (58 Hz), MAME visible area X 16-383, Y 16-255.
+ * Return of Lady Frog (rf): 512x260 total (60 Hz).
  * hdump/vdump are MAME screen coordinates. Pixel layer: 512x256, screen X = layer X - 9. */
 
 module jtsplash_video(
@@ -10,6 +11,8 @@ module jtsplash_video(
     input       [ 3:0] gfx_en,
     input       [ 7:0] debug_bus,
     input              lo_attr,
+    input              rf,
+    input       [15:0] bmode,
     input       [15:0] scr0, scr1,
 
     output      [12:1] vram_video_addr,
@@ -48,6 +51,7 @@ module jtsplash_video(
 
 localparam [8:0] HTOTAL=9'd511, HS_START=9'd420, HS_END=9'd452;
 localparam [8:0] VTOTAL=9'd268, VB_END=9'd16, VB_START=9'd256, VS_START=9'd260, VS_END=9'd263;
+localparam [8:0] VTOTAL_RF=9'd259, VS_START_RF=9'd257, VS_END_RF=9'd259;
 localparam [3:0] OBJ_HOFFSET=4'd0;
 
 reg  [ 8:0] hdump=0, vdump=0, vrender=1;
@@ -65,15 +69,15 @@ always @(posedge clk) if( pxl_cen ) begin
     hdump <= hdump==HTOTAL ? 9'd0 : hdump+9'd1;
     if( hdump==HTOTAL ) begin
         vdump   <= vrender;
-        vrender <= vrender==VTOTAL ? 9'd0 : vrender+9'd1;
+        vrender <= vrender==(rf ? VTOTAL_RF : VTOTAL) ? 9'd0 : vrender+9'd1;
         lvbl    <= vrender >= VB_END && vrender < VB_START;
     end
     // value for the next hdump
     lhbl <= hdump >= 9'd15 && hdump < 9'd383;
     if( hdump==HS_START ) begin
         HS <= 1;
-        if( vdump==VS_START ) VS <= 1;
-        if( vdump==VS_END   ) VS <= 0;
+        if( vdump==(rf ? VS_START_RF : VS_START) ) VS <= 1;
+        if( vdump==(rf ? VS_END_RF   : VS_END  ) ) VS <= 0;
     end
     if( hdump==HS_END ) HS <= 0;
     hbl_sh <= { hbl_sh[1:0], lhbl };
@@ -134,6 +138,8 @@ jtsplash_colmix u_colmix(
     .clk        ( clk               ),
     .pxl_cen    ( pxl_cen           ),
     .gfx_en     ( gfx_en            ),
+    .rf         ( rf                ),
+    .bmode      ( bmode             ),
     .tm0        ( tm0_pxl           ),
     .tm1        ( tm1_pxl           ),
     .obj        ( obj_pxl           ),

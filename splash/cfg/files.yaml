@@ -7,6 +7,7 @@ splash:
     - jtsplash_tile.v
     - jtsplash_obj.v
     - jtsplash_colmix.v
+    - jtsplash_rfsnd.v
 jtframe:
   - get:
       - jtframe_edge.v
@@ -26,3 +27,6 @@ jtopl:
   - get:
     - jtopl2.yaml
 jt5205:
+jt12:
+  - get:
+    - jt03.yaml

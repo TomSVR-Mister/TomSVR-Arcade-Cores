@@ -11,13 +11,14 @@ wire [10:0] vaddr;
 wire [ 1:0] layers;
 wire        flip, snd_wr, vbl_irq;
 reg         bgbig = 1;      // header byte 0 bit 0: 2 MB background (Magix, Rock Tris, Cannon Ball vertical)
+reg         vert  = 0;      // header byte 0 bit 1: Cannon Ball vertical, which resets unless system bit 6 reads 0 (MAME: IPT_CUSTOM)
 
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 `ifdef JTFRAME_IOCTL_RD
 assign ioctl_din  = 8'd0;
 `endif
-always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) bgbig <= prog_data[0];
+always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) begin bgbig <= prog_data[0]; vert <= prog_data[1]; end
 
 // coin and service are 1-frame pulses (MAME PORT_IMPULSE(1))
 reg  [1:0] in_l, pulse;
@@ -39,7 +40,7 @@ always @(posedge clk) begin
 end
 
 // system: -, start 2, -, start 1, -, service, -, coin (active low)
-assign sys = { ~pulse[0], 1'b1, ~pulse[1], 1'b1, cab_1p[0], 1'b1, cab_1p[1], 1'b1 };
+assign sys = { ~pulse[0], ~vert, ~pulse[1], 1'b1, cab_1p[0], 1'b1, cab_1p[1], 1'b1 };
 // players: up, down, left, right, button 1, button 2, button 3, -
 assign p1  = { joystick1[3], joystick1[2], joystick1[1], joystick1[0], joystick1[4], joystick1[5], joystick1[6], 1'b1 };
 assign p2  = { joystick2[3], joystick2[2], joystick2[1], joystick2[0], joystick2[4], joystick2[5], joystick2[6], 1'b1 };

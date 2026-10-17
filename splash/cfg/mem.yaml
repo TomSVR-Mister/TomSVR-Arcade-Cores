@@ -9,18 +9,23 @@ clocks:
     - freq: 384000
       outputs:
         - cen_adpcm
+    - freq: 3000000
+      outputs:
+        - cen_rf
 
 audio:
   rsum: 10k
   channels:
     - { name: fm,  module: jtopl2, rsum: 10k }
     - { name: pcm, module: jt5205, rsum: 10k, dcrm: true }   # the idle MSM5205 sits at full scale (as in MAME)
+    - { name: opn, module: jt03_fm,  rsum: 10k }               # Lady Frog YM2203
+    - { name: psg, module: jt03_psg, rsum: 50k }
 
 sdram:
   banks:
     - buses:
-      - { name: main, addr_width: 22, data_width: 16, cache_size: 1kB }
-      - { name: snd,  addr_width: 16, data_width: 8, offset: SND_OFFSET }
+      - { name: main, addr_width: 23, data_width: 16, cache_size: 1kB }
+      - { name: snd,  addr_width: 18, data_width: 8, offset: SND_OFFSET }
     - buses:
       - { name: tm0,  addr_width: 19, data_width: 32 }
       - { name: tm1,  addr_width: 19, data_width: 32 }
@@ -28,6 +33,11 @@ sdram:
       - { name: obj,  addr_width: 19, data_width: 32 }
 
 bram:
+  - name: xram
+    size: 2kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
   - name: wram
     size: 16kB
     data_width: 16
