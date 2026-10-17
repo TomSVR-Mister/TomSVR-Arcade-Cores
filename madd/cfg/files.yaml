@@ -1,0 +1,16 @@
+madd:
+  - get:
+    - jtmadd_game.v
+    - jtmadd_main.v
+    - jtmadd_sound.v
+    - jtmadd_video.v
+    - jtmadd_tile.v
+    - jtmadd_obj.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jtopl2.yaml
