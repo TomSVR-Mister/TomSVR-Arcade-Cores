@@ -108,7 +108,7 @@ jt5205 u_adpcm(
     .clk        ( clk         ),
     .cen        ( cen_adpcm   ),
     .sel        ( 2'd0        ),    // 400 kHz / 96
-    .din        ( toggle ? adpcm[7:4] : adpcm[3:0] ),
+    .din        ( toggle ? adpcm[3:0] : adpcm[7:4] ),  // sampled with the strobe that flips toggle: new toggle 1 = high nibble
     .sound      ( pcm         ),
     .sample     (             ),
     .irq        ( msm_irq     ),
