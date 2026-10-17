@@ -1,0 +1,69 @@
+params:
+  - { name: SND_OFFSET, value: "`SND_START>>1" }
+  - { name: OKI_OFFSET, value: "`OKI_START>>1" }
+  - { name: OB5_OFFSET, value: "22'h200000" }
+
+clocks:
+  clk:
+    - freq: 4000000
+      outputs:
+        - cen_4
+    - freq: 3500000
+      outputs:
+        - cen_35
+    - freq: 1000000
+      outputs:
+        - cen_1
+    - freq: 875000
+      outputs:
+        - cen_875
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl2, rsum: 20k }
+    - { name: pcm, module: jt6295, rsum: 10k, fir: fir_192k_4k.csv }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 19, data_width: 16, cache_size: 1kB }
+      - { name: snd,  addr_width: 18, data_width: 8, offset: SND_OFFSET }
+      - { name: oki,  addr_width: 19, data_width: 8, offset: OKI_OFFSET }
+    - buses:
+      - { name: obj,  addr_width: 22, data_width: 32 }
+      - { name: ob5,  addr_width: 20, data_width: 8, offset: OB5_OFFSET }
+    - buses:
+      - { name: t0,   addr_width: 22, data_width: 32 }
+      - { name: t1,   addr_width: 22, data_width: 32 }
+
+bram:
+  - name: wram
+    size: 64kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+  - name: pal
+    size: 4kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pal_video_addr, dout: pal_video_dout, rw: false }
+  - name: objram
+    size: 2kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: objram_video_addr, dout: objram_video_dout, rw: false }
+  - name: vram0
+    size: 16kB
+    data_width: 16
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram0_video_addr, dout: vram0_video_dout, rw: false }
+  - name: vram1
+    size: 16kB
+    data_width: 16
+    rw: true
+    din: vram1_din
+    dual_port: { name: video, addr: vram1_video_addr, dout: vram1_video_dout, rw: false }

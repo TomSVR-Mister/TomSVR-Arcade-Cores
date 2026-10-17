@@ -1,0 +1,18 @@
+esd:
+  - get:
+    - jtesd_game.v
+    - jtesd_main.v
+    - jtesd_sound.v
+    - jtesd_video.v
+    - jtesd_tile.v
+    - jtesd_obj.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jtopl2.yaml
+jt6295:
+jteeprom:
