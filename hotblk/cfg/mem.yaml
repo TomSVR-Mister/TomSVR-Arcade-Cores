@@ -1,0 +1,40 @@
+clocks:
+  clk:
+    - freq: 1000000
+      outputs:
+        - cen_ay
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: psg, module: jt49, rsum: 10k }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 20, data_width: 8 }
+
+bram:
+  - name: wram
+    size: 64kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+  - name: vram
+    size: 64kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: vram_video_addr, dout: vram_video_dout, rw: false }
+  - name: pallo
+    size: 256
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pallo_video_addr, dout: pallo_video_dout, rw: false }
+  - name: palhi
+    size: 256
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: palhi_video_addr, dout: palhi_video_dout, rw: false }

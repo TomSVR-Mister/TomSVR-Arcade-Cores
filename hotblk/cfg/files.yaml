@@ -1,0 +1,14 @@
+hotblk:
+  - get:
+    - jthotblk_game.v
+    - jthotblk_video.v
+    - jthotblk_i2c.v
+    - i8088.sv
+    - mcl86_biu_max.sv
+    - KF8288.sv
+    - mcl86_eu_core.sv
+    - mcl86_adder.sv
+    - mcl86_ucode.sv
+jt12:
+  - get:
+    - jt49.yaml
