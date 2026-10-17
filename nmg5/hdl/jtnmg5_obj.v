@@ -13,7 +13,7 @@ module jtnmg5_obj(
     input              clk,
     input              pxl_cen,
     input              big,         // 16384 tiles, otherwise 8192
-    input              small,       // 4096 tiles
+    input              osm,       // 4096 tiles
     input              odd,         // odd frame
     input       [ 8:0] hdump,
     input       [ 8:0] vrender,
@@ -65,7 +65,7 @@ wire        yhit  = !d[10] && d[9:4] <= { 3'd0, n_nx } && !(ram_dout[12] && odd)
 
 wire [ 2:0] b  = fx ? px : ~px;
 wire [ 4:0] pen = { wa[16+b], wa[24+b], wa[8+b], w5[b], wa[b] };
-wire [13:0] tmask = small ? 14'h0fff : { big, 13'h1fff };
+wire [13:0] tmask = osm ? 14'h0fff : { big, 13'h1fff };
 
 assign rom_addr = { tile[13:0] & tmask, ~(half ^ fx), row };
 assign p5_addr  = { tile[13:0] & tmask, ~(half ^ fx), row };

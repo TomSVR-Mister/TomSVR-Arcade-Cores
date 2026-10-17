@@ -156,7 +156,7 @@ jtnmg5_obj u_obj(
     .clk        ( clk               ),
     .pxl_cen    ( pxl_cen           ),
     .big        ( obig              ),
-    .small      ( osmall            ),
+    .osm        ( osmall            ),
     .odd        ( odd               ),
     .hdump      ( hdump             ),
     .vrender    ( vrender           ),
