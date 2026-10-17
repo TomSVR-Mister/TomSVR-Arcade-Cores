@@ -1,0 +1,15 @@
+ys8:
+  - get:
+    - jtys8_game.v
+    - jtys8_main.v
+    - jtys8_sound.v
+    - jtys8_video.v
+    - jtys8_tile.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jtopl2.yaml
+jt5205:

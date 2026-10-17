@@ -1,0 +1,78 @@
+params:
+  - { name: SND_OFFSET, value: "`SND_START>>1" }
+
+clocks:
+  clk:
+    - freq: 8M
+      outputs:
+        - cen8
+        - cen4
+    - freq: 400k
+      outputs:
+        - cen_adpcm
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl2, rsum: 10k }
+    - { name: pcm, module: jt5205, rsum: 12k, dcrm: true }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 17, data_width: 8, cache_size: 1kB }
+      - { name: snd,  addr_width: 17, data_width: 8, offset: SND_OFFSET }
+    - buses:
+      - { name: fgt,  addr_width: 18, data_width: 32 }
+    - buses:
+      - { name: bgt,  addr_width: 21, data_width: 32 }
+
+bram:
+  - name: t0lo
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: t0lo_video_addr, dout: t0lo_video_dout, rw: false }
+  - name: t0hi
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: t0hi_video_addr, dout: t0hi_video_dout, rw: false }
+  - name: t1lo
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: t1lo_video_addr, dout: t1lo_video_dout, rw: false }
+  - name: t1hi
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: t1hi_video_addr, dout: t1hi_video_dout, rw: false }
+  - name: c0
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: c0_video_addr, dout: c0_video_dout, rw: false }
+  - name: c1
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: c1_video_addr, dout: c1_video_dout, rw: false }
+  - name: plo
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: plo_video_addr, dout: plo_video_dout, rw: false }
+  - name: phi
+    size: 2kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: phi_video_addr, dout: phi_video_dout, rw: false }
