@@ -1,0 +1,39 @@
+jpop:
+  - get:
+    - jtjpop_game.v
+    - jtjpop_main.v
+    - jtjpop_video.v
+    - jtjpop_colmix.v
+    - jtjpop_snd.v
+    - jtjpop_gfx.v
+    - jtjpop_obj.v
+    - jtjpop_draw.v
+    - jtjpop_tilemap.v
+jtframe:
+  - get:
+      - jtframe_ff.v
+  - from: clocking
+    get:
+      - jtframe_cen48.v
+      - jtframe_cen24.v
+  - from: ram
+    get:
+      - jtframe_ram.v
+      - jtframe_dual_ram16.v
+      - jtframe_obj_buffer.v
+      - jtframe_prom.v
+  - from: video
+    get:
+      - jtframe_vtimer.v
+      - jtframe_blank.v
+  - from: cpu
+    get:
+      # Z80
+      - jtframe_z80.yaml
+      # MCU
+      - jtframe_i8742.v
+      - upi41.yaml
+jt12:
+  - get:
+    - jt03.yaml
+jt51:
