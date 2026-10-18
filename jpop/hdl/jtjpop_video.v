@@ -73,8 +73,7 @@ wire [ 8:0] scr_pxl, obj_pxl;
 reg  [ 7:0] LHBL_l;
 wire        preLHBL;
 
-// jpop: one pixel (8 clocks) later, so the picture matches MAME horizontally
-assign LHBL = jpop ? LHBL_l[7] : hb_dly ? LHBL_l[4] : preLHBL; // used by JTKIWI
+assign LHBL = hb_dly ? LHBL_l[4] : preLHBL; // used by JTKIWI
 
 always @(posedge clk) begin
     LHBL_l <= LHBL_l<<1;
@@ -82,10 +81,10 @@ always @(posedge clk) begin
 end
 
 jtframe_vtimer #(
-    .HB_START( 9'd256 ),
+    .HB_START( 9'd257 ),   // JTJPOP: blanking one pixel later than JTKIWI, matches MAME's jpopnics
     .HS_START( 9'd297 ),
     .HCNT_END( 9'd383 ),
-    .HB_END  ( 9'd0   ),
+    .HB_END  ( 9'd1   ),
     .V_START ( 9'd008 ),
     .VS_START( 9'd254 ),
     .VB_START( 9'd239 ),
