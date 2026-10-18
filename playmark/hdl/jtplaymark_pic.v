@@ -39,6 +39,7 @@ reg  [ 7:0] trisb, trisc;
 reg  [ 7:0] ram[0:127];
 reg         skip;           // dead cycle: 2nd cycle of a jump (pc already loaded) or of a skip (pc moves past the skipped one)
 reg         skipinc;
+reg         tmr_hold;       // second cycle after a TMR0 write: no count
 
 wire [11:0] op  = prog_data;
 wire [ 4:0] f   = op[4:0];
@@ -60,7 +61,7 @@ always @* begin
     case( fr )
         5'h00: fval = 8'd0;     // INDF through FSR=0
         5'h01: fval = tmr0;
-        5'h02: fval = pc[7:0];
+        5'h02: fval = pc[7:0] + 8'd1;   // PCL reads the address of the next instruction
         5'h03: fval = status;
         5'h04: fval = fsr | 8'h80;
         5'h05: fval = { 4'hf, (pa_in & trisa) | (pa_out & ~trisa) };
@@ -111,19 +112,26 @@ always @* begin
     endcase
 end
 
-// TMR0 clock: instruction cycle, through the prescaler when PSA (OPTION bit 3) = 0
+// TMR0 clock: instruction cycle, through the prescaler when PSA (OPTION bit 3) = 0. As MAME: the prescaler counts to
+// 2 << PS before TMR0 goes up, a TMR0 write holds the timer for two cycles, and the cycle of an OPTION instruction
+// already counts with the new value (MAME updates the timer after each instruction)
 wire [7:0] psc_n  = psc + 1'd1;
-wire       tmr_inc = opt[5] ? 1'b0 : (opt[3] ? 1'b1 : psc_n[opt[2:0]] & ~psc[opt[2:0]]);
+wire [7:0] opt_t  = !skip && op==12'h002 ? w : opt;
+wire [7:0] psc_m  = (8'd2 << opt_t[2:0]) - 8'd1;
+wire       tmr_inc = opt_t[5] || tmr_hold ? 1'b0 : (opt_t[3] ? 1'b1 : (psc_n & psc_m)==0);
 
 integer i;
+// RAM starts cleared, as in MAME (the Big Twin program reads registers it has not written)
+initial for( i=0; i<128; i=i+1 ) ram[i] = 0;
 always @(posedge clk) begin
     pa_wr <= 0; pb_wr <= 0; pc_wr <= 0; pb_rd <= 0; pc_rd <= 0;
     if( rst ) begin
         pc <= 11'h7ff; status <= 8'h18; fsr <= 0; w <= 0; opt <= 8'h3f; psc <= 0; tmr0 <= 0;
-        trisa <= 4'hf; trisb <= 8'hff; trisc <= 8'hff; skip <= 0; skipinc <= 0; stk0 <= 0; stk1 <= 0;
+        trisa <= 4'hf; trisb <= 8'hff; trisc <= 8'hff; skip <= 0; skipinc <= 0; tmr_hold <= 0; stk0 <= 0; stk1 <= 0;
         pa_out <= 0; pb_out <= 0; pc_out <= 0;
     end else if( cen ) begin
-        if( !opt[5] ) begin
+        tmr_hold <= 0;
+        if( !opt_t[5] && !tmr_hold ) begin
             psc <= psc_n;
             if( tmr_inc ) tmr0 <= tmr0 + 1'd1;
         end
@@ -145,7 +153,7 @@ always @(posedge clk) begin
             if( wr_f ) begin
                 case( fr )
                     5'h00:;
-                    5'h01: begin tmr0 <= res; psc <= 0; end
+                    5'h01: begin tmr0 <= res; psc <= 0; tmr_hold <= 1; end
                     5'h02: begin pc <= { status[6:5], 1'b0, res }; skip <= 1; end
                     5'h03: status <= { status[7], res[6:5], status[4:3], (setz||setc||setdc) ? status[2:0] : res[2:0] };
                     5'h04: fsr <= res;
