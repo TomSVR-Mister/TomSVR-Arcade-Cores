@@ -87,13 +87,13 @@ always @(posedge clk) begin
                 end
             end
             // scan from the last entry so that entry 0 is drawn last
-            A1: begin buf_ra <= { ~bank, ent, 3'd0 }; wcnt <= 0; st <= A2; end
+            A1: begin buf_ra <= { bank, ent, 3'd0 }; wcnt <= 0; st <= A2; end
             A2: begin
-                buf_ra <= { ~bank, ent, 3'd1 };
+                buf_ra <= { bank, ent, 3'd1 };
                 st <= A3;
             end
             A3: begin   // w0 arrives
-                buf_ra <= { ~bank, ent, 3'd6 };
+                buf_ra <= { bank, ent, 3'd6 };
                 if( !buf_q[0] ) st <= NEXT;
                 else st <= A4;
             end
@@ -105,12 +105,12 @@ always @(posedge clk) begin
                 if( yhit ) begin
                     ysub   <= dy[3:0] ^ {4{w1[9]}};
                     jrow   <= { 1'b0, w1[9] ? hh - dy[7:4] : dy[7:4] };
-                    buf_ra <= { ~bank, ent, 3'd3 };
+                    buf_ra <= { bank, ent, 3'd3 };
                     st     <= B1;
                 end else st <= NEXT;
             end
-            B1: begin buf_ra <= { ~bank, ent, 3'd4 }; st <= B2; end
-            B2: begin buf_ra <= { ~bank, ent, 3'd7 }; code <= buf_q; st <= B3; end    // w3
+            B1: begin buf_ra <= { bank, ent, 3'd4 }; st <= B2; end
+            B2: begin buf_ra <= { bank, ent, 3'd7 }; code <= buf_q; st <= B3; end    // w3
             B3: begin sx <= buf_q[8:0]; st <= TILE; wsel <= 0; end                    // w4
             TILE: begin
                 if( wsel==0 ) begin  // w7 arrives on this clock
@@ -173,7 +173,7 @@ always @(posedge clk) begin
     end
 end
 
-// two banks: the DMA writes bank 'bank', the sprites are read from the other one
+// two banks: the DMA writes bank "bank" and then toggles it, the sprites are read from "bank" = the copy before (MAME old2)
 jtframe_dual_ram #(.DW(16),.AW(12)) u_buf(
     .clk0   ( clk       ),
     .data0  ( wram_dout ),
