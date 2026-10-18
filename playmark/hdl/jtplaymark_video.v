@@ -70,12 +70,12 @@ localparam [8:0] HTOTAL=9'd511, HS_START=9'd400, HS_END=9'd440;
 localparam [8:0] VTOTAL=9'd269, VB_END=9'd16, VB_START=9'd256, VS_START=9'd262, VS_END=9'd265;
 
 reg  [ 8:0] hdump=0, vdump=0, vrender=1;
-reg         lhbl, lvbl, hs_l;
+reg         lhbl, lvbl, lvbl_i, hs_l;
 reg  [ 3:0] hbl_sh, vbl_sh;
 
 assign LHBL     = hbl_sh[2];
 assign LVBL     = vbl_sh[1];
-assign lvbl_irq = lvbl;
+assign lvbl_irq = lvbl_i;      // Hot Mind: vblank interrupt after row 239, rows 240-255 shown black
 wire   hs_start = pxl_cen && hdump==0 && !hs_l;
 
 always @(posedge clk) if( pxl_cen ) hs_l <= hdump==0;
@@ -85,7 +85,8 @@ always @(posedge clk) if( pxl_cen ) begin
     if( hdump==HTOTAL ) begin
         vdump   <= vrender;
         vrender <= vrender==VTOTAL ? 9'd0 : vrender+9'd1;
-        lvbl    <= vrender >= VB_END && vrender < (hm ? 9'd240 : VB_START);
+        lvbl    <= vrender >= VB_END && vrender < VB_START;
+        lvbl_i  <= vrender >= VB_END && vrender < (hm ? 9'd240 : VB_START);
     end
     lhbl <= hdump==HTOTAL || hdump < 9'd319;
     if( hdump==HS_START ) begin
@@ -238,7 +239,7 @@ always @(posedge clk) if( pxl_cen ) begin
     bm_ok <= bm_en && !bm_out;
     obj_l <= obj_pxl;
     bg_l  <= bg_pxl;
-    blank <= hm && !ven;
+    blank <= hm && (!ven || vdump >= 9'd240);
     if( hm )
         pal_video_addr <= tx_op  ? { 3'b010, tx_l } :
                           hobj   ? { 1'b1, obj_l[8:0] } :
