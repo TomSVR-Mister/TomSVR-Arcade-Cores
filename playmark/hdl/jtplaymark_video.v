@@ -11,7 +11,7 @@
  *   Palette: 1024 words RRRRGGGGBBBBRGBx.
  * hm: Hot Mind (MAME screen_update_hrdtimes, video_start hotmind): visible rows 16-239, black unless scroll register 6
  *   bit 0 is set. bg 16x16 (opaque, palette 000) < fg 16x16 (pen 0 transparent, palette 080) < sprites < tx 8x8 64x64
- *   (palette 100). Sprites with priority 1 go under the fg pixels. Scroll: 0/1 tx, 2/3 fg, 4/5 bg, x - 14 (scrolldx). */
+ *   (palette 100). Sprites with priority 1 go under the fg pixels. Scroll: 0/1 tx, 2/3 fg, 4/5 bg, x + 14 (MAME scrolldx -14: the map origin sits at dx - scroll). */
 
 module jtplaymark_video(
     input              rst,
@@ -117,7 +117,7 @@ jtplaymark_tile u_fg(
     .hs_start   ( hs_start      ),
     .vrender    ( vrender       ),
     .vdump      ( vdump         ),
-    .scrx       ( hm ? scr2[8:0] - 9'd14 : scr4[8:0] + 9'd6 ),
+    .scrx       ( hm ? scr2[8:0] + 9'd14 : scr4[8:0] + 9'd6 ),
     .scry       ( hm ? scr3[8:0] : scr5[8:0] ),
     .vram_addr  ( fg_vaddr      ),
     .vram_dout  ( fgram_video_dout ),
@@ -139,7 +139,7 @@ jtplaymark_tile u_tx(
     .hs_start   ( hs_start      ),
     .vrender    ( vrender       ),
     .vdump      ( vdump         ),
-    .scrx       ( hm ? scr0[8:0] - 9'd14 : scr0[8:0] + 9'd2 ),
+    .scrx       ( hm ? scr0[8:0] + 9'd14 : scr0[8:0] + 9'd2 ),
     .scry       ( scr1[8:0]     ),
     .vram_addr  ( txram_video_addr ),
     .vram_dout  ( txram_video_dout ),
@@ -161,7 +161,7 @@ jtplaymark_tile u_bg(       // Hot Mind only
     .hs_start   ( hs_start & hm ),
     .vrender    ( vrender       ),
     .vdump      ( vdump         ),
-    .scrx       ( scr4[8:0] - 9'd14 ),
+    .scrx       ( scr4[8:0] + 9'd14 ),
     .scry       ( scr5[8:0]     ),
     .vram_addr  ( bg_vaddr      ),
     .vram_dout  ( bgram_video_dout ),
