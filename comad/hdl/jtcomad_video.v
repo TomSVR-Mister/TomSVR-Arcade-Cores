@@ -60,7 +60,7 @@ assign game_vrender     = vrender[7:0];
 assign h1_prefetch       = hdump == HB_END - 9'd1;
 assign h0_prefetch       = hdump == HB_END;
 assign h_addr            = h0_prefetch ? 9'd0 : hdump + 9'd1;
-assign bmp_h_addr        = flip ? h_addr[7:0] : 8'hff - h_addr[7:0];
+assign bmp_h_addr        = gh ? h_addr[7:0] + 8'd1 : flip ? h_addr[7:0] : 8'hff - h_addr[7:0];   // gh: one pixel left (matches MAME)
 assign bmp_v_addr        = flip ? vdump[7:0]  : 8'd223 - vdump[7:0];
 assign fg_video_addr     = { bmp_v_addr, bmp_h_addr };
 assign bg_video_addr     = { bmp_v_addr, bmp_h_addr };

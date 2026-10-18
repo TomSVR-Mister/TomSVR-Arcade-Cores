@@ -80,7 +80,7 @@ wire [ 9:0] vnx    = vlink ? vx + vxw : vxw;
 wire [ 9:0] vny    = vlink ? vy + ram_dout[15:6] : ram_dout[15:6];
 wire [ 9:0] vydiff = { 2'd0, ln_v } - vny;
 wire        vhit   = vydiff[9:4] == 6'd0 && vcode != 13'd0;
-wire [ 8:0] vxpos  = 9'd240 - vnx[8:0];
+wire [ 8:0] vxpos  = 9'd241 - vnx[8:0];
 
 wire [ 8:0] draw_addr;
 wire [31:0] sorted_rom;

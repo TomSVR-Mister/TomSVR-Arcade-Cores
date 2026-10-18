@@ -159,7 +159,7 @@ always @(posedge clk) begin
                 st  <= ent == 0 ? IDLE : A1;
             end
             DMA: begin  // 2048 words from work RAM word 0x4000, two clocks of latency
-                wram_addr <= { 4'h4, dcnt[10:0] };
+                wram_addr <= { 4'h8, dcnt[10:0] };     // word 0x4000 (byte 0x8000)
                 dma_wa    <= wram_addr[11:1];
                 dcnt      <= dcnt + 1'd1;
                 dma_we    <= dcnt != 0 && dcnt <= 12'd2048;
