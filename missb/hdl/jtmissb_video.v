@@ -97,7 +97,7 @@ jtmissb_gfx u_gfx(
     .flip       ( flip           ),
     .LHBL       ( LHBL           ),
     .LVBL       ( LVBL           ),
-    .vdump      ( vdump[7:0]     ),
+    .vdump      ( vdump[7:0]+8'd1 ), // one line earlier than JTBUBL: matches MAME missb2
     .hdump      ( hdump          ),
     // CPU interface
     .vram_cs    ( vram_cs        ),
