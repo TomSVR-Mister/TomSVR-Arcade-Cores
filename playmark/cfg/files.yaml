@@ -1,0 +1,15 @@
+playmark:
+  - get:
+    - jtplaymark_game.v
+    - jtplaymark_main.v
+    - jtplaymark_sound.v
+    - jtplaymark_pic.v
+    - jtplaymark_video.v
+    - jtplaymark_tile.v
+    - jtplaymark_obj.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+jt6295:
+jteeprom:

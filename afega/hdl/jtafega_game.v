@@ -3,7 +3,8 @@
  * Afega boards with an 8 bpp background (MAME nmk16.cpp "popspops" machine: Bubble 2000, Hot Bubble, Pop's Pop's, Mang-Chi)
  * on JTFRAME (Jose Tejada, jotego). Personal build.
  * Header byte 0: bits 1-0 program ROM address scramble (1 Bubble 2000 / Hot Bubble / Mang-Chi, 2 Pop's Pop's),
- *   bits 3-2 background tiles (0: 12288, 1: 16384, 2: 4096), bit 4 8192 sprite tiles (else 4096), bit 5 no sprite ROM. */
+ *   bits 3-2 background tiles (0: 12288, 1: 16384, 2: 4096), bit 4 8192 sprite tiles (else 4096), bit 5 no sprite ROM,
+ *   bit 6 Dolmen (MAME twinactn: 4 bpp background, Z80 + OKI sound without the YM2151). */
 
 module jtafega_game(
     `include "jtframe_game_ports.inc"
@@ -15,12 +16,12 @@ wire [15:0] in0, in1;
 wire [ 8:0] vdump;
 wire        snd_wr, hs_start;
 reg  [ 1:0] scr = 0, tmod = 0;
-reg         omask = 0, nospr = 0;
+reg         omask = 0, nospr = 0, dol = 0;
 
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 always @(posedge clk) if( header && prog_we ) begin
-    if( prog_addr[1:0]==0 ) { nospr, omask, tmod, scr } <= prog_data[5:0];
+    if( prog_addr[1:0]==0 ) { dol, nospr, omask, tmod, scr } <= prog_data[6:0];
 end
 
 // IN0: coin 1, coin 2, service, start 1, start 2   IN1: P1 right, left, down, up, B1, B2 (low byte), P2 (high byte)
@@ -34,6 +35,7 @@ jtafega_main u_main(
     .hs_start    ( hs_start     ),
     .dip_pause   ( dip_pause    ),
     .scr         ( scr          ),
+    .dol         ( dol          ),
     .in0         ( in0          ),
     .in1         ( in1          ),
     .dsw         ( dipsw[15:0]  ),
@@ -68,6 +70,7 @@ jtafega_sound u_sound(
     .cen_4      ( cen_4         ),
     .cen_2      ( cen_2         ),
     .cen_1      ( cen_1         ),
+    .dol        ( dol           ),
     .latch      ( snd_latch     ),
     .snd_wr     ( snd_wr        ),
     .rom_addr   ( snd_addr      ),
@@ -89,6 +92,7 @@ jtafega_video u_video(
     .pxl_cen            ( pxl_cen           ),
     .gfx_en             ( gfx_en            ),
     .tmod               ( tmod              ),
+    .dol                ( dol               ),
     .omask              ( omask             ),
     .oen                ( ~nospr            ),
     .bg_scrx            ( bg_scrx           ),

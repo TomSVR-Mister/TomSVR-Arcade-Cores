@@ -1,0 +1,92 @@
+[global]
+author=["jotego"]
+
+[parse]
+sourcefile=[ "mitchell.cpp" ]
+skip.setnames = [
+    "mstworld", "mstworld2",
+    "spangbl","spangbl2",
+    "pangba","pangbb","pangbc",
+]
+skip.bootlegs=true
+debug = {machines=[
+    # wrong obj shown
+    "hatena", "mgakuen2",
+    # control problems
+    # 8 buttons
+    "pkladies",
+    # 20 buttons
+    "marukin",
+    # Not booting
+    "blockbl", "qtono1", "qsangoku",
+    "mgakuen", "7toitsu"
+]}
+
+[Audio]
+volume = [
+    { machine="block", value=0xF3 },
+    { machine="cworld", value=0x70 },
+    { machine="dokaben", value=0x4B },
+    { machine="pang", value=0x9A },
+    { machine="spang", value=0x65 },
+]
+
+[header]
+data = [
+    # Kabuki codes
+    { machine="cworld",   offset=0, data="04 15 26 37 40 51 62 73 57 51 43" },
+    { machine="pang",     offset=0, data="01 23 45 67 76 54 32 10 65 48 24" },
+    { machine="hatena",   offset=0, data="45 67 01 23 45 67 01 23 57 51 43" },
+    { machine="spang",    offset=0, data="45 67 01 23 45 67 01 23 58 52 43" },
+    # keep these two below spang
+    { setname="spangj",   offset=0, data="45 12 36 70 67 01 23 45 55 aa 5a" },
+    { setname="sbbros",   offset=0, data="45 67 01 23 45 67 01 23 21 30 12" },
+
+
+    { machine="dokaben",  offset=0, data="76 54 32 10 01 23 45 67 aa 55 a5" },
+    { machine="dokaben2", offset=0, data="76 54 32 10 01 23 45 67 aa 55 a5" },
+    { machine="pkladies", offset=0, data="76 54 32 10 01 23 45 67 aa 55 a5" },
+    { machine="marukin",  offset=0, data="54 32 10 76 54 32 10 76 48 54 4f" },
+    { machine="mgakuen2", offset=0, data="76 54 32 10 01 23 45 67 aa 55 a5" },
+
+
+    { machine="qtono1",   offset=0, data="12 34 56 70 12 34 56 70 11 11 11" },
+    { machine="qsangoku", offset=0, data="23 45 67 01 23 45 67 01 18 28 18" },
+    { machine="block",    offset=0, data="02 46 13 57 64 20 75 31 00 02 01" },
+    # GFX encoding
+    { machine="marukin", offset=14, data="01" },
+    # Input type
+    { setname="blockbl", offset=15, data="01" },
+    { setname="blockj",  offset=15, data="01" },
+    { setname="blockr1", offset=15, data="01" },
+    { setname="blockr2", offset=15, data="01" },
+    { setname="block",   offset=15, data="03" },
+    { machine="qtono1",  offset=15, data="02" },
+    { machine="cworld",  offset=15, data="02" }
+]
+
+[dipsw]
+bitcnt = 16
+delete=[{names=["Unused","Unknown"]}]
+
+[ROM]
+regions = [
+    { name="maincpu",  No_offset=true   },
+    { name="oki", No_offset=true, start="JTFRAME_BA1_START" },
+
+    {                     name="chars", start="JTFRAME_BA2_START", width=16, No_offset=true, sort_even=true },
+    { machine="pkladies", name="chars", start="JTFRAME_BA2_START", width=16, No_offset=true },
+    { machine="mgakuen2", name="chars", start="JTFRAME_BA2_START",           No_offset=true },
+    { machine="marukin",  name="chars", start="JTFRAME_BA2_START",           No_offset=true },
+    { machine="cworld",   name="chars", start="JTFRAME_BA2_START", width=16, No_offset=true, sequence=[
+        0, 4, 1, 5, 2, 6, 3, 7] },
+    { name="sprites", start="JTFRAME_BA3_START", width=16, No_offset=true, sort_even=true },
+    { name="eeprom", eeprom=true },
+# Unused
+    { name="plds", skip=true },
+    { name="pals", skip=true },
+]
+
+order = [
+    "maincpu", "oki", "chars", "sprites", "eeprom"
+]

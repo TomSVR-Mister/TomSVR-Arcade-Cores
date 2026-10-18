@@ -6,12 +6,15 @@
  * Graphics in SDRAM: the two ROM halves (MAME RGN_FRAC(1,2)) byte-interleaved: byte 2k = first half byte k (pen bits 7-4),
  *   byte 2k+1 = second half byte k (pen bits 3-0). Each byte holds two pixels, the left one in the high nibble.
  *   8 pixels = two 32-bit words at { tile, x[3], y[3:0], word }.
+ * b4 (Dolmen, MAME macross bg): 16x16x4 tiles (gfx_8x8x4_col_2x2_group_packed_msb), word = { colour, code[11:0] },
+ *   output { colour, pen }. 8 pixels = one 32-bit word at { tile, x[3], y[3:0] } of the ROM as is.
  * The 33 8-pixel columns covering the next line go into a 512-pixel ping-pong line buffer indexed by map x mod 512. */
 
 module jtafega_bg(
     input              rst,
     input              clk,
     input       [ 1:0] tmod,
+    input              b4,
     input       [ 8:0] hdump,
     input              hs_start,
     input       [ 8:0] vrender,
@@ -38,6 +41,7 @@ reg  [ 8:0] sx[0:1];
 reg  [ 8:0] col;            // map x / 8
 reg  [ 5:0] cnt;
 reg  [13:0] tile;
+reg  [ 3:0] tcol;
 reg         lbuf, wsel;
 reg  [ 1:0] wcnt;
 reg  [31:0] wa, wb;
@@ -46,11 +50,13 @@ reg  [ 1:0] up;
 wire [31:0] wsh = px[2] ? wb : wa;
 wire [ 7:0] fb  = wsh[ {px[1],4'd0}   +: 8 ];
 wire [ 7:0] sb  = wsh[ {px[1],4'd8}   +: 8 ];
-wire [ 7:0] pen = px[0] ? { fb[3:0], sb[3:0] } : { fb[7:4], sb[7:4] };
+wire [ 7:0] pen8= px[0] ? { fb[3:0], sb[3:0] } : { fb[7:4], sb[7:4] };
+wire [ 7:0] b4b = wa[ {px[2:1],3'd0} +: 8 ];
+wire [ 7:0] pen = b4 ? { tcol, px[0] ? b4b[3:0] : b4b[7:4] } : pen8;
 wire [ 8:0] rd_x = hdump + sx[vdump[0]];
 
 assign vram_addr = { mapy[8], col[8:1], mapy[7:4] };
-assign rom_addr  = { tile, col[0], mapy[3:0], wsel };
+assign rom_addr  = b4 ? { 3'd0, tile[11:0], col[0], mapy[3:0] } : { tile, col[0], mapy[3:0], wsel };
 
 always @* begin
     case( tmod )
@@ -81,7 +87,8 @@ always @(posedge clk) begin
             RD: begin       // two clocks of BRAM latency
                 wcnt <= wcnt + 1'd1;
                 if( wcnt==2 ) begin
-                    tile <= { up, vram_dout[11:0] };
+                    tile <= { b4 ? 2'd0 : up, vram_dout[11:0] };
+                    tcol <= vram_dout[15:12];
                     wsel <= 0;
                     st   <= FETCH;
                 end
@@ -95,7 +102,8 @@ always @(posedge clk) begin
                 if( wcnt!=3 ) wcnt <= wcnt + 1'd1;
                 else if( rom_ok ) begin
                     rom_cs <= 0;
-                    if( wsel ) begin wb <= rom_data; px <= 0; st <= WRITE; end
+                    if( b4 ) begin wa <= rom_data; px <= 0; st <= WRITE; end
+                    else if( wsel ) begin wb <= rom_data; px <= 0; st <= WRITE; end
                     else begin wa <= rom_data; wsel <= 1; st <= FETCH; end
                 end
             end

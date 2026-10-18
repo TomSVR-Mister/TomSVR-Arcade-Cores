@@ -10,6 +10,7 @@ module jtafega_video(
     input              pxl_cen,
     input       [ 3:0] gfx_en,
     input       [ 1:0] tmod,
+    input              dol,         // Dolmen: 4 bpp bg with colour in the tile word, no bg x offset
     input              omask,
     input              oen,
     input       [15:0] bg_scrx, bg_scry, tx_scrx, tx_scry,
@@ -27,7 +28,7 @@ module jtafega_video(
     output             bg_cs,
     input       [31:0] bg_data,
     input              bg_ok,
-    output      [15:2] tx_addr,
+    output      [16:2] tx_addr,
     output             tx_cs,
     input       [31:0] tx_data,
     input              tx_ok,
@@ -56,7 +57,7 @@ reg  [ 3:0] hbl_sh, vbl_sh;
 wire [ 7:0] bg_q, tx_q, obj_q;
 reg  [ 7:0] bgp, txp, objp;
 reg  [ 9:0] idx;
-wire [11:0] bgx = bg_scrx[11:0] - 12'h100;
+wire [11:0] bgx = dol ? bg_scrx[11:0] : bg_scrx[11:0] - 12'h100;
 
 assign LHBL     = hbl_sh[2];
 assign LVBL     = vbl_sh[2];
@@ -87,6 +88,7 @@ jtafega_bg u_bg(
     .rst        ( rst              ),
     .clk        ( clk              ),
     .tmod       ( tmod             ),
+    .b4         ( dol              ),
     .hdump      ( hdump            ),
     .hs_start   ( hs_start         ),
     .vrender    ( vrender          ),
@@ -113,6 +115,7 @@ jtafega_tx u_tx(
     .scry       ( tx_scry[7:0]     ),
     .vram_addr  ( txram_video_addr ),
     .vram_dout  ( txram_video_dout ),
+    .c4k        ( dol              ),
     .rom_addr   ( tx_addr          ),
     .rom_cs     ( tx_cs            ),
     .rom_data   ( tx_data          ),

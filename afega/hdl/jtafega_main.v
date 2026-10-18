@@ -5,6 +5,7 @@
  *   080012 reads 0x0100   08001f sound latch   084000/08c000 scroll registers (0-3: bg y/x, 4-7: text y/x)
  *   088000-0885ff palette   090000-093fff bg video RAM   09c000-09c7ff text video RAM   0c0000-0cffff work RAM (mirror 0f0000)
  * Interrupts (held until acknowledged): IRQ 4 at line 240, IRQ 2 at line 0, IRQ 1 at lines 25 and 153.
+ * dol: Dolmen (MAME twinactn_map, same map apart from the scroll register at 08c000, see below).
  * scr: 1 = Bubble 2000 / Hot Bubble / Mang-Chi (CPU A13<->A17, A14<->A16), 2 = Pop's Pop's (A16<->A17, A14<->A15). */
 
 module jtafega_main(
@@ -14,6 +15,7 @@ module jtafega_main(
     input              hs_start,    // first clock of a line
     input              dip_pause,
     input       [ 1:0] scr,
+    input              dol,         // Dolmen (MAME twinactn_map): bg x scroll only, through mustang_scroll_w at 08c000
 
     input       [15:0] in0, in1, dsw,
 
@@ -100,7 +102,13 @@ always @(posedge clk) begin
     if( rst ) begin
         bg_scrx <= 0; bg_scry <= 0; tx_scrx <= 0; tx_scry <= 0; snd_latch <= 0;
     end else begin
-        if( scr_cs && !wr_n ) case( A[2:1] )   // set 0: bg y, x  set 1: text y, x
+        if( dol ) begin
+            // 08c000: high byte 0 -> bg x scroll bits 15-8, 1 -> bits 7-0 (low byte of the data)
+            if( scr_cs && !wr_n && pg == 8'h8c && A[2:1]==0 && !lds_n ) begin
+                if( cpu_dout[15:8]==8'h00 ) bg_scrx[15:8] <= cpu_dout[7:0];
+                if( cpu_dout[15:8]==8'h01 ) bg_scrx[ 7:0] <= cpu_dout[7:0];
+            end
+        end else if( scr_cs && !wr_n ) case( A[2:1] )   // set 0: bg y, x  set 1: text y, x
             2'b00: begin if(!uds_n) bg_scry[15:8] <= cpu_dout[15:8]; if(!lds_n) bg_scry[7:0] <= cpu_dout[7:0]; end
             2'b01: begin if(!uds_n) bg_scrx[15:8] <= cpu_dout[15:8]; if(!lds_n) bg_scrx[7:0] <= cpu_dout[7:0]; end
             2'b10: begin if(!uds_n) tx_scry[15:8] <= cpu_dout[15:8]; if(!lds_n) tx_scry[7:0] <= cpu_dout[7:0]; end

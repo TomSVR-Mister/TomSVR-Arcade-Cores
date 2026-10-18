@@ -1,7 +1,8 @@
 /* SPDX-FileCopyrightText: 2026 Tom Sveen
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Afega text layer (MAME nmk16 common_get_tx_tile_info): 32x32 tiles of 8x8x4 scanned by columns (index = col * 32 + row),
- *   word = { colour[3:0], code[11:0] }, palette 0x200 + colour * 16, pen 15 transparent. Codes wrap at 2048 (64 kB ROM).
+ *   word = { colour[3:0], code[11:0] }, palette 0x200 + colour * 16, pen 15 transparent. Codes wrap at 2048 (64 kB ROM),
+ *   or 4096 (128 kB, c4k: Dolmen).
  * Graphics in SDRAM: the ROM as is, 4 bytes per tile row, left pixel in the high nibble of the first byte.
  * Output { colour, pen }. */
 
@@ -14,11 +15,12 @@ module jtafega_tx(
     input       [ 8:0] vdump,
     input       [ 7:0] scrx,
     input       [ 7:0] scry,
+    input              c4k,
 
     output      [10:1] vram_addr,
     input       [15:0] vram_dout,
 
-    output      [15:2] rom_addr,
+    output      [16:2] rom_addr,
     output reg         rom_cs,
     input       [31:0] rom_data,
     input              rom_ok,
@@ -42,7 +44,7 @@ wire [ 3:0] pen = wa[ { px[2:1], ~px[0], 2'd0 } +: 4 ];
 wire [ 7:0] rd_x = hdump[7:0] + sx[vdump[0]];
 
 assign vram_addr = { col, mapy[7:3] };
-assign rom_addr  = { code[10:0], mapy[2:0] };
+assign rom_addr  = { code[11] & c4k, code[10:0], mapy[2:0] };
 
 always @(posedge clk) begin
     if( rst ) begin
