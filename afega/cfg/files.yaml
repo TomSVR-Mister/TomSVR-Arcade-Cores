@@ -1,0 +1,16 @@
+afega:
+  - get:
+    - jtafega_game.v
+    - jtafega_main.v
+    - jtafega_sound.v
+    - jtafega_video.v
+    - jtafega_bg.v
+    - jtafega_tx.v
+    - jtafega_obj.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jt51:
+jt6295:

@@ -1,7 +1,11 @@
 /* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Date: 12-7-2026
- * Comad fork: end-of-list marker (byte 3 bit 3): 2026 Tom Sveen */
+ * Comad fork: end-of-list marker (byte 3 bit 3): 2026 Tom Sveen
+ * vu mode (Gals Hustler board): reads the VU-002 list directly, MAME kaneko16 bootleg_draw_sprites rules:
+ *   512 entries of 4 words at 700000. w0: { -, link[1:0] (both set = relative), -, -, -, -, -, -, -, colour[3:0], flipx, flipy }
+ *   w1: code[12:0]   w2: x << 6   w3: y << 6 (10-bit signed). Drawn in list order, so later entries are on top.
+ *   Words are streamed from the RAM one per clock; a hit that finds the draw queue busy stops the stream until it frees. */
 
 module jtcomad_obj(
     input              rst,
@@ -9,6 +13,7 @@ module jtcomad_obj(
     input              pxl_cen,
     input              lvbl,
     input              flip,
+    input              vu,
 
     output      [ 8:0] ln_addr,
     output      [15:0] ln_data,
@@ -40,7 +45,9 @@ localparam [3:0] IDLE =4'd0,
                  R4   =4'd5,
                  R6   =4'd6,
                  R7   =4'd7,
-                 RCODE=4'd8;
+                 RCODE=4'd8,
+                 VSCAN=4'd9,
+                 VHOLD=4'd10;
 localparam [1:0] D_SCAN=2'd0, D_WAIT=2'd1, D_DONE=2'd2;
 
 reg  [ 3:0] s_st;
@@ -57,6 +64,23 @@ reg  [ 3:0] pend_pal, pend_ysub;
 reg         last_ln_hs, dr_hflip, dr_vflip, dr_draw;
 reg         pend_hflip, pend_vflip, pend_valid;
 reg         scan_active;
+// vu mode
+reg  [10:0] vaddr;
+reg  [11:0] vt1, vt2;       // { valid, word address } of the RAM reads in flight
+reg  [15:0] vw0;
+reg  [12:0] vcode;
+reg  [ 9:0] vx, vy, vxw;
+reg         vissue;
+reg  [12:0] hold_code;
+reg  [ 8:0] hold_xpos;
+reg  [ 3:0] hold_pal, hold_ysub;
+reg         hold_hflip, hold_vflip;
+wire        vlink  = vw0[14:13] == 2'b11;
+wire [ 9:0] vnx    = vlink ? vx + vxw : vxw;
+wire [ 9:0] vny    = vlink ? vy + ram_dout[15:6] : ram_dout[15:6];
+wire [ 9:0] vydiff = { 2'd0, ln_v } - vny;
+wire        vhit   = vydiff[9:4] == 6'd0 && vcode != 13'd0;
+wire [ 8:0] vxpos  = 9'd240 - vnx[8:0];
 
 wire [ 8:0] draw_addr;
 wire [31:0] sorted_rom;
@@ -148,7 +172,13 @@ always @(posedge clk) begin
             scan_active <= 1'b1;
             done_st     <= D_SCAN;
             done_wait   <= 2'd2;
-            s_st        <= A3;
+            s_st        <= vu ? VSCAN : A3;
+            vaddr       <= 11'd0;
+            vissue      <= 1'b1;
+            vt1         <= 12'd0;
+            vt2         <= 12'd0;
+            vx          <= 10'd0;
+            vy          <= 10'd0;
         end
 
         if (pend_valid && !dr_busy) begin
@@ -165,7 +195,7 @@ always @(posedge clk) begin
         case (s_st)
             IDLE: begin
                 if (scan_active)
-                    s_st <= A3;
+                    s_st <= vu ? VSCAN : A3;
             end
             A3: begin
                 ram_addr <= { scan_entry, 3'd3 };
@@ -247,6 +277,67 @@ always @(posedge clk) begin
                         scan_entry <= scan_entry + 9'd1;
                         s_st       <= A3;
                     end
+                end
+            end
+            VSCAN: if (!line_start) begin
+                ram_addr <= { 1'b0, vaddr };
+                vt1      <= { vissue, vaddr };
+                vt2      <= vt1;
+                if (vissue) begin
+                    vaddr <= vaddr + 11'd1;
+                    if (&vaddr) vissue <= 1'b0;
+                end
+                if (vt2[11]) case (vt2[1:0])
+                    2'd0: vw0   <= ram_dout;
+                    2'd1: vcode <= ram_dout[12:0];
+                    2'd2: vxw   <= ram_dout[15:6];
+                    2'd3: begin
+                        vx <= vnx;
+                        vy <= vny;
+                        if (vhit) begin
+                            if (!pend_valid) begin
+                                pend_code  <= vcode;
+                                pend_xpos  <= vxpos;
+                                pend_pal   <= vw0[5:2];
+                                pend_ysub  <= vydiff[3:0];
+                                pend_hflip <= ~vw0[1];
+                                pend_vflip <= vw0[0];
+                                pend_valid <= 1'b1;
+                            end else begin  // queue busy: keep the hit, restart the stream after it
+                                hold_code  <= vcode;
+                                hold_xpos  <= vxpos;
+                                hold_pal   <= vw0[5:2];
+                                hold_ysub  <= vydiff[3:0];
+                                hold_hflip <= ~vw0[1];
+                                hold_vflip <= vw0[0];
+                                vaddr      <= vt2[10:0] + 11'd1;
+                                vissue     <= vt2[10:0] != 11'h7ff;
+                                vt1        <= 12'd0;
+                                vt2        <= 12'd0;
+                                s_st       <= VHOLD;
+                            end
+                        end
+                    end
+                endcase
+                if (vt2[11] && vt2[10:0] == 11'h7ff && !(vhit && pend_valid)) begin
+                    scan_active <= 1'b0;
+                    done_st     <= D_WAIT;
+                    s_st        <= IDLE;
+                end
+            end
+            VHOLD: if (!pend_valid) begin
+                pend_code  <= hold_code;
+                pend_xpos  <= hold_xpos;
+                pend_pal   <= hold_pal;
+                pend_ysub  <= hold_ysub;
+                pend_hflip <= hold_hflip;
+                pend_vflip <= hold_vflip;
+                pend_valid <= 1'b1;
+                if (vissue) s_st <= VSCAN;
+                else begin
+                    scan_active <= 1'b0;
+                    done_st     <= D_WAIT;
+                    s_st        <= IDLE;
                 end
             end
             default: s_st <= IDLE;

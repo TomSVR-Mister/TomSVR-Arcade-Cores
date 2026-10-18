@@ -10,12 +10,12 @@ wire [23:1] cpu_addr;
 wire [15:0] cpu_din;
 wire [ 8:0] vdump;
 wire [ 7:0] oki_dout;
-wire        oki_cs, oki_wr, oki_bank_we, irq3_n, irq5_n;
+wire        oki_cs, oki_wr, oki_bank_we, irq3_n, irq5_n, irq4_n;
 wire        cpu_rnw;
 wire [ 3:0] oki_bank;
 wire        flip;
 
-reg         prot_wdog = 1'b0;
+reg         prot_wdog = 1'b0, gh = 1'b0;
 
 assign ram_we   = ram_cs & ~cpu_rnw;
 assign dip_flip = ~flip;
@@ -26,7 +26,10 @@ assign ioctl_din  = 8'd0;
 
 always @(posedge clk) begin
     if (header && prog_we && prog_addr[1:0] == 2'd0)
+    begin
         prot_wdog <= prog_data[0];
+        gh        <= prog_data[1];   // Gals Hustler board
+    end
 end
 
 jtcomad_main u_main(
@@ -36,6 +39,7 @@ jtcomad_main u_main(
     .vdump          ( vdump           ),
     .dip_pause      ( dip_pause       ),
     .prot_wdog      ( prot_wdog       ),
+    .gh             ( gh              ),
 
     .joystick1      ( joystick1[5:0]  ),
     .joystick2      ( joystick2[5:0]  ),
@@ -81,6 +85,7 @@ jtcomad_main u_main(
     .flip           ( flip            ),
     .irq3_n         ( irq3_n          ),
     .irq5_n         ( irq5_n          ),
+    .irq4_n         ( irq4_n          ),
     .fb_keep        ( fb_keep         ),
 
     .rom_addr       ( main_addr       ),
@@ -113,6 +118,7 @@ jtcomad_video u_video(
     .clk                ( clk              ),
     .pxl_cen            ( pxl_cen          ),
     .flip               ( flip             ),
+    .gh                 ( gh               ),
     .gfx_en             ( gfx_en           ),
     .game_vrender       ( game_vrender     ),
     .game_hdump         ( game_hdump       ),

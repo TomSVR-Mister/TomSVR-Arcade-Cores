@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Date: 12-7-2026
+/* gh mode (Afega Gals Hustler board): RAM at E80000, OKI at D00000, IRQ3/4/5 at lines 224/112/0, VU-002 sprites (bootleg list)
  * Comad fork (5 MB ROM + 1 MB extension at B00000, work RAM at C80000, OKI at A80000, palette-based fg transparency): 2026 Tom Sveen */
 
 module jtcomad_main(
@@ -10,6 +11,7 @@ module jtcomad_main(
     input       [ 8:0] vdump,
     input              dip_pause,
     input              prot_wdog,
+    input              gh,          // Gals Hustler / Pocket Gals V.I.P. board (MAME expro02 galhustl)
 
     input       [ 5:0] joystick1,
     input       [ 5:0] joystick2,
@@ -54,6 +56,7 @@ module jtcomad_main(
     output reg  [ 3:0] oki_bank,
     output             irq3_n,
     output             irq5_n,
+    output             irq4_n,
     output reg         fb_keep,
     output reg         flip,
 
@@ -75,7 +78,7 @@ wire [ 1:0] dsn, fg_byte_we, bg_byte_we,
             pal_byte_we, objram_byte_we, objaux_byte_we;
 wire [ 2:0] ipl_n;
 wire        bus_cs, bus_busy, int_ack, calc_wdog_clr;
-wire        irq3_clr, irq5_clr, irq3_trig, irq5_trig, vdump32;
+wire        irq3_clr, irq5_clr, irq3_trig, irq5_trig, vdump32, irq4_clr, irq4_trig;
 wire [15:0] dsw1_dout, dsw2_dout, system_dout, calc_dout;
 reg         wram_cs;
 reg         fg_cs, bg_cs, pal_cs, objram_cs, objaux_cs,
@@ -101,13 +104,16 @@ assign ok_in = { rom_ok, ram_ok };
 assign bus_busy      = (rom_cs | ram_cs) && !ok_dly;
 assign int_ack       = fc == 3'b111 && !as_n;
 assign vpa_n         = !int_ack;
-assign ipl_n         = !irq5_n ? 3'b010 : (!irq3_n ? 3'b100 : 3'b111);
+assign ipl_n         = !irq5_n ? 3'b010 : !irq4_n ? 3'b011 : !irq3_n ? 3'b100 : 3'b111;
 assign calc_wdog_clr = prot_wdog && calc_cs && wr_n && A[4:1] == 4'd0 && dsn != 2'b11;
 assign vdump32       = vdump == 9'd32;
-assign irq3_trig     = ~lvbl & dip_pause;
-assign irq5_trig     = vdump32;
-assign irq3_clr      = int_ack && !irq3_n;
-assign irq5_clr      = int_ack &&  irq3_n;
+assign irq3_trig     = (gh ? vdump == 9'd224 : ~lvbl) & dip_pause;
+assign irq5_trig     = gh ? vdump == 9'd0 : vdump32;
+assign irq4_trig     = gh && vdump == 9'd112 && dip_pause;
+// gh: the interrupt acknowledge cycle carries the level on A3-A1
+assign irq5_clr      = gh ? int_ack && A[3:1] == 3'd5 : int_ack &&  irq3_n;
+assign irq4_clr      = gh && int_ack && A[3:1] == 3'd4;
+assign irq3_clr      = gh ? int_ack && A[3:1] == 3'd3 : int_ack && !irq3_n;
 
 // SDRAM-backed CPU RAM: bg mirror (520000-53ffff) and native Comad work RAM at C80000-C8FFFF
 assign ram_addr      = wram_cs ? { 2'b10, A[15:1] } : { 1'b0, A[16:1] };
@@ -128,7 +134,7 @@ assign bg_we         = bg_byte_we;
 assign pal_we        = pal_byte_we;
 assign objram_we     = objram_byte_we;
 assign objaux_we     = objaux_byte_we;
-assign objram_din    = !uds_n ? { 2{ cpu_dout[15:8] } } : { 2{ cpu_dout[7:0] } };
+assign objram_din    = gh ? cpu_dout : !uds_n ? { 2{ cpu_dout[15:8] } } : { 2{ cpu_dout[7:0] } };
 
 assign dsw1_dout     = { 2'b11, joystick1, dipsw[ 7:0] };
 assign dsw2_dout     = { 2'b11, joystick2, dipsw[15:8] };
@@ -153,7 +159,7 @@ always @* begin
         rom_cs    = A[23:20] <= 4'h4 || ext_rom;     // 000000-4fffff + b00000-bfffff
         fg_cs     = A[23:17] == 7'b0101000;         // 500000-51ffff
         bg_cs     = A[23:17] == 7'b0101001;         // 520000-53ffff
-        wram_cs   = A[23:16] == 8'hc8;               // c80000-c8ffff: work RAM (Comad boards)
+        wram_cs   = A[23:16] == (gh ? 8'he8 : 8'hc8); // c80000-c8ffff: work RAM (Comad boards), e80000 on gh
         ram_cs    = bg_cs | wram_cs;                // bg RAM also works as CPU RAM
         pal_cs    = A[23:11] == 13'b0110000000000;  // 600000-6007ff
         objram_cs = A[23:13] == 11'b01110000000;    // 700000-701fff
@@ -161,8 +167,8 @@ always @* begin
         dsw1_cs   = A[23:1] == 23'h400000;
         dsw2_cs   = A[23:1] == 23'h400001;
         system_cs = A[23:2] == 22'h200001;
-        oki_cs    = A[23:1] == 23'h540000;          // a80000-a80001 (moved out of the ROM area)
-        calc_cs   = A[23:5] == 19'h70000 && A[4:1] <= 4'ha; // e00000-e00014
+        oki_cs    = A[23:1] == (gh ? 23'h680000 : 23'h540000); // a80000-a80001 (moved out of the ROM area), d00000 on gh
+        calc_cs   = !gh && A[23:5] == 19'h70000 && A[4:1] <= 4'ha; // e00000-e00014
     end
 end
 
@@ -220,12 +226,12 @@ always @(posedge clk) begin
     if (main_rst) begin
         oki_bank <= 4'd0;
         fb_keep  <= 1'b0;
-        flip     <= 1'b0;
+        flip     <= gh;
     end else begin
         if (oki_bank_we && !uds_n) begin
             oki_bank <= cpu_dout[11:8];
             fb_keep  <= 1'b0;             // Comad fork: expro02 boards always redraw the sprite layer
-            flip     <= cpu_dout[14];
+            flip     <= cpu_dout[14] | gh;    // gh: MAME orientation
         end
     end
 end
@@ -247,6 +253,14 @@ jtframe_edge #(.QSET(0)) u_irq3(
     .edgeof ( irq3_trig ),
     .clr    ( irq3_clr  ),
     .q      ( irq3_n    )
+);
+
+jtframe_edge #(.QSET(0)) u_irq4(
+    .rst    ( main_rst  ),
+    .clk    ( clk       ),
+    .edgeof ( irq4_trig ),
+    .clr    ( irq4_clr  ),
+    .q      ( irq4_n    )
 );
 
 jtframe_edge #(.QSET(0)) u_irq5(
@@ -323,6 +337,7 @@ assign oki_wr      = 1'b0;
 assign oki_bank_we = 1'b0;
 assign irq3_n      = 1'b1;
 assign irq5_n      = 1'b1;
+assign irq4_n      = 1'b1;
 
 initial begin
     cpu_din  = 16'd0;
