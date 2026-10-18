@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Tom Sveen
  * SPDX-License-Identifier: GPL-3.0-or-later
- * Afega / NMK16 sprites (MAME nmk16spr.cpp with a colour/priority callback, so entry 0 ends on top).
+ * Afega / NMK16 sprites (MAME nmk16spr.cpp with a colour/priority callback: drawn from the last entry, and a pixel
+ *   already taken in the priority bitmap is kept, so higher entries end on top - checked against MAME).
  * Sprite DMA (MAME dma_callback): at line 241 the 4 kB at work RAM 0x8000 are copied to a buffer; the sprites shown
  *   are those of the previous copy (two buffers), so two ping-pong banks are enough.
  * Entry (8 words): w0 bit 0 visible   w1 { flipy, flipx, h[3:0], w[3:0] } (tiles - 1)   w3 code   w4 x (9 bits)
@@ -81,12 +82,12 @@ always @(posedge clk) begin
                         if( vrender != 9'd241 ) dma_done <= 0;
                         line <= vrender;
                         lbuf <= vrender[0];
-                        ent  <= 8'd255;
+                        ent  <= 8'd0;
                         st   <= oen ? A1 : IDLE;
                     end
                 end
             end
-            // scan from the last entry so that entry 0 is drawn last
+            // scan from entry 0: higher entries end on top (MAME: the first sprite drawn into the priority bitmap wins)
             A1: begin buf_ra <= { bank, ent, 3'd0 }; wcnt <= 0; st <= A2; end
             A2: begin
                 buf_ra <= { bank, ent, 3'd1 };
@@ -155,8 +156,8 @@ always @(posedge clk) begin
                 end
             end
             NEXT: begin
-                ent <= ent - 1'd1;
-                st  <= ent == 0 ? IDLE : A1;
+                ent <= ent + 1'd1;
+                st  <= &ent ? IDLE : A1;
             end
             DMA: begin  // 2048 words from work RAM word 0x4000, two clocks of latency
                 wram_addr <= { 4'h8, dcnt[10:0] };     // word 0x4000 (byte 0x8000)
