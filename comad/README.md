@@ -15,3 +15,7 @@ Changes from JTGALS:
    (JTGALS treats fg value 0 as transparent). Fixes the picture flash when the game blanks the palette.
 
 Build: GitHub Actions workflow "Build Comad core" (Actions tab -> Run workflow). The .rbf is in the run's artifacts.
+
+5. Header byte 0 bit 1 ("gh") selects the Afega Gals Hustler board (MAME expro02 "galhustl": Pocket Gals V.I.P., Gals Hustler):
+   program 000000-0FFFFF + data 200000-2FFFFF, work RAM E80000, OKI D00000, IRQ 3/4/5 at lines 224/112/0,
+   and the VU-002 sprite list at 700000 read natively (MAME kaneko16 bootleg_draw_sprites). These games run unpatched.
