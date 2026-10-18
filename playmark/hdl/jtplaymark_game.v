@@ -36,14 +36,38 @@ end
 assign sys = { 2'b11, coin[1], coin[0], 4'hf };
 assign p1  = { cab_1p[0], joystick1[6:4], joystick1[0], joystick1[1], joystick1[2], joystick1[3] };
 assign p2  = { cab_1p[1], joystick2[6:4], joystick2[0], joystick2[1], joystick2[2], joystick2[3] };
+// jt9346 reports ready as soon as CS rises again after a write; the 93C46 (and MAME) stays busy (DO low) for the
+// write cycle, and Hot Mind waits for DO to go low and then high. Hold DO low for 1.75 ms (MAME's write time).
+wire        eep_wflag;
+reg  [16:0] eep_bcnt;
+wire        eep_busy = eep_bcnt != 0;
+
+always @(posedge clk) begin
+    if( rst ) eep_bcnt <= 0;
+    else if( eep_wflag ) eep_bcnt <= 17'd84_000;   // 1.75 ms at 48 MHz
+    else if( eep_busy ) eep_bcnt <= eep_bcnt - 1'd1;
+end
+
+// jt9346 only takes a start bit when DI rises between clocks, so a command that follows a word ending in 1 is missed.
+// One extra clock with DI low when CS rises (ignored while the chip waits for the start bit) clears that state.
+reg  [2:0] eep_inj;
+reg        eep_csl;
+wire       eep_sclk = eep_clk | eep_inj[1];
+wire       eep_sdi  = eep_di & ~|eep_inj;
+
+always @(posedge clk) begin
+    eep_csl <= eep_cs;
+    eep_inj <= eep_cs && !eep_csl ? 3'b111 : eep_inj >> 1;
+end
+
 // Hot Mind DISPENSER: bit 6 EEPROM data, ticket/token dispensers idle and not empty
-assign disp = { 1'b1, eep_do, 1'b1, 1'b0, 1'b1, 1'b0, 2'b11 };
+assign disp = { 1'b1, eep_do & ~eep_busy, 1'b1, 1'b0, 1'b1, 1'b0, 2'b11 };
 
 jt9346 #(.AW(6),.DW(16)) u_eeprom(
     .rst        ( rst       ),
     .clk        ( clk       ),
-    .sclk       ( eep_clk   ),
-    .sdi        ( eep_di    ),
+    .sclk       ( eep_sclk  ),
+    .sdi        ( eep_sdi   ),
     .sdo        ( eep_do    ),
     .scs        ( eep_cs    ),
     .dump_clk   ( clk       ),
@@ -51,8 +75,8 @@ jt9346 #(.AW(6),.DW(16)) u_eeprom(
     .dump_we    ( 1'b0      ),
     .dump_din   ( 16'd0     ),
     .dump_dout  (           ),
-    .dump_clr   ( 1'b0      ),
-    .dump_flag  (           )
+    .dump_clr   ( eep_wflag ),
+    .dump_flag  ( eep_wflag )
 );
 
 jtplaymark_main u_main(
