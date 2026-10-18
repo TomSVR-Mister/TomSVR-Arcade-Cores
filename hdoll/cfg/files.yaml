@@ -1,0 +1,15 @@
+hdoll:
+  - get:
+    - jthdoll_game.v
+    - jthdoll_main.v
+    - jthdoll_sound.v
+    - jthdoll_video.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jtopl2.yaml
+jt6295:
