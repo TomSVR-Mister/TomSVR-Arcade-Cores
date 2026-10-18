@@ -1,0 +1,54 @@
+clocks:
+  clk:
+    - freq: 6000000
+      outputs:
+        - cen_6
+        - cen_3
+        - cen_1p5
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: psg0, module: jt49, rsum: 10k }
+    - { name: psg1, module: jt49, rsum: 10k }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 17, data_width: 8 }
+    - buses:
+      - { name: gfx,  addr_width: 18, data_width: 8 }
+    - buses:
+      - { name: sprom, addr_width: 16, data_width: 8 }
+
+bram:
+  - name: ram
+    size: 8kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: ram_video_addr, dout: ram_video_dout, rw: false }
+  - name: spr
+    size: 1kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: spr_video_addr, dout: spr_video_dout, rw: false }
+  - name: pal
+    size: 1kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: pal_video_addr, dout: pal_video_dout, rw: false }
+  - name: bmp0
+    size: 32kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: bmp0_video_addr, dout: bmp0_video_dout, rw: false }
+  - name: bmp1
+    size: 32kB
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: video, addr: bmp1_video_addr, dout: bmp1_video_dout, rw: false }
