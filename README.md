@@ -22,6 +22,16 @@ which jotego modules it uses, and how its MRAs are laid out.
 
 ## Install
 
+**With update_all / downloader (recommended):** add this to `downloader.ini` in the root of the SD card, then run
+update_all. It installs the cores to `_Arcade/cores/` and the MRAs to `_Arcade/_TomSVR/`, and keeps them updated.
+
+```ini
+[TomSVR-Mister/TomSVR-Arcade-Cores]
+db_url = https://raw.githubusercontent.com/TomSVR-Mister/TomSVR-Arcade-Cores/db/db.json.zip
+```
+
+**By hand:** download the zip from the Releases page, then:
+
 1. Copy the `.rbf` files to `/media/fat/_Arcade/cores/`.
 2. Copy the `.mra` files to `/media/fat/_Arcade/` (or a subfolder).
 3. Put your own MAME (0.264 or later) zips in `/media/fat/games/mame/`. Merged or split sets both work.
