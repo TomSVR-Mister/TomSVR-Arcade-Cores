@@ -77,9 +77,11 @@ for g in GAMES:
     full = bytes([g['exc'], 0, 0, 0]) + bytes(img) + h
     open(f'{out}/{g["set"]}.rom', 'wb').write(full)
     open(f'{out}/{g["set"]}.md5', 'w').write(hashlib.md5(full).hexdigest())
-    btn = { 3: 'Button 1,Button 2,Button 3,Start,Coin,Core credits', 2: 'Button 1,Button 2,Start,Coin,Core credits',
-            1: 'Button 1,Start,Coin,Core credits' }[g['buttons']]
-    bdef = { 3: 'A,B,X,Start,Select,-', 2: 'A,B,Start,Select,-', 1: 'A,Start,Select,-' }[g['buttons']]
+    # The core always has JTFRAME_BUTTONS=3: MiSTer maps the names list to joystick bits in order, so Start and Coin
+    # must sit after three button slots whatever the game uses (with fewer, Select lands on a button or on Start).
+    used = ['Button 1', 'Button 2', 'Button 3'][:g['buttons']]
+    btn = ','.join(used + ['Unused'] * (3 - len(used)) + ['Start', 'Coin', 'Core credits'])
+    bdef = 'A,B,X,Start,Select,-'
     mra = f'''<!-- {g["name"]} on JTPLAYMARK, a personal MiSTer core for the Playmark {["Big Twin", "Excelsior", "Hard Times"][g["exc"]]} board (MAME playmark.cpp "{g["set"]}"),
      built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified;
      the PIC16C57 sound program is MAME's HEX dump, decoded by the core. Requires jtplaymark.rbf. -->
@@ -100,7 +102,7 @@ for g in GAMES:
     <switches page_id="1" page_name="Switches" base="16" default="{g["dsw"]}">
 {nl.join('        ' + d for d in g["dips"])}
     </switches>
-    <buttons names="{btn}" default="{bdef}" count="{g["buttons"]}"/>
+    <buttons names="{btn}" default="{bdef}" count="3"/>
 </misterromdescription>
 '''
     open(f'{out}/mra/{g["name"]} (JTPLAYMARK).mra', 'w').write(mra)
