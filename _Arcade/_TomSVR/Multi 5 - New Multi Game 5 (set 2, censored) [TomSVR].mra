@@ -1,0 +1,60 @@
+<!-- Multi 5 - New Multi Game 5 (set 2, censored) on TomSVR_nmg5, a personal MiSTer core for Yun Sung's YS-1300 board family, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_nmg5.rbf. -->
+<misterromdescription>
+    <name>Multi 5 - New Multi Game 5 (set 2, censored) [TomSVR]</name>
+    <setname>nmg5a</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1998</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nmg5</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="nmg5.zip" md5="None">
+        <part> 08 10 00 00 </part>
+        <interleave output="16">
+            <part name="m5_p2.ub16" crc="230438db" map="01"/>
+            <part name="m5_p1.ub15" crc="0d63a21d" map="10"/>
+        </interleave>
+        <part name="xh15.bin" crc="12d047c4"/>
+        <part name="xra1.bin" crc="c74a4f3e"/>
+        <part repeat="0x60000"> 00</part>
+        <part repeat="0x70000"> FF</part>
+        <interleave output="32">
+            <part name="uf1.bin" crc="9a9fb6f4" map="0001"/>
+            <part name="uf2.bin" crc="66954d63" map="0010"/>
+            <part name="ufa1.bin" crc="ba73ed2d" map="0100"/>
+            <part name="uh1.bin" crc="f7726e8e" map="1000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <part name="uj1.bin" crc="54f7486e"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="m5_12.srom1" crc="3adff261" map="00000100"/>
+            <part name="m5_8.srom2" crc="b0736b66" map="00100000"/>
+            <part name="m5_13.srom3" crc="8e904919" map="01000000"/>
+            <part name="m5_9.srom4" crc="779e0e30" map="10000000"/>
+            <part name="m5_6.srom5" crc="41061258" map="00000001"/>
+            <part name="m5_10.srom6" crc="8147d8ef" map="00000010"/>
+            <part name="m5_7.srom7" crc="acb00d15" map="00010000"/>
+            <part name="m5_11.srom8" crc="0ba74fce" map="00001000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,df">
+        <dip name="Game Title" bits="0" ids="New Multi Game 5,Multi 5"/>
+        <dip name="Crocodiles (Tong Boy)" bits="1,2" ids="Pattern 4,Pattern 2,Pattern 3,Pattern 1"/>
+        <dip name="License" bits="3,4" ids="New Impeuropex,BNS Enterprises,Nova Games,None"/>
+        <dip name="1P Vs 2P Rounds (Bubble Gum)" bits="5" ids="Best of 3,Best of 1"/>
+        <dip name="Difficulty" bits="6,7" ids="Hardest,Easy,Hard,Normal"/>
+        <dip name="Coin B (type 1 / type 2)" bits="8,9" ids="2C/3C - 1C/6C,1C/2C - 1C/3C,2C/1C - 1C/4C,1C/1C"/>
+        <dip name="Coin A (type 1 / type 2)" bits="10,11" ids="2C/3C - 4C/1C,1C/2C - 2C/1C,2C/1C - 3C/1C,1C/1C"/>
+        <dip name="Demo Sounds" bits="13" ids="On,Off"/>
+        <dip name="Coin Type" bits="14" ids="2,1"/>
+        <dip name="Service Mode" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,-,-,-,Start,Coin,Core credits" default="A,B,X,Y,L,R,Start,Select,-" count="2"/>
+</misterromdescription>

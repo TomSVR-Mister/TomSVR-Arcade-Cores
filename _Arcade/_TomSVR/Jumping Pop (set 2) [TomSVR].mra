@@ -1,0 +1,55 @@
+<!-- Jumping Pop (set 2) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Jumping Pop (set 2) [TomSVR]</name>
+    <setname>jumppope</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>2001</year>
+    <manufacturer>Emag Soft</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="jumppop.zip" md5="None">
+        <part> A4 00 00 00 </part>
+        <interleave output="16">
+            <part name="jumppope/esd1.cu03" crc="883392ba" map="01"/>
+            <part name="jumppope/esd2.cu02" crc="302dd093" map="10"/>
+        </interleave>
+        <part name="z80_prg.bin" crc="a88d4424"/>
+        <part name="samples.bin" crc="066f30a7"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="jumppope/esd7.ju03" crc="9c2970e0" map="0001"/>
+            <part name="jumppope/esd8.ju04" crc="33bf99b0" map="0010"/>
+            <part name="jumppope/esd9.ju05" crc="671d21fd" map="0100"/>
+            <part name="jumppope/esd10.ju06" crc="85a3cc73" map="1000"/>
+        </interleave>
+        <part repeat="0x300000"> 00</part>
+        <part repeat="0x200000"> 00</part>
+        <interleave output="32">
+            <part name="jumppope/esd5.fu28" crc="0d47f821" map="0001"/>
+            <part name="jumppope/esd4.fu26" crc="97b409be" map="0010"/>
+            <part name="jumppope/esd6.fu29" crc="c01af40d" map="0100"/>
+            <part name="jumppope/esd3.fu27" crc="3358a693" map="1000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="FF,FE">
+        <dip name="Service Mode" bits="0" ids="On,Off"/>
+        <dip name="Flip Screen" bits="1" ids="On,Off"/>
+        <dip name="Coin B" bits="2,4" ids="3C1C,1C4C,1C6C,1C2C,2C1C,1C3C,1C5C,1C1C"/>
+        <dip name="Coin A" bits="5,7" ids="3C1C,1C4C,1C6C,1C2C,2C1C,1C3C,1C5C,1C1C"/>
+        <dip name="Demo Sounds" bits="8" ids="On,Off"/>
+        <dip name="Allow Continue" bits="9" ids="No,Yes"/>
+        <dip name="Picture Viewer" bits="10" ids="On,Off"/>
+        <dip name="BG Modesty" bits="11" ids="Less,More"/>
+        <dip name="Difficulty" bits="12,13" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Lives" bits="14,15" ids="2,4,1,3"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

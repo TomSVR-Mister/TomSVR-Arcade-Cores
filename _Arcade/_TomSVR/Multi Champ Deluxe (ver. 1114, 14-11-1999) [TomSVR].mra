@@ -1,0 +1,43 @@
+<!-- Multi Champ Deluxe (ver. 1114, 14-11-1999) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Multi Champ Deluxe (ver. 1114, 14-11-1999) [TomSVR]</name>
+    <setname>mchampdxb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>ESD</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="mchampdx.zip" md5="None">
+        <part> 09 00 00 00 </part>
+        <interleave output="16">
+            <part name="mchampdxb/ver1114_esd1.cu03" crc="11ff2e94" map="01"/>
+            <part name="mchampdxb/ver1114_esd2.cu02" crc="d17b2616" map="10"/>
+        </interleave>
+        <part name="mchampdxb/ver1114_esd3.su06" crc="b87a1e85"/>
+        <part name="esd4.su10" crc="2fbe94ab"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="mchampdxb/ver1114_ju02" crc="2f9ccff8" map="0021"/>
+            <part name="mchampdxb/ver1114_ju01" crc="0048e687" map="2100"/>
+        </interleave>
+        <part name="mchampdxb/ver1114_esd5.ju07" crc="8175939f"/>
+        <part repeat="0x1c0000"> 00</part>
+        <interleave output="32">
+            <part name="mchampdxb/ver1114_fu35" crc="c515c704" map="0021"/>
+            <part name="mchampdxb/ver1114_fu34" crc="39d448bb" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="2" zip="mchampdx.zip" md5="None">
+        <part name="mchampdxb/eeprom1114" crc="427d90d2"/>
+    </rom>
+    <nvram index="2" size="128"/>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

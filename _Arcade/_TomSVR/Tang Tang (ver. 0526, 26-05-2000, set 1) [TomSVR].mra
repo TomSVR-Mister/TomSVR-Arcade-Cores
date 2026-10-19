@@ -1,0 +1,46 @@
+<!-- Tang Tang (ver. 0526, 26-05-2000, set 1) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Tang Tang (ver. 0526, 26-05-2000, set 1) [TomSVR]</name>
+    <setname>tangtang</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>2000</year>
+    <manufacturer>ESD</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="tangtang.zip" md5="None">
+        <part> 1A 00 00 00 </part>
+        <interleave output="16">
+            <part name="esd1.cu03" crc="b6c0f2f4" map="01"/>
+            <part name="esd2.cu02" crc="b6dd6e3d" map="10"/>
+        </interleave>
+        <part name="esd3.su06" crc="d48ecc5c"/>
+        <part name="esd4.su10" crc="f2dfb02d"/>
+        <part repeat="0x60000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="xju07.bin" crc="556acac3" map="0001"/>
+            <part name="xju06.bin" crc="01f59ff7" map="0010"/>
+            <part name="xju05.bin" crc="679302cf" map="0100"/>
+            <part name="xju04.bin" crc="f999b9d7" map="1000"/>
+        </interleave>
+        <part repeat="0x300000"> 00</part>
+        <part name="xju08.bin" crc="ecc2d8c7"/>
+        <part repeat="0x1c0000"> 00</part>
+        <interleave output="32">
+            <part name="fu35.bin" crc="84f3f833" map="0021"/>
+            <part name="fu34.bin" crc="bf91f543" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="2" zip="tangtang.zip" md5="None">
+        <part name="eeprom" crc="00514989"/>
+    </rom>
+    <nvram index="2" size="128"/>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

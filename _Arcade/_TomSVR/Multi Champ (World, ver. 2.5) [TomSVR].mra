@@ -1,0 +1,63 @@
+<!-- Multi Champ (World, ver. 2.5) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Multi Champ (World, ver. 2.5) [TomSVR]</name>
+    <setname>multchmp25</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>ESD</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="multchmp.zip" md5="None">
+        <part> 13 00 00 00 </part>
+        <interleave output="16">
+            <part name="multchmp25/esd1.cu03" crc="10974063" map="01"/>
+            <part name="multchmp25/esd2.cu02" crc="2d1b098a" map="10"/>
+        </interleave>
+        <part name="esd3.su06" crc="7c178bd7"/>
+        <part repeat="0x20000"> 00</part>
+        <part name="esd4.su10" crc="6e741fcd"/>
+        <part repeat="0x60000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="esd17.ju06" crc="a69d4399" map="0001"/>
+            <part name="esd16.ju05" crc="e670a6da" map="0010"/>
+            <part name="esd15.ju04" crc="88b7a97c" map="0100"/>
+            <part name="esd14.ju03" crc="a6122225" map="1000"/>
+        </interleave>
+        <part repeat="0x300000"> 00</part>
+        <part name="esd13.ju07" crc="22071594"/>
+        <part repeat="0x1c0000"> 00</part>
+        <interleave output="32">
+            <part name="esd9.fu28" crc="6652c04a" map="0001"/>
+            <part name="esd7.fu26" crc="a783a003" map="0010"/>
+            <part name="esd11.fu29" crc="9bafd8ee" map="0100"/>
+            <part name="esd5.fu27" crc="299f32c2" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="esd10.fu31" crc="d815974b" map="0001"/>
+            <part name="esd8.fu30" crc="22861af2" map="0010"/>
+            <part name="esd12.fu33" crc="c6b86001" map="0100"/>
+            <part name="esd6.fu32" crc="e2689bb2" map="1000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="FB,FF">
+        <dip name="Service Mode" bits="0" ids="On,Off"/>
+        <dip name="Coinage Type" bits="1" ids="2,1"/>
+        <dip name="Demo Sounds" bits="2" ids="On,Off"/>
+        <dip name="Flip Screen" bits="3" ids="On,Off"/>
+        <dip name="Coin A" bits="4,5" ids="4C1C/2C3C,3C1C/2C1C,2C1C/1C2C,1C1C"/>
+        <dip name="Coin B" bits="6,7" ids="1C6C/2C3C,1C3C/1C2C,1C4C/2C1C,1C1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Lives" bits="10,11" ids="2,5,4,3"/>
+        <dip name="Selectable Games" bits="12" ids="4,3"/>
+        <dip name="Free Play" bits="13" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

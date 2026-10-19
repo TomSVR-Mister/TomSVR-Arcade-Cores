@@ -1,0 +1,58 @@
+<!-- Magic Bubble on TomSVR_ys16, a personal MiSTer core for Yun Sung's 16-bit boards (YS1302 board (Z80 + YM3812 sound)), built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified (tile ROMs are loaded twice, one copy per scroll layer).
+     Requires TomSVR_ys16.rbf. -->
+<misterromdescription>
+    <name>Magic Bubble [TomSVR]</name>
+    <setname>magicbub</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>199?</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_ys16</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="magicbub.zip" md5="None">
+        <part> 01 00 00 00 </part>
+        <interleave output="16">
+            <part name="magbuble.u32" crc="f6ea7004" map="01"/>
+            <part name="magbuble.u33" crc="18fdd582" map="10"/>
+        </interleave>
+        <part name="u131.bin" crc="03e04e89"/>
+        <part repeat="0x60000"> FF</part>
+        <part name="u143.bin" crc="04192753"/>
+        <interleave output="32">
+            <part name="u20.bin" crc="f70e3b8c" map="0001"/>
+            <part name="u21.bin" crc="ad082cf3" map="0010"/>
+            <part name="u22.bin" crc="7c68df7a" map="0100"/>
+            <part name="u23.bin" crc="c7763fc1" map="1000"/>
+        </interleave>
+        <part repeat="0x80000"> FF</part>
+        <interleave output="64">
+            <part name="magbuble.u67" crc="6355e57d" map="00000021"/>
+            <part name="magbuble.u68" crc="53ae6c2b" map="00002100"/>
+            <part name="magbuble.u69" crc="b892e64c" map="00210000"/>
+            <part name="magbuble.u70" crc="37794837" map="21000000"/>
+        </interleave>
+        <part repeat="0x200000"> FF</part>
+        <interleave output="64">
+            <part name="magbuble.u67" crc="6355e57d" map="00000021"/>
+            <part name="magbuble.u68" crc="53ae6c2b" map="00002100"/>
+            <part name="magbuble.u69" crc="b892e64c" map="00210000"/>
+            <part name="magbuble.u70" crc="37794837" map="21000000"/>
+        </interleave>
+        <part repeat="0x200000"> FF</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="bf,ff">
+        <dip name="Coinage" bits="0,1,2" ids="Free Play,3C/2C,3C/1C,2C/3C,2C/1C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,4" ids="Very Hard,Hard,Easy,Normal"/>
+        <dip name="Demo Sounds" bits="6" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="1P Vs 2P Rounds (Start)" bits="10,11" ids="Best of 7,Best of 5,Best of 1,Best of 3"/>
+        <dip name="1P Vs 2P Rounds (Join-in)" bits="12" ids="Best of 1,Best of 3"/>
+    </switches>
+    <buttons names="Button 1,Unused,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

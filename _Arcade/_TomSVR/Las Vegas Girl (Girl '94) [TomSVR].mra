@@ -1,0 +1,36 @@
+<!-- Las Vegas Girl (Girl '94) on TomSVR_zero, a personal MiSTer core for Comad's Zero Zone board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_zero.rbf. -->
+<misterromdescription>
+    <name>Las Vegas Girl (Girl '94) [TomSVR]</name>
+    <setname>lvgirl94</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Comad</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_zero</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="lvgirl94.zip" md5="None">
+        <interleave output="16">
+            <part name="rom5" crc="5d446a1a" map="01"/>
+            <part name="rom4" crc="c4fb449e" map="10"/>
+        </interleave>
+        <part name="rom1" crc="223ccce5"/>
+        <part repeat="0x18000"> FF</part>
+        <part name="rom2" crc="c7551e81"/>
+        <part name="rom3" crc="e348ff5e"/>
+        <part name="rom6" crc="eeeb94ba"/>
+        <part repeat="0x40000"> FF</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Coinage" bits="0,2" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3" ids="Always Hard,In Game Default"/>
+        <dip name="Speed" bits="4" ids="Fast,Normal"/>
+        <dip name="Demo Sounds" bits="5" ids="Off,On"/>
+        <dip name="Helps" bits="10" ids="2,1"/>
+        <dip name="Bonus Help" bits="11" ids="30000,None"/>
+        <dip name="Service Mode" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Rotate,Help,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

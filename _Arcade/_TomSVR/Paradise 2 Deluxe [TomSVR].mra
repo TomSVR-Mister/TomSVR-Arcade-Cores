@@ -1,0 +1,45 @@
+<!-- Paradise 2 Deluxe on TomSVR_para, a personal MiSTer core for Yun Sung's Paradise-family boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_para.rbf (v2, Oct 2026 or newer). -->
+<misterromdescription>
+    <name>Paradise 2 Deluxe [TomSVR]</name>
+    <setname>para2dx</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0282</mameversion>
+    <year>1994</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_para</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="para2dx.zip" md5="None">
+        <part> 00 0F 00 00 </part>
+        <part name="pdx2_u128.bin" crc="4cbd22e1"/>
+        <part name="pdx2_u085.bin" crc="398b842e"/>
+        <part name="pdx2_u113.bin" crc="9c5337f0"/>
+        <part name="pdx2_u094.bin" crc="87c4521b"/>
+        <part name="pdx2_u110.bin" crc="59e828d1"/>
+        <part repeat="0x60000"> 00</part>
+        <part name="pdx2_u111.bin" crc="619dd972"/>
+        <part repeat="0x60000"> 00</part>
+        <part name="pdx2_u092.bin" crc="d6797812"/>
+        <part name="pdx2_u093.bin" crc="7644b8e9"/>
+        <part name="pdx2_u114.bin" crc="3634b086"/>
+        <part repeat="0x40000"> 00</part>
+        <part name="pdx2_u115.bin" crc="404409f4"/>
+        <part repeat="0x40000"> 00</part>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ba,ff">
+        <dip name="Difficulty" bits="0,1" ids="Hardest,Hard,Normal,Easy"/>
+        <dip name="Fill Area" bits="2,3" ids="90%,85%,80%,75%"/>
+        <dip name="Lives" bits="4" ids="3,5"/>
+        <dip name="Time" bits="5,6" ids="45,60,75,90"/>
+        <dip name="Sound Test" bits="7" ids="On,Off"/>
+        <dip name="Coinage" bits="8,9" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Demo Sounds" bits="13" ids="Off,On"/>
+        <dip name="Flip Screen" bits="14" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Unused,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

@@ -1,0 +1,47 @@
+<!-- Funny Bubble (Comad version) on TomSVR_funybubl, a personal MiSTer core for the Funny Bubble board (MAME funybubl.cpp "funybublc"),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_funybubl.rbf. -->
+<misterromdescription>
+    <name>Funny Bubble (Comad version) [TomSVR]</name>
+    <setname>funybublc</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>Comad</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_funybubl</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="funybubl.zip" md5="None">
+        <part name="2.ub16" crc="d684c13f"/>
+        <part name="p.su6" crc="33169d4d"/>
+        <part repeat="0x8000"> 00</part>
+        <part name="b.su12" crc="a2d780f4"/>
+        <part name="c.su13" crc="1f7e9269"/>
+        <part repeat="0x50000"> FF</part>
+        <interleave output="32">
+            <part name="d.ug1" crc="b7ebbc00" map="0001"/>
+            <part name="e.ug2" crc="28afc396" map="0010"/>
+            <part name="j.ug3" crc="9e8687cd" map="0100"/>
+            <part name="k.ug4" crc="63f0e810" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="7.ug12" crc="87603d7b" map="0001"/>
+            <part name="8.uh13" crc="ab6031bd" map="0010"/>
+            <part name="9.ug15" crc="0e8352ff" map="0100"/>
+            <part name="10.uh15" crc="df7dd356" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="13.ug16" crc="9f57bdd5" map="0001"/>
+            <part name="14.uh16" crc="2ac15ea3" map="0010"/>
+            <part name="15.ug17" crc="9a5e66a6" map="0100"/>
+            <part name="16.uh17" crc="218060b3" map="1000"/>
+        </interleave>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="3f,ff">
+        <dip name="Coin A" bits="0,1,2" ids="Free Play,3C/1C,2C/1C,3C/2C,2C/3C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,4,5" ids="-,Hard 4,Hard 3,Hard 2,Hard 1,Easy,Very Easy,Normal"/>
+        <dip name="Demo Sounds" bits="6" ids="On,Off"/>
+        <dip name="Nudity" bits="7" ids="Full,Semi"/>
+    </switches>
+    <buttons names="Button 1,Start,Coin,Core credits" default="A,Start,Select,-" count="1"/>
+</misterromdescription>

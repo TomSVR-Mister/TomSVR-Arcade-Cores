@@ -1,0 +1,51 @@
+<!-- Big Twin on TomSVR_playmark, a personal MiSTer core for the Playmark Big Twin board (MAME playmark.cpp "bigtwin"),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified;
+     the PIC16C57 sound program is MAME's HEX dump, decoded by the core. Requires TomSVR_playmark.rbf. -->
+<misterromdescription>
+    <name>Big Twin [TomSVR]</name>
+    <setname>bigtwin</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>Playmark</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_playmark</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="bigtwin.zip" md5="None">
+        <part>00 00 00 00</part>
+        <interleave output="16">
+            <part name="2.302" crc="e6767f60" map="10"/>
+            <part name="3.301" crc="5aba6990" map="01"/>
+        </interleave>
+        <part repeat="0x200000"> FF</part>
+        <part name="1.013" crc="ff6671dc"/>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="8.321" crc="2749644d" map="0001"/>
+            <part name="9.322" crc="1d1897af" map="0010"/>
+            <part name="10.323" crc="2a03432e" map="0100"/>
+            <part name="11.324" crc="2c980c4c" map="1000"/>
+        </interleave>
+        <part repeat="0x180000"> FF</part>
+        <interleave output="32">
+            <part name="4.311" crc="6f628fbc" map="0001"/>
+            <part name="5.312" crc="6a9b1752" map="0010"/>
+            <part name="6.313" crc="411cf852" map="0100"/>
+            <part name="7.314" crc="635c81fd" map="1000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <part name="pic16c57-hs_bigtwin_015.hex" crc="c07e9375"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,7a">
+        <dip name="Coinage" bits="1,2,3,4" ids="Free Play,8C/3C,5C/3C,3C/2C,2C/3C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,6C/1C,5C/1C,4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Credits to Start" bits="5" ids="2,1"/>
+        <dip name="Language" bits="8" ids="English,Italian"/>
+        <dip name="Censor Pictures" bits="10" ids="No,Yes"/>
+        <dip name="Rising Ground Level" bits="11" ids="On,Off"/>
+        <dip name="Difficulty" bits="12,13" ids="Hardest,Hard,Easy,Medium"/>
+        <dip name="Allow Continue" bits="14" ids="No,Yes"/>
+        <dip name="Demo Sounds" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Unused,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

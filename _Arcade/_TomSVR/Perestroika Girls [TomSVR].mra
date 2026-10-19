@@ -1,0 +1,36 @@
+<!-- Perestroika Girls on TomSVR_sqix, a personal MiSTer core for the Super Qix board without MCU (MAME superqix.cpp "sqix_nomcu"),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified
+     (the program and graphics byte shuffle of this bootleg is undone in the core). Requires TomSVR_sqix.rbf. -->
+<misterromdescription>
+    <name>Perestroika Girls [TomSVR]</name>
+    <setname>perestro</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Promat</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_sqix</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="perestro.zip" md5="None">
+        <part name="rom1.bin" crc="0cbf96c1"/>
+        <part name="rom4.bin" crc="c56122a8"/>
+        <part name="rom2.bin" crc="36f93701"/>
+        <part name="rom3a.bin" crc="7a2a563f"/>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="f6,ff">
+        <dip name="Cabinet" bits="0" ids="Upright,Cocktail"/>
+        <dip name="Freeze" bits="2" ids="On,Off"/>
+        <dip name="Allow Continue" bits="3" ids="Yes,No"/>
+        <dip name="Coin A" bits="4,5" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="6,7" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Bonus Life" bits="10,11" ids="None,50000 100000,20000 50000,30000 100000"/>
+        <dip name="Lives" bits="12,13" ids="5,4,2,3"/>
+        <dip name="Fill Area" bits="14,15" ids="85%,80%,70%,75%"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

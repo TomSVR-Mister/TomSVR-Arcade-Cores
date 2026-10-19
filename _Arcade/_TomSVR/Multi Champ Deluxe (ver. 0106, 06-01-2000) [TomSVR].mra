@@ -1,0 +1,43 @@
+<!-- Multi Champ Deluxe (ver. 0106, 06-01-2000) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Multi Champ Deluxe (ver. 0106, 06-01-2000) [TomSVR]</name>
+    <setname>mchampdx</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>2000</year>
+    <manufacturer>ESD</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="mchampdx.zip" md5="None">
+        <part> 09 00 00 00 </part>
+        <interleave output="16">
+            <part name="ver0106_esd1.cu03" crc="c6e4546b" map="01"/>
+            <part name="ver0106_esd2.cu02" crc="ea98b3fd" map="10"/>
+        </interleave>
+        <part name="esd3.su06" crc="1b22568c"/>
+        <part name="esd4.su10" crc="2fbe94ab"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="ver0106_ju02.bin" crc="b27a4977" map="0021"/>
+            <part name="ver0106_ju01.bin" crc="55841d90" map="2100"/>
+        </interleave>
+        <part name="ver0106_esd5.ju07" crc="7a3ac887"/>
+        <part repeat="0x1c0000"> 00</part>
+        <interleave output="32">
+            <part name="rom.fu35" crc="ba46f3dc" map="0021"/>
+            <part name="rom.fu34" crc="2895cf09" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="2" zip="mchampdx.zip" md5="None">
+        <part name="eeprom" crc="646b2f53"/>
+    </rom>
+    <nvram index="2" size="128"/>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

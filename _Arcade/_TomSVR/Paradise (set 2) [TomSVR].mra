@@ -1,0 +1,47 @@
+<!-- Paradise (set 2) on TomSVR_para, a personal MiSTer core for Yun Sung's Paradise-family boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_para.rbf (v2, Oct 2026 or newer). -->
+<misterromdescription>
+    <name>Paradise (set 2) [TomSVR]</name>
+    <setname>paradisea</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0282</mameversion>
+    <year>1994</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_para</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="paradisea.zip|paradise.zip" md5="None">
+        <part> 00 0F 00 00 </part>
+        <part name="a-19.u128" crc="d47ecb7e"/>
+        <part name="u85" crc="bf3c3065"/>
+        <part name="u113" crc="53de6025"/>
+        <part name="u94" crc="e3a99209"/>
+        <part repeat="0x20000"> 00</part>
+        <part name="u110" crc="9807a7e6"/>
+        <part repeat="0x60000"> 00</part>
+        <part name="u111" crc="bc9f93f0"/>
+        <part repeat="0x60000"> 00</part>
+        <part name="u92" crc="633d24f0"/>
+        <part name="u93" crc="bbf5c632"/>
+        <part name="u114" crc="c748ba3b"/>
+        <part repeat="0x40000"> 00</part>
+        <part name="u115" crc="0d517bbb"/>
+        <part repeat="0x40000"> 00</part>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ba,ff">
+        <dip name="Difficulty" bits="0,1" ids="Hardest,Hard,Normal,Easy"/>
+        <dip name="Fill Area" bits="2,3" ids="90%,85%,80%,75%"/>
+        <dip name="Lives" bits="4" ids="3,5"/>
+        <dip name="Time" bits="5,6" ids="45,60,75,90"/>
+        <dip name="Sound Test" bits="7" ids="On,Off"/>
+        <dip name="Coinage" bits="8,9" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Demo Sounds" bits="13" ids="Off,On"/>
+        <dip name="Flip Screen" bits="14" ids="On,Off"/>
+        <dip name="Slide Show (button 1 advances)" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Unused,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

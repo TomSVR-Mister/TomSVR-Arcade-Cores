@@ -1,0 +1,59 @@
+<!-- Hot Pinball on TomSVR_galpin, a personal MiSTer core built on Jotego's JTFRAME (sprite engine and sound
+     adapted from his JTGAIDEN core). The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_galpin.rbf.
+     Controls: L = left flippers, R = right flippers, A = launch ball / shake (left), B = launch / shake (right).
+     Press Start several times for a multi-player game. -->
+<misterromdescription>
+    <name>Hot Pinball [TomSVR]</name>
+    <setname>hotpinbl</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>Comad</manufacturer>
+    <players>4</players>
+    <rbf>TomSVR_galpin</rbf>
+    <joystick>none</joystick>
+    <region>World</region>
+    <rom index="0" zip="hotpinbl.zip" md5="None">
+        <interleave output="16">
+            <part name="hp_03.bin" crc="68388726" map="01"/>
+            <part name="hp_07.bin" crc="978cc13e" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="hp_04.bin" crc="655b0cf0" map="01"/>
+            <part name="hp_08.bin" crc="bd16be12" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="hp_05.bin" crc="48efd028" map="01"/>
+            <part name="hp_09.bin" crc="a6368624" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="hp_06.bin" crc="513eda91" map="01"/>
+            <part name="hp_10.bin" crc="a5c63e34" map="10"/>
+        </interleave>
+        <part name="hp_02.bin" crc="82698269"/>
+        <part name="hp_01.bin" crc="93c06d3d"/>
+        <part repeat="0x30000"> FF</part>
+        <interleave output="16">
+            <part name="hp_12.bin" crc="5fd603c2" map="01"/>
+            <part name="hp_11.bin" crc="deecd7f1" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="hp_14.bin" crc="2fe3fcee" map="01"/>
+            <part name="hp_13.bin" crc="d53b64b9" map="10"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Difficulty" bits="0,1" ids="Very Hard,Hard,Easy,Normal"/>
+        <dip name="Extra Ball" bits="2,3" ids="None,100K 500K,200K only,200K 800K"/>
+        <dip name="Hit Difficulty" bits="4" ids="Hard,Normal"/>
+        <dip name="Slide Show" bits="5" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="6" ids="Off,On"/>
+        <dip name="Coin A" bits="8,9,10" ids="1C/1C 5/6,2C/1C 3/2,4C/1C,3C/1C,2C/1C,1C/2C,1C/1C 2/3,1C/1C"/>
+        <dip name="Coin B" bits="11,12,13" ids="1C/1C 5/6,2C/1C 3/2,4C/1C,3C/1C,2C/1C,1C/2C,1C/1C 2/3,1C/1C"/>
+        <dip name="Balls" bits="14,15" ids="2,5,4,3"/>
+    </switches>
+    <buttons names="Left Flippers,Launch Right,Launch Left,Right Flippers,Start,Coin,Core credits" default="L,B,A,R,Start,Select,-" count="1"/>
+</misterromdescription>

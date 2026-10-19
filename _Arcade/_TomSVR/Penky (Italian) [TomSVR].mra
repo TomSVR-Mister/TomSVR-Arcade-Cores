@@ -1,0 +1,45 @@
+<!-- Penky (Italian) on TomSVR_para, a personal MiSTer core for Yun Sung's Paradise-family boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_para.rbf (v2, Oct 2026 or newer). -->
+<misterromdescription>
+    <name>Penky (Italian) [TomSVR]</name>
+    <setname>penkyi</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0282</mameversion>
+    <year>1996</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_para</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="penkyi.zip|penky.zip" md5="None">
+        <part> 37 0F 00 00 </part>
+        <part name="u128" crc="17c8c97c" length="0x40000"/>
+        <part name="u85" crc="452578cd" length="0x40000"/>
+        <part repeat="0x80000"> 00</part>
+        <part name="u94" crc="d45bac24"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="u110" crc="c6501e3a"/>
+        <part name="u111" crc="de405c6f"/>
+        <part name="yunsung.u92" crc="31993a6c"/>
+        <part name="yunsung.u93" crc="b570dc0c"/>
+        <part name="u114" crc="593e7b15"/>
+        <part name="u115" crc="29449fa2"/>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fb,bf">
+        <dip name="Time" bits="0,1" ids="0:30,0:40,0:50,1:00"/>
+        <dip name="Difficulty" bits="2,3" ids="Very Hard,Hard,Normal,Easy"/>
+        <dip name="Fill to Win" bits="4,5" ids="80%,85%,90%,99.9%"/>
+        <dip name="Unknown 1-7" bits="6" ids="On,Off"/>
+        <dip name="Game Mode" bits="7" ids="Redemption,Normal"/>
+        <dip name="Coinage" bits="8,9" ids="2C/1C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Points per Ticket" bits="10,11" ids="200k,150k,100k,50k"/>
+        <dip name="Vs. Matches" bits="12" ids="2,3"/>
+        <dip name="Unknown 2-6" bits="13" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="14" ids="On,Off"/>
+        <dip name="Slide Show (button 1 advances)" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Unused,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

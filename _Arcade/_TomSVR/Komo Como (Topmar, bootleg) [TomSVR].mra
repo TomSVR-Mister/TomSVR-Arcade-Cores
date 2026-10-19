@@ -1,0 +1,69 @@
+<!-- Komo Como (Topmar, bootleg) on TomSVR_madd, a personal MiSTer core for the Promat VISYS board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_madd.rbf. -->
+<misterromdescription>
+    <name>Komo Como (Topmar, bootleg) [TomSVR]</name>
+    <setname>komocomo</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_madd</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="komocomo.zip|maddonna.zip" md5="None">
+        <part> 01 00 00 00 </part>
+        <interleave output="16">
+            <part name="10.ua22" crc="fa839c0f" map="01"/>
+            <part name="11.ua24" crc="31c18579" map="10"/>
+        </interleave>
+        <part repeat="0x20000"> FF</part>
+        <part name="maddonna_tmad_b13_160595.ua2" crc="f2080071"/>
+        <part repeat="0xb0000"> FF</part>
+        <interleave output="64">
+            <part name="8.ui16a" crc="11ac04ab" map="00000001"/>
+            <part name="6.ui13a" crc="bb498592" map="00000010"/>
+            <part name="4.ui11a" crc="d22dd6d8" map="00000100"/>
+            <part name="2.ui8a" crc="cc5360f8" map="00001000"/>
+            <part name="7.ui16" crc="dc71de75" map="00010000"/>
+            <part name="5.ui13" crc="56bc3719" map="00100000"/>
+            <part name="3.ui11" crc="646073d1" map="01000000"/>
+            <part name="1.ui8" crc="58ba6622" map="10000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="8.ui16a" crc="11ac04ab" map="00000001"/>
+            <part name="6.ui13a" crc="bb498592" map="00000010"/>
+            <part name="4.ui11a" crc="d22dd6d8" map="00000100"/>
+            <part name="2.ui8a" crc="cc5360f8" map="00001000"/>
+            <part name="7.ui16" crc="dc71de75" map="00010000"/>
+            <part name="5.ui13" crc="56bc3719" map="00100000"/>
+            <part name="3.ui11" crc="646073d1" map="01000000"/>
+            <part name="1.ui8" crc="58ba6622" map="10000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="8.ui16a" crc="11ac04ab" map="00000001"/>
+            <part name="6.ui13a" crc="bb498592" map="00000010"/>
+            <part name="4.ui11a" crc="d22dd6d8" map="00000100"/>
+            <part name="2.ui8a" crc="cc5360f8" map="00001000"/>
+            <part name="7.ui16" crc="dc71de75" map="00010000"/>
+            <part name="5.ui13" crc="56bc3719" map="00100000"/>
+            <part name="3.ui11" crc="646073d1" map="01000000"/>
+            <part name="1.ui8" crc="58ba6622" map="10000000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="04,1a">
+        <dip name="Coinage" bits="0,1" ids="1C/1C,2C/2C,2C/1C,3C/1C"/>
+        <dip name="Girl Pictures" bits="2" ids="Off,On"/>
+        <dip name="Demo Sounds" bits="4" ids="On,Off"/>
+        <dip name="Invulnerability" bits="6" ids="Off,On"/>
+        <dip name="Service Mode" bits="7" ids="Off,On"/>
+        <dip name="Difficulty" bits="8,9" ids="Easy,Normal,Hard,Hardest"/>
+        <dip name="Time Per Round" bits="10,11" ids="100 s,90 s,80 s,?? s"/>
+        <dip name="Lives" bits="12" ids="5,3"/>
+        <dip name="Hurry Up!" bits="14,15" ids="Off,On - 10,On - 01,On - 11"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

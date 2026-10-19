@@ -1,0 +1,43 @@
+<!-- Magix / Rock on TomSVR_ys8, a personal MiSTer core for Yun Sung's 8-bit board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_ys8.rbf. -->
+<misterromdescription>
+    <name>Magix / Rock [TomSVR]</name>
+    <setname>magix</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_ys8</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="magix.zip" md5="None">
+        <part> 01 00 00 00 </part>
+        <part name="yunsung8.07" crc="d4d0b68b"/>
+        <part name="yunsung8.08" crc="6fd60be9"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="32">
+            <part name="yunsung8.05" crc="862d378c" map="0021"/>
+            <part name="yunsung8.06" crc="8b2ab901" map="2100"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="yunsung8.04" crc="0a100d2b" map="00000021"/>
+            <part name="yunsung8.03" crc="c8cb0373" map="00002100"/>
+            <part name="yunsung8.02" crc="09efb8e5" map="00210000"/>
+            <part name="yunsung8.01" crc="4590d782" map="21000000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ef,ff">
+        <dip name="Service Mode" bits="0" ids="On,Off"/>
+        <dip name="Difficulty" bits="1,2" ids="Easy,Hardest,Hard,Normal"/>
+        <dip name="Flip Screen" bits="3" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="4" ids="On,Off"/>
+        <dip name="Coinage" bits="5,7" ids="4C/1C,3C/1C,2C/3C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Title" bits="8" ids="Rock,Magix"/>
+    </switches>
+    <buttons names="Rotate,Rotate,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

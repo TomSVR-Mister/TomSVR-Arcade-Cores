@@ -1,0 +1,47 @@
+<!-- Miss Puzzle (Nudes, less explicit) on TomSVR_gumbo, a personal MiSTer core for Min Corp.'s Gumbo board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gumbo.rbf. -->
+<misterromdescription>
+    <name>Miss Puzzle (Nudes, less explicit) [TomSVR]</name>
+    <setname>mspuzzlea</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Min Corp.</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gumbo</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="mspuzzlea.zip|mspuzzle.zip" md5="None">
+        <part> 01 03 00 00 </part>
+        <interleave output="16">
+            <part name="u1.u1" crc="5e96ea17" map="01"/>
+            <part name="u2.u2" crc="8f161b0c" map="10"/>
+        </interleave>
+        <part name="u210.bin" crc="0a223a38"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="u421.u421" crc="52b67ee5" map="00004321"/>
+            <part name="u420.u420" crc="3565696e" map="43210000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="u425.u425" crc="933544e3" map="00004321"/>
+            <part name="u426.u426" crc="e458eb9d" map="43210000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="u512.bin" crc="505ee3c2" map="0021"/>
+            <part name="u511.bin" crc="3d6b6c78" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe">
+        <dip name="Time Mode" bits="0,1" ids="3,2,1,0"/>
+        <dip name="Coinage" bits="2,3" ids="2C/1C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Sound Test" bits="4" ids="On,Off"/>
+        <dip name="View Staff Credits" bits="5" ids="On,Off"/>
+        <dip name="Picture View" bits="6" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Rotate,Help,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

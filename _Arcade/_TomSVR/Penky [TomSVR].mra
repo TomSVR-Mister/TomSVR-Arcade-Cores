@@ -1,0 +1,44 @@
+<!-- Penky on TomSVR_para, a personal MiSTer core for Yun Sung's Paradise-family boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_para.rbf (v2, Oct 2026 or newer). -->
+<misterromdescription>
+    <name>Penky [TomSVR]</name>
+    <setname>penky</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0282</mameversion>
+    <year>1996</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_para</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="penky.zip" md5="None">
+        <part> 37 0F 00 00 </part>
+        <part name="yunsung.u128" crc="57baeada"/>
+        <part name="yunsung.u85" crc="c664d0cc"/>
+        <part repeat="0x80000"> 00</part>
+        <part name="yunsung.u94" crc="58b31c0e"/>
+        <part repeat="0x20000"> 00</part>
+        <part name="yunsung.u110" crc="ba3173a1"/>
+        <part name="yunsung.u111" crc="9223ef85"/>
+        <part name="yunsung.u92" crc="31993a6c"/>
+        <part name="yunsung.u93" crc="b570dc0c"/>
+        <part name="yunsung.u114" crc="cb6b1cfd"/>
+        <part name="yunsung.u115" crc="55c5ff90"/>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fb,df">
+        <dip name="Time" bits="0,1" ids="0:40,0:50,1:00,1:10"/>
+        <dip name="Difficulty" bits="2,3" ids="Very Hard,Hard,Normal,Easy"/>
+        <dip name="Fill to Win" bits="4,5" ids="80%,85%,90%,99.9%"/>
+        <dip name="Unknown 1-7" bits="6" ids="On,Off"/>
+        <dip name="Unknown 1-8" bits="7" ids="On,Off"/>
+        <dip name="Coinage" bits="8,9" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Vs. Matches" bits="12" ids="2,3"/>
+        <dip name="Demo Sounds" bits="13" ids="On,Off"/>
+        <dip name="Flip Screen" bits="14" ids="On,Off"/>
+        <dip name="Slide Show (button 1 advances)" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Unused,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

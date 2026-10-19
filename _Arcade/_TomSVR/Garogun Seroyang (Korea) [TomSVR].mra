@@ -1,0 +1,55 @@
+<!-- Garogun Seroyang (Korea) on TomSVR_nmg5, a personal MiSTer core for Yun Sung's YS-1300 board family, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_nmg5.rbf. -->
+<misterromdescription>
+    <name>Garogun Seroyang (Korea) [TomSVR]</name>
+    <setname>garogun</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>2000</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nmg5</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="garogun.zip" md5="None">
+        <part> 05 40 00 00 </part>
+        <interleave output="16">
+            <part name="p2.u2" crc="1d2ff271" map="01"/>
+            <part name="p1.u7" crc="9b5627f8" map="10"/>
+        </interleave>
+        <part name="rom.u128" crc="117b31ce"/>
+        <part name="s.u137" crc="3eadc21a"/>
+        <part repeat="0x70000"> FF</part>
+        <interleave output="32">
+            <part name="4.u83" crc="3d1d46ff" map="0001"/>
+            <part name="5.u82" crc="2a7b2fb5" map="0010"/>
+            <part name="3.u105" crc="cd20e39c" map="0100"/>
+            <part name="2.u96" crc="4df3b502" map="1000"/>
+        </interleave>
+        <part repeat="0x100000"> 00</part>
+        <part name="1.u97" crc="591b3efe"/>
+        <part repeat="0x40000"> 00</part>
+        <interleave output="64">
+            <part name="8.u63" crc="2d152d32" map="00000100"/>
+            <part name="11.u68" crc="60ec7f67" map="00100000"/>
+            <part name="9.u73" crc="a4b16319" map="01000000"/>
+            <part name="13.u79" crc="2dc14fb6" map="10000000"/>
+            <part name="6.u64" crc="a0fc7547" map="00000001"/>
+            <part name="10.u69" crc="e5dc36c3" map="00000010"/>
+            <part name="7.u74" crc="a0574f8d" map="00010000"/>
+            <part name="12.u80" crc="94d66169" map="00001000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,fd">
+        <dip name="Helps" bits="0,1" ids="1,2,3,4"/>
+        <dip name="Timer Speed (Bonus Levels)" bits="2,3" ids="Fastest,Fast,Slow,Slowest"/>
+        <dip name="Timer Speed (Main Levels)" bits="4,5" ids="Fastest,Fast,Slow,Slowest"/>
+        <dip name="Coinage" bits="6,7" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Service Mode" bits="8" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="9" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,-,-,-,-,Start,Coin,Core credits" default="A,B,X,Y,L,R,Start,Select,-" count="1"/>
+</misterromdescription>

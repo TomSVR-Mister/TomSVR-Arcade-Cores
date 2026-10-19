@@ -1,0 +1,42 @@
+<!-- Gals Hustler (set 2) on TomSVR_comad, a personal fork of Jotego's jtgals core, built on JTFRAME.
+     Header byte 0 = 02 selects the Afega Gals Hustler board (MAME expro02 "galhustl"): work RAM at 0xE80000, OKI at 0xD00000,
+     IRQ 3/4/5, VU-002 sprite list read natively. The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_comad.rbf. -->
+<misterromdescription>
+    <name>Gals Hustler (set 2) [TomSVR]</name>
+    <setname>galhustla</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0282</mameversion>
+    <year>1997</year>
+    <manufacturer>ACE International</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_comad</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="pgalvip.zip" md5="None">
+        <part> 02 00 00 00 </part>
+        <interleave output="16">
+            <part name="afega_4.ud17" crc="b9aeb643" map="01"/>
+            <part name="afega_3.uc17" crc="b811c791" map="10"/>
+        </interleave>
+        <part repeat="0x100000"> 00</part>
+        <part repeat="0x100000"> FF</part>
+        <part repeat="0x200000"> 00</part>
+        <part repeat="0x100000"> FF</part>
+        <part name="afega_1.ub6" crc="1aac243c"/>
+        <part name="afega_11.uc6" crc="2168e54a"/>
+        <part name="afega_5.u5" crc="8bbffcd3"/>
+        <part repeat="0x80000"> 00</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Lives" bits="0,1" ids="6,7,10,8"/>
+        <dip name="Demo Sounds" bits="6" ids="Off,On"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Coinage" bits="8,9,10" ids="4C/1C,3C/1C,2C/1C,2C/3C,3C/2C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="11,12" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Play Time" bits="13,14" ids="70 s,80 s,120 s,100 s"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

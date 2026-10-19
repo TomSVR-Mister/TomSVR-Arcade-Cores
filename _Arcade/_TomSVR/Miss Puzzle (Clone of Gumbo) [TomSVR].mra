@@ -1,0 +1,46 @@
+<!-- Miss Puzzle (Clone of Gumbo) on TomSVR_gumbo, a personal MiSTer core for Min Corp.'s Gumbo board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gumbo.rbf. -->
+<misterromdescription>
+    <name>Miss Puzzle (Clone of Gumbo) [TomSVR]</name>
+    <setname>mspuzzleg</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Min Corp.</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gumbo</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="mspuzzleg.zip|gumbo.zip" md5="None">
+        <part> 00 01 00 00 </part>
+        <interleave output="16">
+            <part name="u1" crc="95218ff1" map="01"/>
+            <part name="u2" crc="7ea7d96c" map="10"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+        <part name="u210.bin" crc="16fbe06b"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="u420" crc="2b387153" map="00004321"/>
+            <part name="u421" crc="afa06a93" map="43210000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <interleave output="32">
+            <part name="u512.bin" crc="97741798" map="0021"/>
+            <part name="u511.bin" crc="1411451b" map="2100"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff">
+        <dip name="Coinage" bits="0,1" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Helps" bits="2" ids="0,1"/>
+        <dip name="Bonus Bar Level" bits="3" ids="High,Normal"/>
+        <dip name="Difficulty" bits="4,5" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Picture View" bits="6" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Rotate,Help,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

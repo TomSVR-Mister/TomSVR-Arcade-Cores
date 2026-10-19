@@ -1,0 +1,59 @@
+<!-- Search Eye (English, Korean) on TomSVR_nmg5, a personal MiSTer core for Yun Sung's YS-1300 board family, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_nmg5.rbf. -->
+<misterromdescription>
+    <name>Search Eye (English, Korean) [TomSVR]</name>
+    <setname>searcheya</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nmg5</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="searchey.zip" md5="None">
+        <part> 10 10 00 00 </part>
+        <interleave output="16">
+            <part name="u2.bin" crc="b574f033" map="01"/>
+            <part name="u7.bin" crc="287ce3dd" map="10"/>
+        </interleave>
+        <part repeat="0x80000"> FF</part>
+        <part name="u128.bin" crc="85bae10c"/>
+        <part name="u137.bin" crc="49105e23"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0x70000"> FF</part>
+        <interleave output="32">
+            <part name="u83.bin" crc="c5a1c647" map="0001"/>
+            <part name="u82.bin" crc="25b2ae62" map="0010"/>
+            <part name="u105.bin" crc="b4207ef0" map="0100"/>
+            <part name="u96.bin" crc="8c40818a" map="1000"/>
+        </interleave>
+        <part repeat="0x180000"> FF</part>
+        <part name="u97.bin" crc="5dc7f231"/>
+        <part repeat="0x60000"> FF</part>
+        <interleave output="64">
+            <part name="u63.bin" crc="1b0b7b7d" map="00000100"/>
+            <part name="u68.bin" crc="ae18b2aa" map="00100000"/>
+            <part name="u73.bin" crc="ab7f8716" map="01000000"/>
+            <part name="u79.bin" crc="7f2c8b83" map="10000000"/>
+            <part name="u64.bin" crc="322a903c" map="00000001"/>
+            <part name="u69.bin" crc="d546eaf8" map="00000010"/>
+            <part name="u74.bin" crc="e6134d84" map="00010000"/>
+            <part name="u80.bin" crc="9a160918" map="00001000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="f3,dd">
+        <dip name="Timer Speed" bits="0,1" ids="Fastest,Fast,Slow,Slowest"/>
+        <dip name="Helps" bits="2,3" ids="4,3,2,1"/>
+        <dip name="Lives" bits="4,5" ids="6,4,3,5"/>
+        <dip name="Coinage" bits="6,7" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Service Mode" bits="8" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="9" ids="On,Off"/>
+        <dip name="Language" bits="13" ids="English,Korean"/>
+        <dip name="Items to find" bits="15" ids="Less,More"/>
+    </switches>
+    <buttons names="Spot,Help,-,-,-,-,Start,Coin,Core credits" default="A,B,X,Y,L,R,Start,Select,-" count="2"/>
+</misterromdescription>

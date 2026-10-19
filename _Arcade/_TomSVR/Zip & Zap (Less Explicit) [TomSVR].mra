@@ -1,0 +1,171 @@
+<!-- Zip &amp; Zap (Less Explicit) on TomSVR_comad, a personal fork of Jotego's jtgals core (5 MB CPU ROM
+     plus a 1 MB extension ROM at 0xB00000, OKI at 0xA80001, palette-based fg transparency). The ROM is assembled from your own MAME zip(s) and patched (work RAM relocated,
+     VU-002 sprites converted to Pandora format each frame;
+     Zip &amp; Zap hardware differences patched: RAM, OKI, IRQ4 task tick, bootleg VU-002 sprite list). Requires TomSVR_comad.rbf. -->
+<misterromdescription>
+    <name>Zip &amp; Zap (Less Explicit) [TomSVR]</name>
+    <setname>zipzapa</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0282</mameversion>
+    <year>1995</year>
+    <manufacturer>Barko Corp</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_comad</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="zipzapa.zip|zipzap.zip" md5="None">
+        <part> 00 00 00 00 </part>
+        <interleave output="16">
+            <part name="30.ud17" crc="769ec252" offset="0x0" length="0x20000" map="01"/>
+            <part name="31.ue17" crc="e098ef98" offset="0x0" length="0x20000" map="10"/>
+        </interleave>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="16">
+            <part name="33.rd2a" crc="df35c8f5" offset="0x0" length="0x80000" map="01"/>
+            <part name="37.rd2b" crc="0b59d718" offset="0x0" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="34.rd3a" crc="f8bd156b" offset="0x0" length="0x80000" map="01"/>
+            <part name="38.rd3b" crc="575dfc8c" offset="0x0" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="35" crc="9b6409a6" offset="0x0" length="0x80000" map="01"/>
+            <part name="39" crc="302375c0" offset="0x0" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="32.rd1a" crc="1dd511a9" offset="0x0" length="0x80000" map="01"/>
+            <part name="36.rd1b" crc="f3256bbb" offset="0x0" length="0x80000" map="10"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <part name="29.ub6" crc="2cf3b8ea"/>
+        <part name="29.ub6" crc="2cf3b8ea"/>
+        <part name="29.ub6" crc="2cf3b8ea"/>
+        <part name="29.ub6" crc="2cf3b8ea"/>
+        <part name="28.uc6" crc="e5d026c7"/>
+        <part name="u5.bin" crc="c274d8b5"/>
+        <part repeat="0x80000"> 00</part>
+        <patch offset="0x70">0C 00 00 00 00 00 0C 04</patch>
+        <patch offset="0x91a">60 2E</patch>
+        <patch offset="0x944">60 2E</patch>
+        <patch offset="0xa30">A8 00 01 00 00 61 E2 FF 1F 20 C0 13 A8 00 01 00</patch>
+        <patch offset="0xb3e">A8 00 01 00 00 61 D4 FE 39 10 A8 00 01 00</patch>
+        <patch offset="0xb5c">A8 00 01 00</patch>
+        <patch offset="0xb6c">A8 00 01 00</patch>
+        <patch offset="0xb80">A8 00 01 00</patch>
+        <patch offset="0xba4">A8 00 01 00</patch>
+        <patch offset="0xbb4">A8 00 01 00</patch>
+        <patch offset="0xbc4">A8 00 01 00 00 08 00 00 71 4E 75 4E 39 10 A8 00 01 00</patch>
+        <patch offset="0xc2e">A8 00 01 00</patch>
+        <patch offset="0xc40">A8 00 01 00</patch>
+        <patch offset="0x1154">80 27</patch>
+        <patch offset="0x1284">80 2C</patch>
+        <patch offset="0x14e0">80 27</patch>
+        <patch offset="0x1ffc">80 27</patch>
+        <patch offset="0x20b8">80 2C</patch>
+        <patch offset="0x21b6">00 20</patch>
+        <patch offset="0x2286">00 20</patch>
+        <patch offset="0x283a">00 20</patch>
+        <patch offset="0x40fc">00 20</patch>
+        <patch offset="0x4152">00 20</patch>
+        <patch offset="0x41b6">00 20</patch>
+        <patch offset="0x422c">00 20</patch>
+        <patch offset="0x4272">00 20</patch>
+        <patch offset="0x4642">40 26</patch>
+        <patch offset="0x4758">40 26 7C 28 70 00 40 26</patch>
+        <patch offset="0x56a0">00 20</patch>
+        <patch offset="0x56d2">00 20</patch>
+        <patch offset="0x5a74">60 29</patch>
+        <patch offset="0x5af0">F0 2A</patch>
+        <patch offset="0x5da6">C0 2D</patch>
+        <patch offset="0x5e4e">00 20</patch>
+        <patch offset="0x5ee6">00 28</patch>
+        <patch offset="0x5f44">08 20</patch>
+        <patch offset="0x6014">08 20</patch>
+        <patch offset="0x6090">C0 2D</patch>
+        <patch offset="0x645e">00 20</patch>
+        <patch offset="0x6536">00 20</patch>
+        <patch offset="0x6604">00 20</patch>
+        <patch offset="0x66ca">00 20</patch>
+        <patch offset="0x670e">00 20</patch>
+        <patch offset="0x68f4">00 20</patch>
+        <patch offset="0x69ba">00 20</patch>
+        <patch offset="0x6a94">00 20</patch>
+        <patch offset="0x6cb4">00 20</patch>
+        <patch offset="0x7228">30 2F</patch>
+        <patch offset="0x7258">68 2F</patch>
+        <patch offset="0x72da">30 2F</patch>
+        <patch offset="0x730a">68 2F</patch>
+        <patch offset="0x7572">40 26</patch>
+        <patch offset="0x75d6">40 26</patch>
+        <patch offset="0x762c">40 26</patch>
+        <patch offset="0x78ce">40 26</patch>
+        <patch offset="0x7bca">60 29</patch>
+        <patch offset="0x7bda">F0 2A</patch>
+        <patch offset="0x7c74">00 20</patch>
+        <patch offset="0x7c84">00 20</patch>
+        <patch offset="0x7de0">80 2C</patch>
+        <patch offset="0x7e1c">80 2C</patch>
+        <patch offset="0x7e7e">80 2C</patch>
+        <patch offset="0x7eda">60 29</patch>
+        <patch offset="0x7f4c">F0 2A</patch>
+        <patch offset="0x814e">60 29</patch>
+        <patch offset="0x8224">F0 2A</patch>
+        <patch offset="0x82fa">60 29</patch>
+        <patch offset="0x8342">F0 2A</patch>
+        <patch offset="0x8934">80 2C</patch>
+        <patch offset="0x8ce4">80 2C</patch>
+        <patch offset="0x90ec">08 20</patch>
+        <patch offset="0x9510">80 2C</patch>
+        <patch offset="0x9540">80 2C</patch>
+        <patch offset="0x9578">80 2C</patch>
+        <patch offset="0x95f2">30 2C</patch>
+        <patch offset="0x9630">30 2C</patch>
+        <patch offset="0x9682">60 29</patch>
+        <patch offset="0x97ae">F0 2A</patch>
+        <patch offset="0x9dee">80 2C</patch>
+        <patch offset="0x9e22">80 2C</patch>
+        <patch offset="0x9e6e">80 2C</patch>
+        <patch offset="0x9eba">80 2C</patch>
+        <patch offset="0x9f06">80 2C</patch>
+        <patch offset="0x9f52">80 2C</patch>
+        <patch offset="0x9f9e">80 2C</patch>
+        <patch offset="0x9fe6">60 29</patch>
+        <patch offset="0xa03a">F0 2A</patch>
+        <patch offset="0xa518">60 29</patch>
+        <patch offset="0xa52c">F0 2A</patch>
+        <patch offset="0xa540">80 2C</patch>
+        <patch offset="0xad36">08 20</patch>
+        <patch offset="0xad5c">08 20</patch>
+        <patch offset="0xad8e">08 20</patch>
+        <patch offset="0xafb6">80 2C</patch>
+        <patch offset="0xafdc">80 2C</patch>
+        <patch offset="0xb018">80 2C</patch>
+        <patch offset="0xb07a">C0 25</patch>
+        <patch offset="0xb090">C0 25</patch>
+        <patch offset="0xb0d2">00 26</patch>
+        <patch offset="0xb0e8">00 26</patch>
+        <patch offset="0xb36a">80 2C</patch>
+        <patch offset="0xb41c">80 2C</patch>
+        <patch offset="0xb4e2">08 20</patch>
+        <patch offset="0xb530">08 20</patch>
+        <patch offset="0xb702">28 2D</patch>
+        <patch offset="0xb726">50 2D</patch>
+        <patch offset="0xb74a">28 2D</patch>
+        <patch offset="0xb772">50 2D</patch>
+        <patch offset="0xb7de">28 2D</patch>
+        <patch offset="0xb7fa">50 2D</patch>
+        <patch offset="0xc0004">7A 48 08 00 E7 40 F8 4E 76 06 E7 48 F0 FF F9 41 70 00 00 20 F9 43 70 00 00 00 00 7C 00 7A 3C 3E FF 01 10 30 28 34 04 00 4A EC 28 36 06 00 4B EC 00 38 44 02 00 60 44 0C 00 60 06 66 42 DC 43 DA 04 60 02 3C 03 3A 4E ED 46 EC 4D ED 45 EC 28 32 02 00 41 02 FF 1F 5A 67 06 34 42 06 00 00 05 36 43 06 00 00 00 38 4C E5 44 02 F0 00 02 08 08 00 04 67 C4 08 00 00 03 08 08 00 04 67 C4 08 01 00 44 13 07 00 42 13 09 00 43 13 0B 00 41 13 0D 00 49 E0 01 02 3F 00 00 08 01 00 04 67 C1 08 07 00 00 08 00 00 04 67 C1 08 06 00 41 13 0F 00 E9 43 10 00 88 50 CF 51 6C FF FC B3 70 00 00 20 0E 64 7C 13 08 00 07 00 29 42 0D 00 29 42 0F 00 DF 4C FF 0F 7A 48 08 00 E7 40 F8 4E B4 06 73 4E</patch>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Additional Obstacles" bits="1" ids="On,Off"/>
+        <dip name="Lives" bits="2,3" ids="1,4,2,3"/>
+        <dip name="Coinage" bits="8,9" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Select Player Mode" bits="10" ids="Off,On"/>
+        <dip name="Demo Sounds" bits="11" ids="Off,On"/>
+        <dip name="Level Skip with Button 2" bits="14" ids="On,Off"/>
+    </switches>
+    <buttons names="Cut,Unused,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

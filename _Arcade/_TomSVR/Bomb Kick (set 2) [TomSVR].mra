@@ -1,0 +1,56 @@
+<!-- Bomb Kick (set 2) on TomSVR_ys16, a personal MiSTer core for Yun Sung's 16-bit boards (YS-0211 board), built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified (tile ROMs are loaded twice, one copy per scroll layer).
+     Requires TomSVR_ys16.rbf. -->
+<misterromdescription>
+    <name>Bomb Kick (set 2) [TomSVR]</name>
+    <setname>bombkicka</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1998</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_ys16</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="bombkicka.zip|bombkick.zip" md5="None">
+        <part> 00 00 00 00 </part>
+        <interleave output="16">
+            <part name="u32.bin" crc="c5a105f3" map="01"/>
+            <part name="u33.bin" crc="4624d618" map="10"/>
+        </interleave>
+        <part name="bk_u131" crc="22cc5732"/>
+        <part repeat="0x10000"> FF</part>
+        <interleave output="32">
+            <part name="bk_u20" crc="c2b83e3f" map="0001"/>
+            <part name="bk_u21" crc="d6890192" map="0010"/>
+            <part name="bk_u22" crc="9538c46c" map="0100"/>
+            <part name="bk_u23" crc="e3831f3d" map="1000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="bk_u67" crc="1962f536" map="00000021"/>
+            <part name="bk_u68" crc="d80c75a4" map="00002100"/>
+            <part name="bk_u69" crc="615e1e6f" map="00210000"/>
+            <part name="bk_u70" crc="59817ef1" map="21000000"/>
+        </interleave>
+        <part repeat="0x200000"> FF</part>
+        <interleave output="64">
+            <part name="bk_u67" crc="1962f536" map="00000021"/>
+            <part name="bk_u68" crc="d80c75a4" map="00002100"/>
+            <part name="bk_u69" crc="615e1e6f" map="00210000"/>
+            <part name="bk_u70" crc="59817ef1" map="21000000"/>
+        </interleave>
+        <part repeat="0x200000"> FF</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="9f,af">
+        <dip name="Coinage" bits="0,1,2" ids="Free Play,3C/2C,3C/1C,2C/3C,2C/1C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,4" ids="Very Hard,Hard,Easy,Normal"/>
+        <dip name="Special Powers" bits="5" ids="3,2"/>
+        <dip name="Demo Sounds" bits="6" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Lives" bits="8,9" ids="2,5,4,3"/>
+    </switches>
+    <buttons names="Button 2,Button 1,Button 3,Start,Coin,Core credits" default="B,A,X,Start,Select,-" count="2"/>
+</misterromdescription>

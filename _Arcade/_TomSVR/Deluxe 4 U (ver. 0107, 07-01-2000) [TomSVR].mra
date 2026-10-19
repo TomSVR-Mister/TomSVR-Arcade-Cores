@@ -1,0 +1,46 @@
+<!-- Deluxe 4 U (ver. 0107, 07-01-2000) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Deluxe 4 U (ver. 0107, 07-01-2000) [TomSVR]</name>
+    <setname>deluxe4u</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>2000</year>
+    <manufacturer>ESD</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="deluxe5.zip" md5="None">
+        <part> 1A 00 00 00 </part>
+        <interleave output="16">
+            <part name="deluxe4u/1.cu03" crc="fbf14d74" map="01"/>
+            <part name="deluxe4u/2.cu02" crc="db213e1f" map="10"/>
+        </interleave>
+        <part name="esd3.su06" crc="31de379a"/>
+        <part name="esd4.su10" crc="23f2b7d9"/>
+        <part repeat="0x60000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="am27c020.ju06" crc="8b853bce" map="0001"/>
+            <part name="am27c020.ju05" crc="bbe81779" map="0010"/>
+            <part name="am27c020.ju04" crc="40fa2c2f" map="0100"/>
+            <part name="am27c020.ju03" crc="aa130fd3" map="1000"/>
+        </interleave>
+        <part repeat="0x300000"> 00</part>
+        <part name="am27c020.ju07" crc="d414c3af"/>
+        <part repeat="0x1c0000"> 00</part>
+        <interleave output="32">
+            <part name="deluxe4u/fu35" crc="6df14570" map="0021"/>
+            <part name="deluxe4u/fu34" crc="93175d6d" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="2" zip="deluxe5.zip" md5="None">
+        <part name="eeprom" crc="4539a8a0"/>
+    </rom>
+    <nvram index="2" size="128"/>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

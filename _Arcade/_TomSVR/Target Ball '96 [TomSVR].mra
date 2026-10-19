@@ -1,0 +1,48 @@
+<!-- Target Ball '96 on TomSVR_para, a personal MiSTer core for Yun Sung's Paradise-family boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_para.rbf (v2, Oct 2026 or newer). -->
+<misterromdescription>
+    <name>Target Ball '96 [TomSVR]</name>
+    <setname>tgtbal96</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0282</mameversion>
+    <year>1996</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_para</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="tgtbal96.zip" md5="None">
+        <part> 63 0F 00 00 </part>
+        <part name="bc7.u128" crc="3ae07ee5"/>
+        <part name="yunsung.u85" crc="cdf3336b"/>
+        <part repeat="0x20000"> FF</part>
+        <part name="yunsung.u113" crc="150a6cc6"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0x40000"> 00</part>
+        <part name="bc8.u110" crc="f97d754e"/>
+        <part name="bc9.u111" crc="ee0728c0"/>
+        <part name="bc10.u92" crc="2f511f93"/>
+        <part name="bc11.u93" crc="c5acf1e0"/>
+        <part name="yunsung.u114" crc="3dbe1872"/>
+        <part repeat="0x40000"> 00</part>
+        <part name="yunsung.u115" crc="30f49dac"/>
+        <part repeat="0x40000"> 00</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ea,db">
+        <dip name="Time for 1 Player" bits="0,1" ids="2:00,1:40,1:20,1:00"/>
+        <dip name="Bonus Time" bits="2,3" ids="30,25,20,15"/>
+        <dip name="Lives" bits="4,5" ids="7,6,5,4"/>
+        <dip name="Balls Sequence Length" bits="6" ids="5,3"/>
+        <dip name="Game Goal" bits="7" ids="Balls Sequence,Target Score"/>
+        <dip name="Coinage" bits="8,9" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Time for 2 Players" bits="10,11" ids="4:00,3:20,2:40,2:00"/>
+        <dip name="Vs. Matches" bits="12" ids="3,1"/>
+        <dip name="Demo Sounds" bits="13" ids="On,Off"/>
+        <dip name="Flip Screen" bits="14" ids="On,Off"/>
+        <dip name="Slide Show (button 1 advances)" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

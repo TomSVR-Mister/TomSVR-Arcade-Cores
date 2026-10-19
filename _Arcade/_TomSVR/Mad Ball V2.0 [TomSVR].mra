@@ -1,0 +1,42 @@
+<!-- Mad Ball V2.0 on TomSVR_para, a personal MiSTer core for Yun Sung's Paradise-family boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_para.rbf (v2, Oct 2026 or newer). -->
+<misterromdescription>
+    <name>Mad Ball V2.0 [TomSVR]</name>
+    <setname>madball</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0282</mameversion>
+    <year>1998</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_para</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="madball.zip" md5="None">
+        <part> 2F 27 00 00 </part>
+        <part name="p.u1" crc="73008425"/>
+        <part repeat="0x20000"> FF</part>
+        <part name="s.u28" crc="78f02584" length="0x40000"/>
+        <part repeat="0x80000"> 00</part>
+        <part repeat="0x40000"> 00</part>
+        <part name="3.u92" crc="846019a6"/>
+        <part name="4.u93" crc="c3be56ad"/>
+        <part name="5.u105" crc="f26aac1e"/>
+        <part name="6.u106" crc="27b78907"/>
+        <part name="2.u67" crc="1f3a6cd5"/>
+        <part repeat="0x40000"> 00</part>
+        <part name="1.u66" crc="8637c7b4"/>
+        <part repeat="0x40000"> 00</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="9b,ff">
+        <dip name="Coinage" bits="0,1" ids="2C/1C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Lives" bits="2,3" ids="6,5,4,3"/>
+        <dip name="Flip Screen" bits="4" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="6" ids="On,Off"/>
+        <dip name="Slide Show (button 1 advances)" bits="7" ids="On,Off"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

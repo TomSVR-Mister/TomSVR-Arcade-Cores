@@ -1,0 +1,42 @@
+<!-- Rock Tris on TomSVR_ys8, a personal MiSTer core for Yun Sung's 8-bit board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_ys8.rbf. -->
+<misterromdescription>
+    <name>Rock Tris [TomSVR]</name>
+    <setname>rocktris</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_ys8</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="rocktris.zip" md5="None">
+        <part> 01 00 00 00 </part>
+        <part name="cpu07.bin" crc="46e3b79c"/>
+        <part name="cpu08.bin" crc="3a78a4cf"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="32">
+            <part name="gfx5.bin" crc="058ee379" map="0021"/>
+            <part name="gfx6.bin" crc="593cbd39" map="2100"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="gfx4.bin" crc="abb49cac" map="00000021"/>
+            <part name="gfx3.bin" crc="70a6ad52" map="00002100"/>
+            <part name="gfx2.bin" crc="fcc9ec97" map="00210000"/>
+            <part name="gfx1.bin" crc="4295034d" map="21000000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ef,ff">
+        <dip name="Service Mode" bits="0" ids="On,Off"/>
+        <dip name="Difficulty" bits="1,2" ids="Easy,Hardest,Hard,Normal"/>
+        <dip name="Flip Screen" bits="3" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="4" ids="On,Off"/>
+        <dip name="Coinage" bits="5,7" ids="4C/1C,3C/1C,2C/3C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+    </switches>
+    <buttons names="Rotate,Bomb,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

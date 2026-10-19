@@ -1,0 +1,45 @@
+<!-- Miss Bingo on TomSVR_gumbo, a personal MiSTer core for Min Corp.'s Gumbo board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gumbo.rbf. -->
+<misterromdescription>
+    <name>Miss Bingo [TomSVR]</name>
+    <setname>msbingo</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Min Corp.</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gumbo</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="msbingo.zip" md5="None">
+        <part> 01 03 00 00 </part>
+        <interleave output="16">
+            <part name="u1.bin" crc="6eeb6d89" map="01"/>
+            <part name="u2.bin" crc="f15dd4b5" map="10"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+        <part name="u210.bin" crc="55011f69"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="u421.bin" crc="b73f21ab" map="00004321"/>
+            <part name="u420.bin" crc="c2fe9175" map="43210000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <interleave output="32">
+            <part name="u512.bin" crc="8a46d467" map="0021"/>
+            <part name="u511.bin" crc="d5fd3e2e" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff">
+        <dip name="Coinage" bits="0,1" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Chance Count" bits="2,3" ids="3,2,1,0"/>
+        <dip name="Play Level" bits="4" ids="Easy,Normal"/>
+        <dip name="Play Speed" bits="5" ids="High,Normal"/>
+        <dip name="Left Count" bits="6" ids="Low,Normal"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Rotate,Help,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

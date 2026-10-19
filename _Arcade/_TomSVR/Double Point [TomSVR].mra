@@ -1,0 +1,44 @@
+<!-- Double Point on TomSVR_gumbo, a personal MiSTer core for Min Corp.'s Gumbo board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gumbo.rbf. -->
+<misterromdescription>
+    <name>Double Point [TomSVR]</name>
+    <setname>dblpoint</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>Min Corp.</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gumbo</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="dblpoint.zip" md5="None">
+        <part> 02 03 00 00 </part>
+        <interleave output="16">
+            <part name="u1.bin" crc="b05c9e02" map="01"/>
+            <part name="u2.bin" crc="cab35cbe" map="10"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+        <part name="u210.rom" crc="d35f975c"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="u421.bin" crc="b0e9271f" map="00004321"/>
+            <part name="u420.bin" crc="252789e8" map="43210000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <interleave output="32">
+            <part name="u512.bin" crc="b57b8534" map="0021"/>
+            <part name="u511.bin" crc="74ed13ff" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fb">
+        <dip name="Coinage" bits="0,1" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="2,3" ids="Very Hard,Hard,Normal,Easy"/>
+        <dip name="Sound Test" bits="4" ids="On,Off"/>
+        <dip name="Picture View" bits="5" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

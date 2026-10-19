@@ -1,0 +1,55 @@
+<!-- Search Eye Plus V2.0 on TomSVR_nmg5, a personal MiSTer core for Yun Sung's YS-1300 board family, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_nmg5.rbf. -->
+<misterromdescription>
+    <name>Search Eye Plus V2.0 [TomSVR]</name>
+    <setname>searchp2</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nmg5</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="searchp2.zip" md5="None">
+        <part> 22 10 00 00 </part>
+        <interleave output="16">
+            <part name="u2" crc="8278513b" map="01"/>
+            <part name="u7" crc="37fe9e18" map="10"/>
+        </interleave>
+        <part name="u128" crc="85bae10c"/>
+        <part name="u137" crc="cd037524"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0x70000"> FF</part>
+        <interleave output="32">
+            <part name="u83" crc="2bae34cb" map="0001"/>
+            <part name="u82" crc="5cb773f0" map="0010"/>
+            <part name="u105" crc="e8adb15e" map="0100"/>
+            <part name="u96" crc="67efb536" map="1000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+        <part name="u97" crc="f7b63826"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="0.u1" crc="28a50dcf" map="00000021"/>
+            <part name="2.u3" crc="30d46e19" map="00002100"/>
+            <part name="1.u2" crc="f9c4e824" map="00210000"/>
+            <part name="3.u4" crc="619f142f" map="21000000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="f3,f7">
+        <dip name="Timer Speed" bits="0,1" ids="Fastest,Fast,Slow,Slowest"/>
+        <dip name="Helps" bits="2,3" ids="4,3,2,1"/>
+        <dip name="Lives" bits="4,5" ids="6,4,3,5"/>
+        <dip name="Coinage" bits="6,7" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Service Mode" bits="8" ids="On,Off"/>
+        <dip name="Lucky Chance" bits="9,10" ids="Table 4,Table 3,Table 2,Table 1"/>
+        <dip name="Language" bits="11,12,13" ids="Korean (dup 1),Korean (dup 2),Korean,Italian,Chinese,Japanese,English,Korean (dup 3)"/>
+        <dip name="Lucky Timer" bits="14" ids="Less,More"/>
+        <dip name="Items to find" bits="15" ids="Less,More"/>
+    </switches>
+    <buttons names="Spot,Help,-,-,-,-,Start,Coin,Core credits" default="A,B,X,Y,L,R,Start,Select,-" count="2"/>
+</misterromdescription>

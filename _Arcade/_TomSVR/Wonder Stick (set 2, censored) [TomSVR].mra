@@ -1,0 +1,55 @@
+<!-- Wonder Stick (set 2, censored) on TomSVR_nmg5, a personal MiSTer core for Yun Sung's YS-1300 board family, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_nmg5.rbf. -->
+<misterromdescription>
+    <name>Wonder Stick (set 2, censored) [TomSVR]</name>
+    <setname>wondstcka</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>199?</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nmg5</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="wondstck.zip" md5="None">
+        <part> 04 00 00 00 </part>
+        <interleave output="16">
+            <part name="4.u2" crc="0b28ab9d" map="01"/>
+            <part name="3.u7" crc="5f1337d8" map="10"/>
+        </interleave>
+        <part repeat="0xc0000"> FF</part>
+        <part name="u128.bin" crc="86dba085"/>
+        <part name="u137.bin" crc="294b6cbd"/>
+        <part repeat="0x40000"> 00</part>
+        <part repeat="0x70000"> FF</part>
+        <interleave output="32">
+            <part name="u83.bin" crc="f51cf9c6" map="0001"/>
+            <part name="u82.bin" crc="ddd3c60c" map="0010"/>
+            <part name="u105.bin" crc="a7fc624d" map="0100"/>
+            <part name="u96.bin" crc="2369d8a3" map="1000"/>
+        </interleave>
+        <part name="u97.bin" crc="aba1bd94"/>
+        <interleave output="64">
+            <part name="7.u63" crc="25ee44ce" map="00000100"/>
+            <part name="2.u68" crc="b26afb40" map="00100000"/>
+            <part name="8.u73" crc="7cf46203" map="01000000"/>
+            <part name="4.u79" crc="825213e0" map="10000000"/>
+            <part name="5.u64" crc="9ece36d6" map="00000001"/>
+            <part name="1.u69" crc="ec091e87" map="00000010"/>
+            <part name="6.u74" crc="9795ff80" map="00010000"/>
+            <part name="3.u80" crc="553c5781" map="00001000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,fd">
+        <dip name="Helps" bits="4" ids="5,3"/>
+        <dip name="Lives" bits="5" ids="5,3"/>
+        <dip name="Coinage" bits="6,7" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Service Mode" bits="8" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="9" ids="On,Off"/>
+        <dip name="Difficulty" bits="14,15" ids="Hardest,Hard,Easy,Normal"/>
+    </switches>
+    <buttons names="Button 1,Button 2,-,-,-,-,Start,Coin,Core credits" default="A,B,X,Y,L,R,Start,Select,-" count="2"/>
+</misterromdescription>

@@ -1,0 +1,43 @@
+<!-- Head Panic (ver. 0615, 15-06-1999) on TomSVR_esd, a personal MiSTer core for ESD's 16-bit boards, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set, current MAME names), unmodified. Requires TomSVR_esd.rbf. -->
+<misterromdescription>
+    <name>Head Panic (ver. 0615, 15-06-1999) [TomSVR]</name>
+    <setname>hedpanico</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>ESD</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_esd</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="hedpanic.zip" md5="None">
+        <part> 40 00 00 00 </part>
+        <interleave output="16">
+            <part name="hedpanico/esd1.rom" crc="4e0682c5" map="01"/>
+            <part name="hedpanico/esd2.rom" crc="70b08424" map="10"/>
+        </interleave>
+        <part name="esd3.su06" crc="a88d4424"/>
+        <part name="hedpanico/esd4.rom" crc="d7ca6806"/>
+        <part repeat="0x60000"> 00</part>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="hedpanico/sm1.ju01" crc="8083813f" map="0021"/>
+            <part name="hedpanico/sm2.ju02" crc="7a9610e4" map="2100"/>
+        </interleave>
+        <part name="hedpanico/esd5.rom" crc="82c5727f"/>
+        <part repeat="0x180000"> 00</part>
+        <interleave output="32">
+            <part name="hedpanico/sm3.fu35" crc="94dd4cfc" map="0021"/>
+            <part name="hedpanico/sm4.fu34" crc="6da0fb9e" map="2100"/>
+        </interleave>
+    </rom>
+    <rom index="2" zip="hedpanic.zip" md5="None">
+        <part name="hedpanic.nv" crc="e91f4038"/>
+    </rom>
+    <nvram index="2" size="128"/>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

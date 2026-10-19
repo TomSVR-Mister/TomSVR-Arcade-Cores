@@ -1,0 +1,44 @@
+<!-- Cannon Ball (Yun Sung, horizontal) on TomSVR_ys8, a personal MiSTer core for Yun Sung's 8-bit board, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_ys8.rbf. -->
+<misterromdescription>
+    <name>Cannon Ball (Yun Sung, horizontal) [TomSVR]</name>
+    <setname>cannball</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_ys8</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="cannball.zip" md5="None">
+        <part> 00 00 00 00 </part>
+        <part name="cannball.07" crc="17db56b4"/>
+        <part name="cannball.08" crc="11403875"/>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="32">
+            <part name="cannball.05" crc="87c1f1fa" map="0021"/>
+            <part name="cannball.06" crc="e722bee8" map="2100"/>
+        </interleave>
+        <part repeat="0x40000"> FF</part>
+        <interleave output="64">
+            <part name="cannball.01" crc="2d7785e4" map="00000021"/>
+            <part name="cannball.02" crc="24df387e" map="00002100"/>
+            <part name="cannball.03" crc="4d62f192" map="00210000"/>
+            <part name="cannball.04" crc="37cf8b12" map="21000000"/>
+        </interleave>
+        <part repeat="0x100000"> FF</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ef,ff">
+        <dip name="Service Mode" bits="0" ids="On,Off"/>
+        <dip name="Difficulty" bits="1,2" ids="Easy,Hardest,Hard,Normal"/>
+        <dip name="Flip Screen" bits="3" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="4" ids="On,Off"/>
+        <dip name="Coinage" bits="5,7" ids="4C/1C,3C/1C,2C/3C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Bombs" bits="10,11" ids="4,1,2,3"/>
+    </switches>
+    <buttons names="Launch,Rotate,Bomb,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

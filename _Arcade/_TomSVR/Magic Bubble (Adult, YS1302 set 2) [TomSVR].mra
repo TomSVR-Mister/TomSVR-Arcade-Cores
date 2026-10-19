@@ -1,0 +1,69 @@
+<!-- Magic Bubble (Adult, YS1302 set 2) on TomSVR_ys16, a personal MiSTer core for Yun Sung's 16-bit boards (YS1302 board (Z80 + YM3812 sound)), built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip, unmodified (tile ROMs are loaded twice, one copy per scroll layer).
+     Requires TomSVR_ys16.rbf. -->
+<misterromdescription>
+    <name>Magic Bubble (Adult, YS1302 set 2) [TomSVR]</name>
+    <setname>magicbubb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>199?</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_ys16</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="magicbubb.zip|magicbub.zip" md5="None">
+        <part> 01 00 00 00 </part>
+        <interleave output="16">
+            <part name="p1.u32" crc="0fa8b089" map="01"/>
+            <part name="p2.u33" crc="24e7e2b4" map="10"/>
+        </interleave>
+        <part name="u131" crc="9bdb08e4"/>
+        <part repeat="0x40000"> FF</part>
+        <part name="u143.bin" crc="04192753"/>
+        <interleave output="32">
+            <part name="1.u20" crc="d3bba963" map="0001"/>
+            <part name="3.u21" crc="0017f6d3" map="0010"/>
+            <part name="2.u22" crc="7d71f838" map="0100"/>
+            <part name="4.u23" crc="ecee1f63" map="1000"/>
+        </interleave>
+        <part repeat="0x80000"> FF</part>
+        <interleave output="64">
+            <part name="u67.bin" crc="89523dcd" map="00000021"/>
+            <part name="u68.bin" crc="30e01a70" map="00002100"/>
+            <part name="u69.bin" crc="fe357f52" map="00210000"/>
+            <part name="u70.bin" crc="1398a473" map="21000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="u71.bin" crc="0844e017" map="00000021"/>
+            <part name="u72.bin" crc="591db1cb" map="00002100"/>
+            <part name="u73.bin" crc="cb4f3c3c" map="00210000"/>
+            <part name="u74.bin" crc="81ff4910" map="21000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="u67.bin" crc="89523dcd" map="00000021"/>
+            <part name="u68.bin" crc="30e01a70" map="00002100"/>
+            <part name="u69.bin" crc="fe357f52" map="00210000"/>
+            <part name="u70.bin" crc="1398a473" map="21000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="u71.bin" crc="0844e017" map="00000021"/>
+            <part name="u72.bin" crc="591db1cb" map="00002100"/>
+            <part name="u73.bin" crc="cb4f3c3c" map="00210000"/>
+            <part name="u74.bin" crc="81ff4910" map="21000000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="bf,ff">
+        <dip name="Coinage" bits="0,1,2" ids="Free Play,3C/2C,3C/1C,2C/3C,2C/1C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,4" ids="Very Hard,Hard,Easy,Normal"/>
+        <dip name="Demo Sounds" bits="6" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="1P Vs 2P Rounds (Start)" bits="10,11" ids="Best of 7,Best of 5,Best of 1,Best of 3"/>
+        <dip name="1P Vs 2P Rounds (Join-in)" bits="12" ids="Best of 1,Best of 3"/>
+        <dip name="Nudity" bits="8,9" ids="Hard only,Soft and Hard,Soft then Hard,Soft only"/>
+    </switches>
+    <buttons names="Button 1,Unused,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+</misterromdescription>

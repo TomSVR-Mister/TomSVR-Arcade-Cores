@@ -1,0 +1,24 @@
+<!-- Hot Blocks - Tetrix II (set 1) on TomSVR_hotblk, a personal MiSTer core built on Jotego's JTFRAME (CPU: MCL86 by Ted Fried).
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_hotblk.rbf. -->
+<misterromdescription>
+    <name>Hot Blocks - Tetrix II (set 1) [TomSVR]</name>
+    <setname>hotblock</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1993</year>
+    <manufacturer>NIX?</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_hotblk</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="hotblock.zip" md5="None">
+        <part> 00 00 00 00 </part>
+        <part name="hotblk5.ic4" crc="5f90f776"/>
+        <part name="hotblk6.ic5" crc="3176d231"/>
+        <part repeat="0x100"> FF</part>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <buttons names="Rotate,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

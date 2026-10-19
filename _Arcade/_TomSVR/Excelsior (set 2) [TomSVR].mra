@@ -1,0 +1,57 @@
+<!-- Excelsior (set 2) on TomSVR_playmark, a personal MiSTer core for the Playmark Excelsior board (MAME playmark.cpp "excelsra"),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified;
+     the PIC16C57 sound program is MAME's HEX dump, decoded by the core. Requires TomSVR_playmark.rbf. -->
+<misterromdescription>
+    <name>Excelsior (set 2) [TomSVR]</name>
+    <setname>excelsra</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1996</year>
+    <manufacturer>Playmark</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_playmark</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="excelsr.zip" md5="None">
+        <part>01 00 00 00</part>
+        <interleave output="16">
+            <part name="19.u302" crc="d13990a8" map="10"/>
+            <part name="22.u301" crc="55dca2da" map="01"/>
+        </interleave>
+        <interleave output="16">
+            <part name="18.u304" crc="fe517e0e" map="10"/>
+            <part name="21.u303" crc="fdf9bd64" map="01"/>
+        </interleave>
+        <interleave output="16">
+            <part name="17.u306" crc="978f9a6b" map="10"/>
+            <part name="20.u305" crc="8692afe9" map="01"/>
+        </interleave>
+        <part name="16.i013" crc="7ed9da5d"/>
+        <part repeat="0x80000"> FF</part>
+        <interleave output="32">
+            <part name="24.u321" crc="17f46825" map="0001"/>
+            <part name="28.u322" crc="a823f2bd" map="0010"/>
+            <part name="23.u323" crc="d8e1453b" map="0100"/>
+            <part name="27.u324" crc="eca2c079" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="26.u311" crc="c171c059" map="0001"/>
+            <part name="30.u312" crc="b4a4c510" map="0010"/>
+            <part name="25.u313" crc="667eec1b" map="0100"/>
+            <part name="29.u314" crc="4acb0745" map="1000"/>
+        </interleave>
+        <part name="pic16c57-hs_excelsior_i015.hex" crc="022c6941"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,63">
+        <dip name="Coinage" bits="1,2,3,4" ids="Free Play,8C/3C,5C/3C,3C/2C,2C/3C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,6C/1C,5C/1C,4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Credits to Start" bits="5" ids="2,1"/>
+        <dip name="Percentage to Reveal" bits="6" ids="90%,80%"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Lives" bits="8,9" ids="1,4,2,3"/>
+        <dip name="Censor Pictures" bits="10,11" ids="No,No,50%,100%"/>
+        <dip name="Difficulty" bits="12,13" ids="Hard,Medium,Normal,Easy"/>
+        <dip name="Allow Continue" bits="14" ids="No,Yes"/>
+        <dip name="Demo Sounds" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

@@ -1,0 +1,53 @@
+<!-- Puzzle Club (Yun Sung, set 2) on TomSVR_nmg5, a personal MiSTer core for Yun Sung's YS-1300 board family, built on Jotego's JTFRAME.
+     The ROM is assembled from your own MAME zip (merged set), unmodified. Requires TomSVR_nmg5.rbf. -->
+<misterromdescription>
+    <name>Puzzle Club (Yun Sung, set 2) [TomSVR]</name>
+    <setname>pclubysa</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>2000</year>
+    <manufacturer>Yun Sung</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nmg5</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="pclubys.zip" md5="None">
+        <part> 07 10 00 00 </part>
+        <interleave output="16">
+            <part name="rom4a.2" crc="9bfbdeac" map="01"/>
+            <part name="rom3a.7" crc="885aa07a" map="10"/>
+        </interleave>
+        <part name="rom1.128" crc="25cd27f8"/>
+        <part name="rom2.137" crc="4ff97ad1"/>
+        <part repeat="0x70000"> FF</part>
+        <interleave output="32">
+            <part name="rom8.83" crc="651af101" map="0001"/>
+            <part name="rom9.82" crc="2535b4d6" map="0010"/>
+            <part name="rom7.105" crc="f7536c52" map="0100"/>
+            <part name="rom6.95" crc="3c078a52" map="1000"/>
+        </interleave>
+        <part name="rom5.97" crc="20eae2f8"/>
+        <interleave output="64">
+            <part name="rom10.167" crc="d67e8e84" map="00000021"/>
+            <part name="rom12.165" crc="6be8b733" map="00002100"/>
+            <part name="rom11.166" crc="672501a4" map="00210000"/>
+            <part name="rom13.164" crc="fc725ce7" map="21000000"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="f6,bf">
+        <dip name="Lives (Mad Ball)" bits="0" ids="3,4"/>
+        <dip name="Demo Sounds" bits="1" ids="Off,On"/>
+        <dip name="1P Vs 2P Rounds" bits="2" ids="Best of 1,Best of 3"/>
+        <dip name="Nudity" bits="3" ids="Soft and Hard,Soft only"/>
+        <dip name="Difficulty" bits="4,5" ids="Hardest,Hard,Normal,Easy"/>
+        <dip name="Coinage" bits="6,7" ids="3C/1C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Service Mode" bits="8" ids="On,Off"/>
+        <dip name="Timer Speed (Magic Eye)" bits="12,13" ids="Fastest,Fast,Slow,Slowest"/>
+        <dip name="Lives (Magic Eye)" bits="14" ids="3,4"/>
+        <dip name="Timer Speed (Box Logic)" bits="15" ids="Fast,Slow"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,-,-,-,Start,Coin,Core credits" default="A,B,X,Y,L,R,Start,Select,-" count="2"/>
+</misterromdescription>
