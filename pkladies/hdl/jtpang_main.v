@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Date: 20-5-2022
- * Poker Ladies fork (tosius2026, 2026): ctrl_type 4 = key matrix (MAME mitchell.cpp mahjong_input_r, pkladies ports). */
+ * Poker Ladies fork (TomSVR-Mister, 2026): ctrl_type 4 = key matrix (MAME mitchell.cpp mahjong_input_r, pkladies ports). */
 
 module jtpang_main(
     input               clk,    // must run at 48MHz for Kabuki to be in time

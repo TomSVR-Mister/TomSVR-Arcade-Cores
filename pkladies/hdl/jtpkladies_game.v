@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Jose Tejada Gomez
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Date: 21-5-2022
- * Poker Ladies fork (tosius2026, 2026): header byte 15 value 4 selects the mahjong-style key matrix
+ * Poker Ladies fork (TomSVR-Mister, 2026): header byte 15 value 4 selects the mahjong-style key matrix
  * used by Poker Ladies, with 8 buttons: Deal, Cancel, Flip, Hold A-E. */
 
 module jtpkladies_game(
