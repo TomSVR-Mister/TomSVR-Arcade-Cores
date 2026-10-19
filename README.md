@@ -30,6 +30,10 @@ update_all. It installs the cores to `_Arcade/cores/` and the MRAs to `_Arcade/_
 db_url = https://raw.githubusercontent.com/TomSVR-Mister/TomSVR-Arcade-Cores/db/db.json.zip
 ```
 
+To install only some cores, use update_all's download filter with the per-core tags: `arcadetomsvr<core>`
+(for example `arcadetomsvresd`, `arcadetomsvrsplash`). Each tag covers one core and its MRAs. Core files are named
+`TomSVR_<core>_<build date>.rbf`.
+
 **By hand:** download the zip from the Releases page, then:
 
 1. Copy the `.rbf` files to `/media/fat/_Arcade/cores/`.
