@@ -73,7 +73,7 @@ Known issue: Miss Puzzle (more explicit) shows some picture corruption. Reports 
 Each folder (`esd/`, `para/` ...) is a JTFRAME core. Copy it into `cores/` of
 [jotego/jtcores](https://github.com/jotego/jtcores) at commit `bfced64` and build with jotego's normal flow, or run
 the `build.yaml` GitHub Actions workflow in this repo. `tools/` holds the MRA generators and the simulation helpers
-used to compare against MAME; `HANDOVER.md` has developer notes.
+used to compare against MAME.
 
 ## Credits and licence
 
