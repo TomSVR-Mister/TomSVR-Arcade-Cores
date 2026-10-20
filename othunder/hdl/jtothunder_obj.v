@@ -48,7 +48,8 @@ module jtothunder_obj(
 );
 
 // The scan reads word 0 of one entry per clock and only stops for sprites on this line.
-// Chunk fetches (sprite map + two tile reads) run while the previous chunk is being drawn,
+// Chunk fetches (sprite map + one tile row read from each of two SDRAM banks) run while the previous
+// chunk is drawn at two pixels per clock (even and odd x in separate line buffers);
 // chunks fully outside the 320 pixel window are skipped and each 32-bit map read serves two chunks.
 localparam [3:0] IDLE=0, SCAN=1, H1=2, H2=3, H3=4, H4=5, FINDJ=6, CHK=7, CHUNK=8,
                  MAPW=9, T0W0=10, T0W=11, HAND=14, NEXT=15;
@@ -88,10 +89,20 @@ reg  [21:0] d_stepx;
 reg  [25:0] sxacc;
 reg  [ 8:0] wx;
 reg  [15:0] pl0, pl1, pl2, pl3;
-wire [ 3:0] sx  = sxacc[19:16];
-wire [ 3:0] pen = { pl0[~sx], pl1[~sx], pl2[~sx], pl3[~sx] };
-wire        we  = d_busy && pen!=0;
-wire [12:0] q1;
+// two pixels per clock: pixel A at wx and pixel B at wx+1 go to different (even/odd x) buffers
+wire [25:0] sxnx = d_flipx ? sxacc - {4'd0,d_stepx} : sxacc + {4'd0,d_stepx};
+wire [ 3:0] sxa  = sxacc[19:16], sxb = sxnx[19:16];
+wire [ 3:0] pena = { pl0[~sxa], pl1[~sxa], pl2[~sxa], pl3[~sxa] };
+wire [ 3:0] penb = { pl0[~sxb], pl1[~sxb], pl2[~sxb], pl3[~sxb] };
+wire        wea  = d_busy && pena!=0;
+wire        web  = d_busy && penb!=0 && icnt+1'd1 != d_zx;
+wire [ 8:0] wxb  = wx + 1'd1;
+wire [ 3:0] pen_e = wx[0] ? penb : pena,  pen_o = wx[0] ? pena : penb;
+wire        we_e  = wx[0] ? web  : wea,   we_o  = wx[0] ? wea  : web;
+wire [ 7:0] ax_e  = wx[0] ? wxb[8:1] : wx[8:1];
+wire [ 7:0] ax_o  = wx[8:1];
+wire [12:0] q1, q_e, q_o;
+assign q1 = rd_x[0] ? q_o : q_e;
 reg  [ 2:0] ecnt;
 wire        erase = ecnt==3;
 
@@ -107,10 +118,24 @@ wire [16:0] mtag  = { tilenum, jrow, kc[1]^flipx };
 wire [14:0] mcode = (kc[0]^flipx) ? map_q[30:16] : map_q[14:0];
 
 `ifdef SIMULATION
-integer short_lines=0;
-always @(posedge clk) if( start && st!=IDLE ) begin
-    short_lines <= short_lines+1;
-    $display("OBJ short line %0d (total %0d)", vrender, short_lines+1);
+integer short_lines=0, c_map=0, c_rom=0, c_r1=0, c_r2=0, c_hand=0, c_scan=0, n_chunk=0;
+always @(posedge clk) begin
+    if( start ) begin
+        if( st!=IDLE ) begin
+            short_lines <= short_lines+1;
+            $display("OBJ short line %0d (total %0d) map %0d rom %0d (r1 %0d r2 %0d) hand %0d scan %0d chunks %0d",
+                vrender, short_lines+1, c_map, c_rom, c_r1, c_r2, c_hand, c_scan, n_chunk);
+        end
+        c_map<=0; c_rom<=0; c_r1<=0; c_r2<=0; c_hand<=0; c_scan<=0; n_chunk<=0;
+    end else begin
+        if( st==MAPW ) c_map <= c_map+1;
+        if( st==T0W  ) c_rom <= c_rom+1;
+        if( st==T0W && !got[0] ) c_r1 <= c_r1+1;
+        if( st==T0W && !got[1] ) c_r2 <= c_r2+1;
+        if( st==HAND ) c_hand <= c_hand+1;
+        if( st==SCAN ) c_scan <= c_scan+1;
+        if( st==HAND && !d_busy ) n_chunk <= n_chunk+1;
+    end
 end
 `endif
 
@@ -161,10 +186,10 @@ always @(posedge clk, posedge rst) begin
         end
         // drawer
         if( d_busy ) begin
-            wx    <= wx + 1'd1;
-            icnt  <= icnt + 1'd1;
-            sxacc <= d_flipx ? sxacc - d_stepx : sxacc + d_stepx;
-            if( icnt+1'd1 == d_zx ) d_busy <= 0;
+            wx    <= wx + 2'd2;
+            icnt  <= icnt + 2'd2;
+            sxacc <= d_flipx ? sxnx - {4'd0,d_stepx} : sxnx + {4'd0,d_stepx};
+            if( icnt+2'd2 >= d_zx ) d_busy <= 0;
         end
         if( start ) begin
             sidx  <= 8'd191;
@@ -320,17 +345,30 @@ jtframe_dual_ram16 #(.AW(10)) u_ram(
     .clk1   ( clk       ), .data1 ( 16'd0    ), .addr1 ( oaddr    ), .we1 ( 2'b0 ), .q1 ( odata )
 );
 
-jtframe_dual_ram #(.DW(13),.AW(10)) u_buf(
-    .clk0   ( clk                   ),
-    .data0  ( { d_prio, d_col, pen } ),
-    .addr0  ( { wr_bank, wx }       ),
-    .we0    ( we                    ),
-    .q0     (                       ),
-    .clk1   ( clk                   ),
-    .data1  ( 13'd0                 ),
-    .addr1  ( { rd_bank, rd_x }     ),
-    .we1    ( erase                 ),
-    .q1     ( q1                    )
+jtframe_dual_ram #(.DW(13),.AW(9)) u_even(
+    .clk0   ( clk                    ),
+    .data0  ( { d_prio, d_col, pen_e } ),
+    .addr0  ( { wr_bank, ax_e }      ),
+    .we0    ( we_e                   ),
+    .q0     (                        ),
+    .clk1   ( clk                    ),
+    .data1  ( 13'd0                  ),
+    .addr1  ( { rd_bank, rd_x[8:1] } ),
+    .we1    ( erase & ~rd_x[0]       ),
+    .q1     ( q_e                    )
+);
+
+jtframe_dual_ram #(.DW(13),.AW(9)) u_odd(
+    .clk0   ( clk                    ),
+    .data0  ( { d_prio, d_col, pen_o } ),
+    .addr0  ( { wr_bank, ax_o }      ),
+    .we0    ( we_o                   ),
+    .q0     (                        ),
+    .clk1   ( clk                    ),
+    .data1  ( 13'd0                  ),
+    .addr1  ( { rd_bank, rd_x[8:1] } ),
+    .we1    ( erase &  rd_x[0]       ),
+    .q1     ( q_o                    )
 );
 
 endmodule
