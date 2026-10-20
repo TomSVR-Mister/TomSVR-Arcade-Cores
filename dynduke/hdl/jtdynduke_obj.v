@@ -147,7 +147,7 @@ always @(posedge clk) begin
     end
 end
 
-jtframe_objdraw #(.AW(9),.CW(14),.PW(11),.LATCH(1),.KEEP_OLD(0),.ALPHA(15)) u_draw(
+jtframe_objdraw #(.AW(9),.CW(14),.PW(11),.LATCH(1),.KEEP_OLD(0),.ALPHA(15),.HFIX(0)) u_draw(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .pxl_cen    ( pxl_cen       ),
