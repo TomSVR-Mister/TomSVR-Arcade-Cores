@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-18 MiSTer arcade cores and 114 MRAs for small 1990s arcade boards that have no other MiSTer core.
+22 MiSTer arcade cores and 143 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** They are built on jotego's JTFRAME framework, but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
@@ -10,7 +10,7 @@ project will drop its version.
 ## How accurate they are
 
 - Each core is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295, jtopl, jt12, jt51,
-  jt5205, jteeprom), all unchanged.
+  jt5205, jteeprom, jt5911, jt8051), all unchanged.
 - The board logic on top of that (memory maps, video, sprites, how the chips are wired) was written from the
   **MAME drivers**. No PCBs or schematics were used.
 - They were checked by comparing simulation frames against MAME and by playing them on MiSTer hardware. So they
@@ -48,6 +48,7 @@ why); the patch is applied in memory by the MRA.
 | Core | Games | MAME driver |
 |---|---|---|
 | comad | Comad Gals Panic clones (Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
+| dynduke | Dynamite Duke | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
 | galpin | Gals Pinball, Hot Pinball | galspnbl.cpp |
@@ -58,17 +59,19 @@ why); the patch is applied in memory by the MRA.
 | madd | Mad Donna, Komo Como | oneshot.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
+| othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
 | playmark | Big Twin, Excelsior, Hot Mind | playmark.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix, Perestroika Girls | superqix.cpp |
 | wrally | World Rally (Gaelco, 1993) | wrally.cpp |
+| xexex | Xexex, Orius | xexex.cpp |
 | ys16 | Paparazzi, Shocking, Bomb Kick, Magic Bubble | yunsun16.cpp |
 | ys8 | Cannon Ball, Magix / Rock, Rock Tris | yunsung8.cpp |
 | zero | Zero Zone, Las Vegas Girl | zerozone.cpp |
 
-`afega/` (Afega boards, already covered by kuzecores) and `pkladies/` (unfinished) are in the source but not
-released.
+`afega/` (Afega boards, already covered by kuzecores), `chqflag/` (Chequered Flag, still being fixed) and `pkladies/`
+(unfinished) are in the source but not released.
 
 Known issue: Miss Puzzle (more explicit) shows some picture corruption. Reports are welcome as GitHub issues
 (game, MRA name and what you see).
@@ -83,7 +86,8 @@ used to compare against MAME.
 ## Credits and licence
 
 - **Jose Tejada (jotego)**: JTFRAME, jtcores and the chip modules. Three cores are forks of his game cores
-  (comad from JTGALS, jpop from JTKIWI, missb from JTBUBL) and galpin reuses parts of JTGAIDEN.
+  (comad from JTGALS, jpop from JTKIWI, missb from JTBUBL). galpin reuses parts of JTGAIDEN, dynduke the Seibu
+  sound from JTTOKI, and xexex the Konami sprite and sound latch models from JTSIMSON / JTRIDERS.
 - **Jorge Cwik**: fx68k. **T80** authors: Z80.
 - **Ted Fried (MicroCore Labs)**: MCL86 8088, packaged by Marcus Andrade (openGateware); **Kitune-san**: KF8288.
   Both MIT licensed, used in hotblk.

@@ -1,11 +1,11 @@
-# How the 18 released cores are put together
+# How the 22 released cores are put together
 
-This covers the 18 released cores and their 114 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 22 released cores and their 143 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
 
-All 18 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
+All 22 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
 `jotego/jtcores/cores/` at commit `bfced64` and built there with jotego's normal build flow. So every core
 depends on jtcores at that commit. Nothing in jotego's tree is changed; the cores only add new folders.
 
@@ -41,10 +41,11 @@ jotego's separate chip modules, all unchanged:
 |---|---|
 | jt6295 | OKI M6295 ADPCM |
 | jtopl (`jtopl2`, `jt26`) | YM3812 / YM3526 |
-| jt12 (`jt03`, `jt49`) | YM2203, AY-3-8910 |
+| jt12 (`jt03`, `jt10`, `jt49`) | YM2203, YM2610, AY-3-8910 |
 | jt51 | YM2151 |
 | jt5205 | MSM5205 ADPCM |
-| jteeprom | 93C46 serial EEPROM |
+| jteeprom, jt5911 | 93C46 / ER5911 serial EEPROM |
+| jt8051 | 8051 family MCU (i8751, DS5002FP) |
 
 ## The cores
 
@@ -60,13 +61,15 @@ These began as a copy of one of jotego's game cores, renamed and changed. The or
 | **jtjpop** (1) | **JTKIWI** (Taito TNZS / Seta X1) | Jumping Pop (Nics): JT51 YM2151 on the second CPU in place of the YM2203, inputs and DIP switches on the second CPU, a 1024-entry palette, dial support from JTKIWI. Keeps JTKIWI's Z80s and i8742 MCU module (upi41), jt03 and jt51. |
 | **jtmissb** (2) | **JTBUBL** (Bubble Bobble) | Miss Bubble II and Bubble Pong Pong. No MCU, a rewritten sub CPU for the picture background, 8 bpp tiles and sprites, and YM3526 + OKI in place of the YM2203. Z80s, jt26, jt6295. |
 
-### New cores that reuse pieces of a jotego core (1)
+### New cores that reuse pieces of a jotego core (3)
 
 | Core | Reused from | Notes |
 |---|---|---|
+| **jtdynduke** (5) | **JTTOKI** | Dynamite Duke. The Seibu sound board (Z80 with SEI80BU decryption, YM3812, OKI) comes from JTTOKI. Two NEC V30 CPUs from the MiSTer Irem M72 core (GPL-2, see below). Text, two scroll layers and sprites are new, from MAME's dynduke.cpp. |
+| **jtxexex** (4) | **JTSIMSON / JTRIDERS** | Xexex and Orius. The K053246 sprite DMA and register blocks and the K054321 sound latch come from those cores. K056832 tilemaps, K053250 line background, K053251/K054338 mixing with alpha and a new K054539 PCM model are new, from MAME's xexex.cpp. 68000, Z80, jt51, jt5911 EEPROM saved as NVRAM. |
 | **jtgalpin** (2) | **JTGAIDEN** | Gals Pinball / Hot Pinball. The Tecmo sprite engine (`jtgalpin_obj*.v`) and the sound board module are adapted from JTGAIDEN. The bitmap, tilemap, memory map and colour mixer are new, from MAME's galspnbl.cpp. 68000 + Z80 + YM3812 + OKI. |
 
-### New board cores on JTFRAME (14)
+### New board cores on JTFRAME (16)
 
 Each of these is a new driver written from the MAME source named, using only JTFRAME and the chip modules above.
 
@@ -81,8 +84,10 @@ Each of these is a new driver written from the MAME source named, using only JTF
 | **jtnmg5** | 12 | Yun Sung YS-1300 (nmg5.cpp) | 68000, Z80 | YM3812, OKI | m68k, z80, jtopl2, jt6295 |
 | **jtpara** | 13 | Yun Sung Paradise (paradise.cpp) | Z80 | 2 x OKI | z80, jt6295, jtframe_edge |
 | **jtplaymark** | 5 | Playmark (playmark.cpp) | 68000, PIC16C57 | OKI | m68k, jt6295, jteeprom (Hot Mind). The PIC16C57 is new code (`jtplaymark_pic.v`, from the Microchip data sheet and MAME). |
+| **jtothunder** | 6 | Taito Operation Thunderbolt (othunder.cpp) | 68000, Z80 | YM2610 | m68k, z80, jt10, jteeprom (93C46 NVRAM). Light gun game; the MRA sets the JTFRAME light gun flag so a crosshair is drawn for mouse, stick or Sinden aiming. |
 | **jtsplash** | 11 | Gaelco Splash! (splash.cpp) | 68000, Z80 | YM3812, MSM5205; YM2203 for Lady Frog | m68k, z80, jtopl2, jt5205, jt03, jtframe obj draw |
-| **jtsqix** | 2 | Super Qix without MCU (superqix.cpp) | Z80 | 2 x AY-3-8910 | z80, jt49. The bootleg's ROM byte shuffle is undone in the core. |
+| **jtsqix** | 7 | Super Qix, Perestroika Girls (superqix.cpp) | Z80, i8751 MCU | 2 x AY-3-8910 | z80, jt49, jt8051 running the dumped MCU program. The bootleg's ROM byte shuffle is undone in the core. |
+| **jtwrally** | 9 | Gaelco World Rally (wrally.cpp) | 68000, DS5002FP | OKI | m68k, jt8051 (DS5002FP running the dumped program), jt6295. VRAM writes are decrypted on the fly. |
 | **jtys16** | 10 | Yun Sung 16-bit (yunsun16.cpp) | 68000 (+ Z80 on Magic Bubble) | OKI, YM3812 | m68k, z80, jt6295, jtopl2, jtframe obj draw |
 | **jtys8** | 5 | Yun Sung 8-bit (yunsung8.cpp) | Z80, Z80 | YM3812, MSM5205 | z80, jtopl2, jt5205 |
 | **jtzero** | 2 | Comad 1993 (zerozone.cpp) | 68000, Z80 | OKI | m68k, z80, jt6295 |
@@ -91,13 +96,15 @@ Each of these is a new driver written from the MAME source named, using only JTF
 
 - **jthotblk** uses the **MCL86** 8088 core by Ted Fried (MicroCore Labs), as packaged by Marcus Andrade (openGateware), and **KF8288** by Kitune-san. Both are MIT licensed and kept as copies in `hotblk/hdl/`. This is the only core that uses no JTFRAME CPU wrapper. The board's 24C02 EEPROM is a small new I2C module.
 
+- **jtdynduke** uses the **NEC V30** model by Martin Donlon (wickerwaka) from the MiSTer Irem M72 core, GPL-2, kept in `dynduke/hdl/v30` with its licence. It is used without asking the author first; if he objects, the core will be withdrawn.
+
 - **fx68k** (Jorge Cwik) and **T80** come with JTFRAME and are used through jotego's wrappers.
 
 - Everything else is new code (2026), written against MAME 0.264-era drivers.
 
 ### Licence
 
-All of the cores are GPL-3.0, as JTFRAME and jtcores require. The MCL86 and KF8288 files keep their MIT licence.
+All of the cores are GPL-3.0, as JTFRAME and jtcores require. The MCL86 and KF8288 files keep their MIT licence, and the V30 files keep their GPL-2 licence.
 
 ## The MRAs
 
@@ -107,13 +114,13 @@ All the MRAs follow the same scheme, with a few exceptions listed at the end.
 
 - **`rom index="0"`: the game ROM.** It starts with a 4-byte header part on 13 of the cores. The rest is assembled from your MAME zip in the order set by that core's `macros.def` (`JTFRAME_BA1_START` and so on). Steps include byte swaps for 68000 programs, `interleave` for 16- and 32-bit graphics, and `repeat` padding to fill each slot.
 
-- **`rom index="1"`: default DIP switches.** The `<switches>` block (97 of the 114 MRAs) gives the OSD menu.
+- **`rom index="1"`: default DIP switches.** The `<switches>` block gives the OSD menu. On jtothunder `rom index="1"` instead carries the JTFRAME core flags (`02 00` = light gun, which turns on the crosshair).
 
-- **`rom index="2"` with `<nvram>`:** this appears on the 14 JTESD MRAs whose board has a 93C46 EEPROM. It loads MAME's default `.nv` file from the zip, and after that MiSTer saves your own. Hot Mind and Hot Blocks have EEPROMs too, but their MRAs don't preload one.
+- **`rom index="2"` with `<nvram>`:** this appears on the 14 JTESD MRAs whose board has a 93C46 EEPROM, and on the Xexex and Operation Thunderbolt MRAs. It saves the EEPROM to the SD card; the JTESD ones also preload MAME's default `.nv` file from the zip. Hot Mind and Hot Blocks have EEPROMs too, but their MRAs don't preload one.
 
 - **`<buttons>`:** named buttons. The count must match `JTFRAME_BUTTONS`, or a button lands on Select. (This caused a coin bug on Big Twin / Hot Mind, now fixed.)
 
-- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 74 MRAs, 0282 on 37 (the Comad ones) and 0270 on 3.
+- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 103 MRAs, 0282 on 37 (the Comad ones) and 0270 on 3.
 
 ### What the header bytes select, per core
 
@@ -134,7 +141,9 @@ One core can run several board variants because the header tells it which one it
 | jtys16 | byte 0 bit 0: Magic Bubble YS1302 board |
 | jtys8 | byte 0 bit 0: 2 MB background; bit 1: Cannon Ball vertical |
 | jthotblk | header present, all zero |
-| jtfunybubl, jtgalpin, jthdoll, jtsqix, jtzero | no header (one board layout) |
+| jtdynduke | byte 0 bit 0: The Double Dynamites I/O map (no MRAs yet) |
+| jtsqix | byte 0 bit 0: Perestroika Girls ROM byte shuffle; bit 1: i8751 MCU fitted |
+| jtfunybubl, jtgalpin, jthdoll, jtothunder, jtwrally, jtxexex, jtzero | no header (one board layout) |
 
 ### Exceptions to know about
 
