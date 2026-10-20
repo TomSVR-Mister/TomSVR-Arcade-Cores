@@ -1,0 +1,41 @@
+xexex:
+  - get:
+    - jtxexex_game.v
+    - jtxexex_main.v
+    - jtxexex_sound.v
+    - jtxexex_k539.v
+    - jtxexex_video.v
+    - jtxexex_tmap.v
+    - jtxexex_lvc.v
+    - jtxexex_obj.v
+    - jtxexex_k246.sv
+    - jtxexex_k246_scan.sv
+    - jtxexex_colmix.v
+simson:
+  - get:
+    - jt053246_dma.v
+    - jt053246_mmr.v
+riders:
+  - get:
+    - jt054321.v
+jtframe:
+  - get:
+      - jtframe_edge.v
+  - from: ram
+    get:
+      - jtframe_dual_ram.v
+      - jtframe_dual_ram16.v
+  - from: video
+    get:
+      - jtframe_obj.yaml
+  - from: video/layouts
+    get:
+      - jtframe_8x8x4_packed_msb.v
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+      - jtframe_m68k.yaml
+jt51:
+jteeprom:
+  - get:
+    - jt5911.sv

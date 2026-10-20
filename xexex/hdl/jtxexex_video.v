@@ -32,6 +32,7 @@ module jtxexex_video(
     output     [15:0] pal_dout,
     output            dma_bsy,
     output reg        vb_start,   // one clock, line 256
+    output     [ 8:0] vdump,
 
     // ROMs
     output     [20:2] tile_addr,
@@ -76,6 +77,7 @@ wire        lvc_behind;
 wire [22:2] obj_full;
 
 assign obj_addr = obj_full[21:2];
+assign vdump    = vcnt;
 
 always @(posedge clk) begin
     line_start <= 0;
