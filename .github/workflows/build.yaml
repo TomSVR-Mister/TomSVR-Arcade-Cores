@@ -32,6 +32,8 @@ jobs:
           git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51 modules/jtkcpu
           git -C modules/jt12 submodule update --init
           cp -r ../mine/${{ inputs.core }} cores/${{ inputs.core }}
+          # TomSVR menu background instead of the JT logo (jtcore links hdl/*.hex over jtframe's own)
+          cp ../mine/logo/logodata.hex ../mine/logo/logomap.hex cores/${{ inputs.core }}/hdl/
 
       - name: Compile for MiSTer (Quartus 20.1 Lite in jotego/jtcore20)
         shell: bash
