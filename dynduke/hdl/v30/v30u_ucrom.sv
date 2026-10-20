@@ -76,7 +76,7 @@ initial begin
     $readmemh({HEXDIR, "ucrom.hex"}, ucrom);
 end
 
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 //----------------------------------------------------------------------------
 // F44 -- THE SILENT-EMPTY FAILURE MODE, CLOSED.
 //

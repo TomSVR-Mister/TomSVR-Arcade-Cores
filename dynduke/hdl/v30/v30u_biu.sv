@@ -1271,7 +1271,7 @@ always @(posedge clk)
     else if (ce_half) t1_half2 <= (r_run && (r_ts == TS_T1)) ||
                                   vector_follow_preview;
 
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 //----------------------------------------------------------------------------
 // THE `bus_half` EQUIVALENCE.  The de-muxed configuration has no `ce_half` and
 // no `t1_half2`; it reads the phase off the registers the flop is loaded from.
@@ -2682,7 +2682,7 @@ always_ff @(posedge clk) if (ss_we || srst || ce) begin
     r_g_row_q <= (srst && !ss_we) ? g_row_q_rst : g_row_q;
 end
 
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 // The module's contracts, checked on the REGISTERED state -- the always_comb
 // above settles more than once per clock, so an immediate assertion inside it
 // would report transients (campaign risk #2 kept, instrument fixed).
@@ -2940,7 +2940,7 @@ end
 // V30SIM_EVALTRACE `ET` / `QT` lines.  Guarded out of synthesis, and gated on
 // the plusarg so a normal run is byte-identical without it.
 //----------------------------------------------------------------------------
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 logic utrace_en;
 integer utrace_clk;
 initial begin

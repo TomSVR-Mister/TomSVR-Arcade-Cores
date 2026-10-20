@@ -249,7 +249,7 @@ assign SS_BUS_QUIET = ss_biu_bus_quiet;
 // what S-1 protects is `t1_half2`, the T1 address->data turnaround, which a
 // de-muxed bus does not have.  A de-muxed integrator's only enable contract is
 // `CE`, and the core has no clause to state about a single enable.
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 `ifdef V30_MUXED_AD
 // has a CE_HALF been seen since the last CE?  Starts asserted so a run's FIRST
 // CE is never reported -- there is no preceding CE for it to be too close to.

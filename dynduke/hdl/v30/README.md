@@ -11,3 +11,4 @@ Changes for JTDYNDUKE:
 
 `jtdynduke_cpu.sv` and `jtdynduke_ssbus.sv` are new files for this core: the clock enable around the V30 bus adapter,
 and a minimal stand-in for the M72 save-state bus interface, which this core does not use.
+- Simulation-only blocks are guarded with `ifdef SIMULATION` (jtframe defines it in simulation) instead of `ifndef SYNTHESIS`, which Quartus does not define.

@@ -4094,7 +4094,7 @@ reg      [2:0] poll_pipe_n;
 //============================================================================
 // THE CLOCK
 //============================================================================
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 reg eutrace = 0;
 initial if ($test$plusargs("eutrace")) eutrace = 1;
 // §86 -- THE ARM'S OWN INSTRUMENT, and it is the one the model already has
@@ -4585,7 +4585,7 @@ always @* begin
         //====================================================================
         // (a) the BIU's completion pulses, sampled on the clock they ride
         //====================================================================
-`ifndef SYNTHESIS
+`ifdef SIMULATION
         trc_1bl_hit = 1'b0; trc_pe_hit = 1'b0; trc_1bld_hit = 1'b0;
 `endif
         poll_pipe_n = {poll_pipe_n[1:0], pin_poll_n};
@@ -4760,7 +4760,7 @@ always @* begin
         //====================================================================
         if (poste_n) begin
             poste_n = 1'b0;
-`ifndef SYNTHESIS
+`ifdef SIMULATION
             trc_pe_hit = 1'b1; trc_pe_pre = psw_n;
             trc_pe_upc = {upc_opc_n, upc_loc_n};
 `endif
@@ -4927,7 +4927,7 @@ endcase
             default: ;
         endcase
     end
-`ifndef SYNTHESIS
+`ifdef SIMULATION
     if (row_bus)
         $error("v30u_eu: a post-E row carries a bus cycle (upc %0d.%02X.%0d)",
                upc_page_n, upc_opc_n, upc_loc_n);
@@ -4938,7 +4938,7 @@ end
             // JTDYNDUKE: end of v30u_eu_poste.svh
             if (tmpa_n != tmpa) ea_residue_n = tmpa_n;
             if (tmpb_n != tmpb) ea_pair_valid_n = 1'b0;
-`ifndef SYNTHESIS
+`ifdef SIMULATION
             trc_pe_post = psw_n;
 `endif
         end
@@ -5021,7 +5021,7 @@ al_eaconst_n = 1'b0; al_adjust_n = 2'd0; al_bitarm_n = 1'b0; al_spent_n = 1'b0;
             // JTDYNDUKE: end of v30u_eu_iend_late.svh
         end
 
-`ifndef SYNTHESIS
+`ifdef SIMULATION
         //-- the eutrace SNAPSHOT (the $display is in the clocked observer)
         trc_st = st_n;
         trc_upc_page = upc_page_n;
@@ -5041,13 +5041,13 @@ al_eaconst_n = 1'b0; al_adjust_n = 2'd0; al_bitarm_n = 1'b0; al_spent_n = 1'b0;
         trc_tmpc = tmpc_n;
 `endif
         stop = 1'b0;
-`ifndef SYNTHESIS
+`ifdef SIMULATION
         chain_used = 4'd0;
         chain_first = st_n;
 `endif
         for (chain = 0; chain < CHAIN_MAX; chain = chain + 4'd1) begin
             if (!stop) begin
-`ifndef SYNTHESIS
+`ifdef SIMULATION
                 chain_used = chain + 4'd1;
 `ifdef CHAIN_PROBE
                 if (!cp_seen[{chain, st_n}]) begin : cprobe
@@ -5260,7 +5260,7 @@ S_DECODE2: begin
             // both paths owe.  MEASURED, `FA idx 4`: the golden's status
             // nibble is already 2 (IE=0) on clock 1 and `S_1BL_LEAD` was
             // standing there, so the write landed on the edge ENDING clock 1.
-`ifndef SYNTHESIS
+`ifdef SIMULATION
             // wrfuzz W3.5's decode probe (see `trc_1bld_*` in v30u_eu.sv).
             trc_1bld_hit = 1'b1; trc_1bld_ripe = q_ripe_lead_n;
             trc_1bld_seen = brk_seen; trc_1bld_arm = brk_arm;
@@ -5329,7 +5329,7 @@ if (!(poste_n &&
       ((pla3_xop(ld_pla_n) == PLA3_BL1_SET_CY) ||
        (pla3_xop(ld_pla_n) == PLA3_BL1_CLR_CY) ||
        (pla3_xop(ld_pla_n) == PLA3_BL1_NOT_CY)))) begin
-`ifndef SYNTHESIS
+`ifdef SIMULATION
     trc_1bl_pre = psw_n; trc_1bl_hit = 1'b1;
 `endif
     case (pla3_xop(ld_pla_n))
@@ -5343,7 +5343,7 @@ if (!(poste_n &&
         default: ;
     endcase
     psw_n = (psw_n & PSW_WRITABLE) | PSW_FORCED;
-`ifndef SYNTHESIS
+`ifdef SIMULATION
     trc_1bl_post = psw_n;
 `endif
 end
@@ -5413,7 +5413,7 @@ if (!(poste_n &&
       ((pla3_xop(ld_pla_n) == PLA3_BL1_SET_CY) ||
        (pla3_xop(ld_pla_n) == PLA3_BL1_CLR_CY) ||
        (pla3_xop(ld_pla_n) == PLA3_BL1_NOT_CY)))) begin
-`ifndef SYNTHESIS
+`ifdef SIMULATION
     trc_1bl_pre = psw_n; trc_1bl_hit = 1'b1;
 `endif
     case (pla3_xop(ld_pla_n))
@@ -5427,7 +5427,7 @@ if (!(poste_n &&
         default: ;
     endcase
     psw_n = (psw_n & PSW_WRITABLE) | PSW_FORCED;
-`ifndef SYNTHESIS
+`ifdef SIMULATION
     trc_1bl_post = psw_n;
 `endif
 end
@@ -6938,7 +6938,7 @@ always @(posedge clk) begin
     end
 end
 
-`ifndef SYNTHESIS
+`ifdef SIMULATION
 //--------------------------------------------------------------------------
 // THE CLOCKED OBSERVER -- everything that must happen ONCE PER CE CLOCK.
 //--------------------------------------------------------------------------
