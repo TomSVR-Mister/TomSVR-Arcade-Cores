@@ -87,6 +87,10 @@ used to compare against MAME.
 - **Jorge Cwik**: fx68k. **T80** authors: Z80.
 - **Ted Fried (MicroCore Labs)**: MCL86 8088, packaged by Marcus Andrade (openGateware); **Kitune-san**: KF8288.
   Both MIT licensed, used in hotblk.
+- **Martin Donlon (wickerwaka)**: the NEC V30 CPU model from the MiSTer Irem M72 core
+  ([Arcade-IremM72_MiSTer](https://github.com/MiSTer-devel/Arcade-IremM72_MiSTer)), GPL-2, used in dynduke.
+  It is used without asking the author first; if he objects, the dynduke core will be withdrawn.
 - **The MAME team**, whose drivers document these boards.
 
-GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence.
+GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,
+and the V30 files in `dynduke/hdl/v30` keep their GPL-2 licence.

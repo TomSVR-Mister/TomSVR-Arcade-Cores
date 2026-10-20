@@ -1,0 +1,35 @@
+params:
+  - { name: SUB_OFFSET, value: "`SUB_START>>1" }
+  - { name: OKI_OFFSET, value: "(`OKI_START-`JTFRAME_BA1_START)>>1" }
+  - { name: CHR_OFFSET, value: "(`CHR_START-`JTFRAME_BA1_START)>>1" }
+  - { name: SPR_OFFSET, value: "(`SPR_START-`JTFRAME_BA3_START)>>1" }
+
+clocks:
+  clk:
+    - freq: 3579545
+      outputs:
+        - fm_cen
+    - freq: 1000000
+      outputs:
+        - oki_cen
+
+audio:
+  rsum: 10k
+  channels:
+    - { name: fm,  module: jtopl2, rsum: 10k }
+    - { name: pcm, module: jt6295, rsum: 25k }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main,  addr_width: 19, data_width: 16 }
+      - { name: sub,   addr_width: 17, data_width: 16, offset: SUB_OFFSET }
+    - buses:
+      - { name: snd,   addr_width: 17, data_width: 8 }
+      - { name: adpcm, addr_width: 16, data_width: 8,  offset: OKI_OFFSET }
+      - { name: chr,   addr_width: 15, data_width: 32, offset: CHR_OFFSET }
+    - buses:
+      - { name: scr2,  addr_width: 21, data_width: 32 }
+    - buses:
+      - { name: scr1,  addr_width: 20, data_width: 32 }
+      - { name: spr,   addr_width: 21, data_width: 32, offset: SPR_OFFSET }

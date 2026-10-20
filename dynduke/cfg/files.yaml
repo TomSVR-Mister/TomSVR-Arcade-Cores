@@ -1,0 +1,44 @@
+dynduke:
+  - get:
+    - jtdynduke_game.v
+    - jtdynduke_main.v
+    - jtdynduke_sub.v
+    - jtdynduke_sound.v
+    - jtdynduke_video.v
+    - jtdynduke_tiles.v
+    - jtdynduke_obj.v
+    - jtdynduke_colmix.v
+    - timing.sdc
+  - from: v30
+    get:
+    - v30u_ss_pkg.sv
+    - jtdynduke_ssbus.sv
+    - v30u_ucrom.sv
+    - v30u_biu.sv
+    - v30u_eu.sv
+    - v30_core.sv
+    - v30_bus.sv
+    - jtdynduke_cpu.sv
+toki:
+  - get:
+    - jttoki_irq.v
+    - sei80bu.v
+jtframe:
+  - from: ram
+    get:
+      - jtframe_obj_buffer.v
+      - jtframe_dual_ram.v
+      - jtframe_dual_ram16.v
+      - jtframe_ram16.v
+  - from: video
+    get:
+      - jtframe_objdraw.v
+      - jtframe_objdraw_gate.v
+      - jtframe_draw.v
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+jtopl:
+  - get:
+    - jtopl2.yaml
+jt6295:
