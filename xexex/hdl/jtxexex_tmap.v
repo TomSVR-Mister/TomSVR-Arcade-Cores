@@ -197,18 +197,15 @@ generate for( L=0; L<4; L=L+1 ) begin : layer
     assign tflipx = attr[0] & regs[1][L*2];
     assign tflipy = attr[1] & regs[1][L*2+1];
     assign trow   = vpos[2:0] ^ {3{tflipy}};
-    assign pen    = nib(cnt);
-    assign pen_fx = nib(~cnt);
+    // Quartus does not take functions inside generate loops: gfx nibbles in drawing order
+    wire [3:0] nibs[0:7];
+    assign nibs[0] = gfx[15:12]; assign nibs[1] = gfx[11: 8]; assign nibs[2] = gfx[ 7: 4]; assign nibs[3] = gfx[ 3: 0];
+    assign nibs[4] = gfx[31:28]; assign nibs[5] = gfx[27:24]; assign nibs[6] = gfx[23:20]; assign nibs[7] = gfx[19:16];
+    assign pen    = nibs[cnt];
+    assign pen_fx = nibs[~cnt];
     assign eng_addr[L] = addr;
     assign eng_rom[L]  = { code, trow };
     assign rq[L]       = req;
-
-    function [3:0] nib(input [2:0] c);
-        case( c )
-            0: nib = gfx[15:12]; 1: nib = gfx[11:8];  2: nib = gfx[ 7: 4]; 3: nib = gfx[ 3: 0];
-            4: nib = gfx[31:28]; 5: nib = gfx[27:24]; 6: nib = gfx[23:20]; 7: nib = gfx[19:16];
-        endcase
-    endfunction
 
     always @(posedge clk, posedge rst) begin
         if( rst ) begin
