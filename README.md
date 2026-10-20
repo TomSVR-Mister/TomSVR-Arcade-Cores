@@ -62,6 +62,7 @@ why); the patch is applied in memory by the MRA.
 | playmark | Big Twin, Excelsior, Hot Mind | playmark.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix, Perestroika Girls | superqix.cpp |
+| wrally | World Rally (Gaelco, 1993) | wrally.cpp |
 | ys16 | Paparazzi, Shocking, Bomb Kick, Magic Bubble | yunsun16.cpp |
 | ys8 | Cannon Ball, Magix / Rock, Rock Tris | yunsung8.cpp |
 | zero | Zero Zone, Las Vegas Girl | zerozone.cpp |
