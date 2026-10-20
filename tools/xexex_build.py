@@ -71,7 +71,7 @@ for name, (title, ev, od, snd, eep, region) in SETS.items():
         {P(eep)}
     </rom>
     <nvram index="2" size="128"/>
-    <buttons names="Shot,Flint,-,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+    <buttons names="Shot,Flint,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
 </misterromdescription>
 '''
     open(f"{out}/mra/{title} (JTXEXEX).mra", 'w').write(mra)

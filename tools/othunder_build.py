@@ -81,7 +81,7 @@ for name, (title, ev, od, region) in SETS.items():
     <switches page_id="1" page_name="Switches" base="16" default="ff,7f">
 {nl.join('        ' + d for d in DIPS)}
     </switches>
-    <buttons names="Fire,Rocket,-,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="2"/>
+    <buttons names="Fire,Rocket,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
 </misterromdescription>
 '''
     open(f"{out}/mra/{title} (JTOTHUNDER).mra", 'w').write(mra)
