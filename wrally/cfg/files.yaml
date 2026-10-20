@@ -7,6 +7,7 @@ wrally:
     - jtwrally_obj.v
     - jtwrally_colmix.v
     - jtwrally_vram_decrypt.v
+    - timing.sdc
 jtframe:
   - get:
       - jtframe_edge.v

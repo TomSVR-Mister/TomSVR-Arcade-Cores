@@ -28,16 +28,22 @@ wire        ram_we, pre_wr, pre_acc;
 reg  [15:0] rom_addr, xa;
 reg  [ 7:0] xd;
 reg         xw;
+reg  [ 1:0] cen_dly;
 
 assign x_addr = xa[13:0];
 assign x_dout = xd;
 assign x_wr   = xw;
 
+// the 8051 outputs change on cen and are taken two clocks later (multicycle in syn/timing.sdc);
+// cen comes every fourth clock, so the program ROM still answers before the next cen
 always @(posedge clk) begin
-    xa       <= pre_addr;
-    xd       <= pre_dout;
-    xw       <= pre_wr & pre_acc;
-    rom_addr <= pre_rom;
+    cen_dly <= { cen_dly[0], cen };
+    if( cen_dly[1] ) begin
+        xa       <= pre_addr;
+        xd       <= pre_dout;
+        xw       <= pre_wr & pre_acc;
+        rom_addr <= pre_rom;
+    end
 end
 
 jtframe_dual_ram #(.AW(15),.SIMFILE("mcu.bin")) u_prog(
@@ -53,7 +59,7 @@ jtframe_dual_ram #(.AW(15),.SIMFILE("mcu.bin")) u_prog(
     .q1     ( rom_data  )
 );
 
-jtframe_ram_rst #(.AW(7),.CEN_RD(1)) u_iram(
+jtframe_ram_rst #(.AW(7),.CEN_RD(1)) u_ramu(
     .rst    ( rst       ),
     .clk    ( clk       ),
     .cen    ( cen       ),
