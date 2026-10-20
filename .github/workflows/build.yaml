@@ -29,7 +29,7 @@ jobs:
           git remote add origin https://github.com/jotego/jtcores.git
           git fetch -q --depth 1 origin bfced64dad833daa3864e601e9c0e90614c56df8
           git checkout -q FETCH_HEAD
-          git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51
+          git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51 modules/jtkcpu
           git -C modules/jt12 submodule update --init
           cp -r ../mine/${{ inputs.core }} cores/${{ inputs.core }}
 
