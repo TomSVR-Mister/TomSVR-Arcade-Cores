@@ -1,0 +1,3 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 278 warnings
+Warning (10027): Verilog HDL or VHDL warning at the jtmadd_tile.v(40): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/madd/hdl/jtmadd_tile.v Line: 40
+Warning (10027): Verilog HDL or VHDL warning at the jtmadd_obj.v(46): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/madd/hdl/jtmadd_obj.v Line: 46
