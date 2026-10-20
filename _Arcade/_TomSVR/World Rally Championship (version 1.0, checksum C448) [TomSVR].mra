@@ -1,0 +1,43 @@
+<!-- World Rally Championship (version 1.0, checksum C448) on TomSVR_wrally, a personal MiSTer core for the Gaelco World Rally board (MAME wrally.cpp),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified
+     (the DS5002FP protection CPU runs the dumped wrdallas.bin program). Requires TomSVR_wrally.rbf. -->
+<misterromdescription>
+    <name>World Rally Championship (version 1.0, checksum C448) [TomSVR]</name>
+    <setname>wrallyac</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1993</year>
+    <manufacturer>Gaelco (Automáticos Canarios license)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_wrally</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="wrally.zip" md5="None">
+        <interleave output="16">
+            <part name="17_27c4001.c23" crc="ad823c0e" map="10"/>
+            <part name="16_27c4001.c22" crc="13921708" map="01"/>
+        </interleave>
+        <part name="worldr14.c01" crc="e931c2ee"/>
+        <part name="worldr15.c03" crc="11f0fe2c"/>
+        <interleave output="32">
+            <part name="worldr21.i13" crc="b7fddb12" map="0001"/>
+            <part name="worldr20.i11" crc="58b2809a" map="0010"/>
+            <part name="worldr19.i09" crc="018b35bb" map="0100"/>
+            <part name="worldr18.i07" crc="b37c807e" map="1000"/>
+        </interleave>
+        <part name="wrdallas.bin" crc="547d1768"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="df,ff">
+        <dip name="Difficulty" bits="0,1" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Number of Joysticks" bits="2" ids="1,2"/>
+        <dip name="Control" bits="3,4" ids="Optical Wheel,invalid,Pot Wheel,Joystick"/>
+        <dip name="Demo Sounds" bits="5" ids="On,Off"/>
+        <dip name="Cabinet" bits="6" ids="Cocktail,Upright"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Coin A" bits="8,9,10" ids="3C/4C,2C/3C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="11,12,13" ids="4C/3C,3C/2C,6C/1C,5C/1C,4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Credit Config" bits="14" ids="Start 2C/Cont 1C,Start 1C/Cont 1C"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Accelerate,Gear Shift,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>
