@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # othunder_build.py outdir : JTOTHUNDER images + MRAs for Operation Thunderbolt (user's merged othunder.zip)
 # Image: 68000 program 0 (512 kB, 16-bit big endian words), Z80 0x80000, YM2610 ADPCM-A 0x90000,
-# ADPCM-B 0x110000, TC0100SCN tiles 0x200000, sprite map 0x280000, sprites 0x400000 (one 16-bit plane word
-# per ROM, 64-bit rows), 93C46 default contents 0x600000 (little endian words).
+# ADPCM-B 0x110000, sprite planes 2-3 0x200000, TC0100SCN tiles 0x300000, sprite map 0x380000, sprite planes 0-1
+# 0x400000 (one 16-bit plane word per ROM, 32-bit words), 93C46 default contents 0x600000 (little endian words).
 import sys, os, zipfile, hashlib
 S = '/tmp/claude-0/-home-claude/183009bc-02e0-578a-b0ba-00b6083aaf64/scratchpad'
 DIPS = [
@@ -39,23 +39,24 @@ for name, (title, ev, od, region) in SETS.items():
     img = il16(ev, od) + il16('b67-14.ic61', 'b67-15.ic62')
     img += rd('b67-13.ic40') + rd('b67-08.ic67') + rd('b67-07.ic44')
     img += bytes([0xff]) * (0x200000 - len(img))
+    pl = [rd(f'b67-0{i}.ic{i}') for i in range(1, 5)]
+    pair = lambda a, b: bytes(x for k in range(0, len(a), 2) for x in a[k:k+2] + b[k:k+2])
+    img += pair(pl[2], pl[3])
+    img += bytes([0xff]) * (0x300000 - len(img))
     img += rd('b67-06.ic66') + rd('b67-05.ic43')
     img += bytes([0xff]) * (0x400000 - len(img))
-    pl = [rd(f'b67-0{i}.ic{i}') for i in range(1, 5)]
-    spr = bytearray()
-    for k in range(0, len(pl[0]), 2):
-        for p in pl: spr += p[k:k+2]
-    img += spr
+    img += pair(pl[0], pl[1])
+    img += bytes([0xff]) * (0x600000 - len(img))
     e = rd('93c46_eeprom-othunder.ic86')
     img += bytes(x for k in range(0, len(e), 2) for x in (e[k+1], e[k]))
     assert len(img) == 0x600080, hex(len(img))
     parts = ['<interleave output="16">', '    ' + P(ev, ' map="10"'), '    ' + P(od, ' map="01"'), '</interleave>',
              '<interleave output="16">', '    ' + P('b67-14.ic61', ' map="10"'), '    ' + P('b67-15.ic62', ' map="01"'), '</interleave>',
              P('b67-13.ic40'), P('b67-08.ic67'), P('b67-07.ic44'), '<part repeat="0x70000">FF</part>',
-             P('b67-06.ic66'), P('b67-05.ic43'), '<part repeat="0x100000">FF</part>',
-             '<interleave output="64">'] + \
-            ['    ' + P(f'b67-0{i}.ic{i}', f' map="{"0" * (8 - 2 * i)}21{"0" * (2 * i - 2)}"') for i in range(1, 5)] + \
-            ['</interleave>',
+             '<interleave output="32">', '    ' + P('b67-03.ic3', ' map="0021"'), '    ' + P('b67-04.ic4', ' map="2100"'), '</interleave>',
+             P('b67-06.ic66'), P('b67-05.ic43'),
+             '<interleave output="32">', '    ' + P('b67-01.ic1', ' map="0021"'), '    ' + P('b67-02.ic2', ' map="2100"'), '</interleave>',
+             '<part repeat="0x100000">FF</part>',
              '<interleave output="16">', '    ' + P('93c46_eeprom-othunder.ic86', ' map="12"'), '</interleave>']
     open(f'{out}/{name}.rom', 'wb').write(img)
     md5 = hashlib.md5(img).hexdigest()

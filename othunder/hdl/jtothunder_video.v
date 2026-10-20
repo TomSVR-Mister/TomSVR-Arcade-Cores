@@ -34,10 +34,14 @@ module jtothunder_video(
     output            smap_cs,
     input             smap_ok,
     input      [31:0] smap_data,
-    output     [20:2] orom_addr,
+    output     [19:2] orom_addr,
     output            orom_cs,
     input             orom_ok,
     input      [31:0] orom_data,
+    output     [19:2] orom2_addr,
+    output            orom2_cs,
+    input             orom2_ok,
+    input      [31:0] orom2_data,
 
     output     [ 4:0] red,
     output     [ 4:0] green,
@@ -149,6 +153,10 @@ jtothunder_obj u_obj(
     .rom_cs     ( orom_cs   ),
     .rom_ok     ( orom_ok   ),
     .rom_data   ( orom_data ),
+    .rom2_addr  ( orom2_addr),
+    .rom2_cs    ( orom2_cs  ),
+    .rom2_ok    ( orom2_ok  ),
+    .rom2_data  ( orom2_data),
     .pxl        ( obj_pxl   )
 );
 

@@ -1,6 +1,7 @@
 params:
   - { name: ADPCMA_OFFSET, value: "(`ADPCMA_START-`JTFRAME_BA1_START)>>1" }
   - { name: ADPCMB_OFFSET, value: "(`ADPCMB_START-`JTFRAME_BA1_START)>>1" }
+  - { name: OBJHI_OFFSET, value: "(`OBJHI_START-`JTFRAME_BA1_START)>>1" }
   - { name: SPRMAP_OFFSET, value: "(`SPRMAP_START-`JTFRAME_BA2_START)>>1" }
 clocks:
   clk:
@@ -36,6 +37,10 @@ sdram:
         addr_width: 19
         data_width: 8
         offset: ADPCMB_OFFSET
+      - name: orom2
+        addr_width: 20
+        data_width: 32
+        offset: OBJHI_OFFSET
     - buses:
       - name: bg0
         addr_width: 19
@@ -49,7 +54,7 @@ sdram:
         offset: SPRMAP_OFFSET
     - buses:
       - name: orom
-        addr_width: 21
+        addr_width: 20
         data_width: 32
 bram:
   - name: ram
