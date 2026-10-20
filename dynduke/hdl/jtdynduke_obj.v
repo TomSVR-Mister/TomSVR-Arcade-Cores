@@ -175,4 +175,14 @@ jtframe_objdraw #(.AW(9),.CW(14),.PW(11),.LATCH(1),.KEEP_OLD(0),.ALPHA(15)) u_dr
     .pxl        ( pxl           )
 );
 
+`ifdef SIMULATION
+// lines whose sprite scan did not reach entry 0 before the next HS
+integer short_lines=0;
+always @(posedge clk) if( hs && !hs_l && en && st!=IDLE ) begin
+    short_lines = short_lines + 1;
+    if( short_lines < 50 || short_lines%500==0 )
+        $display("OBJ short line %0d at entry %0d (total %0d)", line, aidx, short_lines);
+end
+`endif
+
 endmodule
