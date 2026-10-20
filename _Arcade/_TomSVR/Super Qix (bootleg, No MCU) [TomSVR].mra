@@ -1,0 +1,40 @@
+<!-- Super Qix (bootleg, No MCU) on TomSVR_sqix, a personal MiSTer core for the Super Qix board (MAME superqix.cpp),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified
+     (this bootleg runs without the MCU). Requires TomSVR_sqix.rbf. -->
+<misterromdescription>
+    <name>Super Qix (bootleg, No MCU) [TomSVR]</name>
+    <setname>sqixb2</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0264</mameversion>
+    <year>1987</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_sqix</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="sqix.zip" md5="None">
+        <part>00 00 00 00</part>
+        <part name="cpu.2" crc="682e28e3"/>
+        <part repeat="0x8000"> 00</part>
+        <part name="b03__02.h3" crc="9c23cb64"/>
+        <part name="b03__04.s8" crc="f815ef45"/>
+        <part name="b03__04.s8" crc="f815ef45"/>
+        <part name="taito_sq-iu3__lh231041__sharp_japan__8709_d.p8" crc="b8d0c493"/>
+        <part name="b03__05.t8" crc="df326540"/>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="f6,ff">
+        <dip name="Cabinet" bits="0" ids="Upright,Cocktail"/>
+        <dip name="Freeze" bits="2" ids="On,Off"/>
+        <dip name="Allow Continue" bits="3" ids="Yes,No"/>
+        <dip name="Coin A" bits="4,5" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="6,7" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Bonus Life" bits="10,11" ids="None,50000 100000,20000 50000,30000 100000"/>
+        <dip name="Lives" bits="12,13" ids="5,4,2,3"/>
+        <dip name="Fill Area" bits="14,15" ids="85%,80%,70%,75%"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

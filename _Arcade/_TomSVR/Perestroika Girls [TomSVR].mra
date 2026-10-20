@@ -1,4 +1,4 @@
-<!-- Perestroika Girls on TomSVR_sqix, a personal MiSTer core for the Super Qix board without MCU (MAME superqix.cpp "sqix_nomcu"),
+<!-- Perestroika Girls on TomSVR_sqix, a personal MiSTer core for the Super Qix board (MAME superqix.cpp),
      built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified
      (the program and graphics byte shuffle of this bootleg is undone in the core). Requires TomSVR_sqix.rbf. -->
 <misterromdescription>
@@ -13,6 +13,7 @@
     <joystick>4</joystick>
     <region>World</region>
     <rom index="0" zip="perestro.zip" md5="None">
+        <part>01 00 00 00</part>
         <part name="rom1.bin" crc="0cbf96c1"/>
         <part name="rom4.bin" crc="c56122a8"/>
         <part name="rom2.bin" crc="36f93701"/>
