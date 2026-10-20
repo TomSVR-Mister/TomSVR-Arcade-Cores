@@ -7,10 +7,13 @@ JTFRAME_WIDTH=256
 JTFRAME_HEIGHT=224
 JTFRAME_BUTTONS=2
 JTFRAME_CREDITS
+JTFRAME_HEADER=4
 
-# SDRAM layout (download offsets): program 0, chars + tiles 0x20000, sprites 0x50000
+# SDRAM layout (download offsets after the 4-byte header): program 0, chars + tiles 0x20000, sprites 0x50000,
+# i8751 MCU program 0x60000
 JTFRAME_BA1_START=0x020000
 JTFRAME_BA2_START=0x050000
+JTFRAME_PROM_START=0x060000
 
 [mist|sidi]
 JTFRAME_SKIP

@@ -8,7 +8,7 @@
  *   Sprites: 64 entries of 4 bytes at RAM 0000: code[7:0], x, y, { colour[3:0], flipy, flipx, -, code[8] }, 16x16x4,
  *     later entries on top, pen 0 transparent.
  *   Palette: 256 bytes BBGGRRII (colour = { 2 bits, II }). Index colour * 16 + pen, bitmap colour 0.
- * Perestroika Girls graphics ROMs: bytes shuffled within each 16-byte block (MAME init_perestro):
+ * Perestroika Girls graphics ROMs (shuf set): bytes shuffled within each 16-byte block (MAME init_perestro):
  *   chars: bits 1/0 swapped, background tiles: bits 3-0 reversed, sprites: { j1, j0, j3, j2 }. */
 
 module jtsqix_video(
@@ -18,6 +18,7 @@ module jtsqix_video(
     input       [ 3:0] gfx_en,
     input       [ 1:0] tbank,
     input              bpage,
+    input              shuf,        // Perestroika Girls graphics byte shuffle
 
     output      [12:0] ram_video_addr,
     input       [ 7:0] ram_video_dout,
@@ -94,7 +95,7 @@ reg  [ 2:0] tpx;
 reg         tlbuf;
 wire [ 3:0] tj   = { ty[1:0], tk };
 wire        tchr = tattr[2];
-wire [ 3:0] tjr  = tchr ? { tj[3:2], tj[0], tj[1] } : { tj[0], tj[1], tj[2], tj[3] };
+wire [ 3:0] tjr  = !shuf ? tj : tchr ? { tj[3:2], tj[0], tj[1] } : { tj[0], tj[1], tj[2], tj[3] };
 wire [11:0] tcd  = tchr ? { 2'b00, tattr[1:0], tcode } : { tbank, tattr[1:0], tcode };
 wire [ 3:0] tpen = tbits[ 31 - { tpx, 2'd0 } -: 4 ];
 wire [ 8:0] tq;
@@ -171,8 +172,9 @@ wire [ 8:0] swx  = { 1'b0, sx } + { 5'd0, shalf, spx };
 wire [ 7:0] sq;
 
 assign spr_video_addr = { 2'b00, sent, sb };
-// byte = tile * 128 + row[3] * 64 + half * 32 + row[2:0] * 4 + k, low nibble shuffled to { k1, k0, r1, r0 }
-assign sprom_addr = { sattr[0], scode, srow[3], sth, srow[2], sk, srow[1:0] };
+// byte = tile * 128 + row[3] * 64 + half * 32 + row[2:0] * 4 + k, low nibble shuffled to { k1, k0, r1, r0 } on Perestroika
+assign sprom_addr = shuf ? { sattr[0], scode, srow[3], sth, srow[2], sk, srow[1:0] } :
+                           { sattr[0], scode, srow[3], sth, srow[2], srow[1:0], sk };
 
 always @(posedge clk) begin
     if( rst ) begin

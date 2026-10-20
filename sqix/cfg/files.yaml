@@ -7,6 +7,7 @@ jtframe:
   - from: cpu
     get:
       - jtframe_z80.yaml
+      - jtframe_8751.yaml
 jt12:
   - get:
     - jt49.yaml

@@ -7,7 +7,12 @@
  *           0418 SYSTEM inputs, acknowledges the NMI   0800-77ff bitmap 0   8800-f7ff bitmap 1
  *   NMI four times per frame while enabled (MAME sqix_timer_irq, 240 Hz), held until 0418 is read.
  *   AY1 ports: P1, P2. AY2 ports: DSW2, DSW1 with its bits reversed.
- * Perestroika Girls program: bytes are shuffled within each 16-byte block (MAME init_perestro). */
+ * Perestroika Girls program (shuf set): bytes are shuffled within each 16-byte block (MAME init_perestro).
+ * Super Qix with MCU (mcu set, MAME "sqix"): i8751 at 6 MHz. Z80 0408 read sets the Z80->MCU semaphore,
+ *   AY2 port B is the command/answer bus (Z80 writes the command, reads the MCU's port 3 answer),
+ *   AY1 port B bit 6 = MCU->Z80 semaphore, bit 7 = Z80->MCU semaphore. MCU P0 = SYSTEM (bit 7 = Z80->MCU semaphore),
+ *   P1 = DSW1, P3 in = command, P3 out = answer. P2: falling edge of bit 0 latches bit 5 (Z80 run) and bit 6
+ *   (MCU->Z80 semaphore); falling edge of bit 7 clears the Z80->MCU semaphore. 0418 reads FF. */
 
 module jtsqix_main(
     input              rst,
@@ -19,6 +24,13 @@ module jtsqix_main(
     input              lvbl,
 
     input       [ 7:0] p1, p2, system, dsw1, dsw2,
+    input              shuf,
+    input              mcu,
+    output             z80_sem, mcu_sem,
+    input              cen_mcu,
+    input       [11:0] prog_addr,
+    input       [ 7:0] prog_data,
+    input              prom_we,
 
     output      [ 7:0] cpu_dout,
     output      [16:0] rom_addr,
@@ -60,7 +72,7 @@ wire [ 3:0] jl  = A[3:0];
 wire [ 3:0] cj  = { ~jl[3], ~(jl[2] ^ (jl[1] | jl[0])), jl[1], jl[0] ^ jl[1] };
 wire [16:0] pa  = A[15] ? { 1'b1, rbank, A[13:0] } : { 2'b00, A[14:0] };   // 8000-bfff: 0x10000 + bank * 0x4000
 
-assign rom_addr  = { pa[16:4], cj };
+assign rom_addr  = shuf ? { pa[16:4], cj } : pa;
 assign ram_addr  = A[12:0];
 assign pal_addr  = { 2'd0, A[7:0] };
 assign bmp0_addr = bo0[14:0];
@@ -79,7 +91,31 @@ wire ay2_aw = reg_cs && A[7:0]==8'h07 && !wr_n;
 assign bdir = { ay2_dw | ay2_aw, ay1_dw | ay1_aw };
 assign bc1  = { ay2_rd | ay2_aw, ay1_rd | ay1_aw };
 
-always @(posedge clk) rstn <= ~rst;
+// MCU interface
+wire [ 7:0] mcu_p2, mcu_p3, ay2_iob_out;
+reg  [ 7:0] p2_l;
+reg         z80_run, z80_has_written, mcu_has_written;
+assign z80_sem = z80_has_written;
+assign mcu_sem = mcu_has_written;
+
+always @(posedge clk) begin
+    if( rst ) begin
+        z80_run <= 1; z80_has_written <= 0; mcu_has_written <= 0; p2_l <= 8'hff;
+    end else begin
+        p2_l <= mcu_p2;
+        if( mcu ) begin
+            if( p2_l[0] && !mcu_p2[0] ) begin
+                z80_run         <= mcu_p2[5];
+                mcu_has_written <= mcu_p2[6];
+            end
+            if( p2_l[7] && !mcu_p2[7] ) z80_has_written <= 0;
+            if( reg_cs && A[7:0]==8'h08 && !rd_n ) z80_has_written <= 1;
+        end
+    end
+end
+
+reg cpu_rstn;
+always @(posedge clk) begin rstn <= ~rst; cpu_rstn <= ~rst & (~mcu | z80_run); end
 
 always @* begin
     rom_cs = mem && A[15:14]!=2'b11;
@@ -96,7 +132,7 @@ always @(posedge clk) begin
            pal_cs ? pal_dout :
            b0_cs  ? bmp0_dout :
            b1_cs  ? bmp1_dout :
-           reg_cs ? ( A[7:0]==8'h01 ? ay1_dout : A[7:0]==8'h05 ? ay2_dout : A[7:0]==8'h18 ? system : 8'h00 ) :
+           reg_cs ? ( A[7:0]==8'h01 ? ay1_dout : A[7:0]==8'h05 ? ay2_dout : A[7:0]==8'h18 ? (mcu ? 8'hff : system) : 8'h00 ) :
            8'hff;
 end
 
@@ -119,7 +155,7 @@ always @(posedge clk) begin
 end
 
 jtframe_sysz80 #(.RAM_AW(2)) u_cpu(
-    .rst_n      ( rstn        ),
+    .rst_n      ( cpu_rstn    ),
     .clk        ( clk         ),
     .cen        ( cen_6       ),
     .cpu_cen    (             ),
@@ -177,13 +213,38 @@ jt49_bus u_ay2(
     .IOA_in ( dsw2      ),
     .IOA_out(           ),
     .IOA_oe (           ),
-    .IOB_in ( { dsw1[0], dsw1[1], dsw1[2], dsw1[3], dsw1[4], dsw1[5], dsw1[6], dsw1[7] } ),
-    .IOB_out(           ),
+    .IOB_in ( mcu ? mcu_p3 : { dsw1[0], dsw1[1], dsw1[2], dsw1[3], dsw1[4], dsw1[5], dsw1[6], dsw1[7] } ),
+    .IOB_out( ay2_iob_out ),
     .IOB_oe (           ),
     .A(), .B(), .C()
 );
+jtframe_8751mcu #(.SYNC_XDATA(0)) u_mcu(
+    .rst        ( rst | ~mcu  ),
+    .clk        ( clk         ),
+    .cen        ( cen_mcu     ),
+    .int0n      ( 1'b1        ),
+    .int1n      ( 1'b1        ),
+    .p0_i       ( { z80_has_written, system[6:0] } ),
+    .p1_i       ( dsw1        ),
+    .p2_i       ( mcu_p2      ),
+    .p3_i       ( ay2_iob_out ),
+    .p0_o       (             ),
+    .p1_o       (             ),
+    .p2_o       ( mcu_p2      ),
+    .p3_o       ( mcu_p3      ),
+    .x_din      ( 8'hff       ),
+    .x_dout     (             ),
+    .x_addr     (             ),
+    .x_wr       (             ),
+    .x_acc      (             ),
+    .clk_rom    ( clk         ),
+    .prog_addr  ( prog_addr   ),
+    .prom_din   ( prog_data   ),
+    .prom_we    ( prom_we     )
+);
 `else
 initial begin rom_cs=0; tbank=0; bpage=0; end
+assign z80_sem=0, mcu_sem=0;
 assign cpu_dout=0, rom_addr=0, ram_addr=0, ram_we=0, pal_addr=0, pal_we=0, bmp0_addr=0, bmp0_we=0, bmp1_addr=0, bmp1_we=0,
        psg0=0, psg1=0;
 `endif

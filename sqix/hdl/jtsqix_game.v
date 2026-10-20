@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Tom Sveen
  * SPDX-License-Identifier: GPL-3.0-or-later
- * Super Qix hardware without MCU (MAME superqix.cpp sqix_nomcu): Perestroika Girls.
+ * Super Qix hardware (MAME superqix.cpp): Super Qix with its i8751 MCU, the no-MCU bootleg and Perestroika Girls.
+ * Header byte 0: bit 0 Perestroika Girls ROM byte shuffle, bit 1 i8751 MCU fitted.
  * On JTFRAME (Jose Tejada, jotego). Personal build. */
 
 module jtsqix_game(
@@ -11,6 +12,10 @@ wire [ 7:0] p1, p2, system;
 wire [ 8:0] vdump;
 wire [ 1:0] tbank;
 wire        bpage, hs_start;
+wire        z80_sem, mcu_sem;
+reg         shuf, mcu;
+
+always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) { mcu, shuf } <= prog_data[1:0];
 // e000-e0ff (sprites) is mirrored into a second RAM for the sprite engine
 wire        spr_wr = ram_we && ram_addr[12:8]==0;
 
@@ -21,7 +26,7 @@ assign spr_we     = spr_wr;
 
 // active low: up, down, left, right, button 1, button 2
 assign p1     = { dip_test, LVBL, joystick1[5], joystick1[4], joystick1[0], joystick1[1], joystick1[2], joystick1[3] };
-assign p2     = { 2'b00,       joystick2[5], joystick2[4], joystick2[0], joystick2[1], joystick2[2], joystick2[3] };
+assign p2     = { z80_sem, mcu_sem, joystick2[5], joystick2[4], joystick2[0], joystick2[1], joystick2[2], joystick2[3] };
 assign system = { 1'b0, dip_test, tilt, service, cab_1p[1], cab_1p[0], coin[1], coin[0] };
 
 jtsqix_main u_main(
@@ -37,6 +42,14 @@ jtsqix_main u_main(
     .system      ( system       ),
     .dsw1        ( dipsw[ 7:0]  ),
     .dsw2        ( dipsw[15:8]  ),
+    .shuf        ( shuf         ),
+    .mcu         ( mcu          ),
+    .z80_sem     ( z80_sem      ),
+    .mcu_sem     ( mcu_sem      ),
+    .cen_mcu     ( cen_6        ),
+    .prog_addr   ( prog_addr[11:0] ),
+    .prog_data   ( prog_data    ),
+    .prom_we     ( prom_we      ),
     .cpu_dout    ( cpu_dout     ),
     .rom_addr    ( main_addr    ),
     .rom_cs      ( main_cs      ),
@@ -67,6 +80,7 @@ jtsqix_video u_video(
     .gfx_en          ( gfx_en          ),
     .tbank           ( tbank           ),
     .bpage           ( bpage           ),
+    .shuf            ( shuf            ),
     .ram_video_addr  ( ram_video_addr  ),
     .ram_video_dout  ( ram_video_dout  ),
     .spr_video_addr  ( spr_video_addr  ),
