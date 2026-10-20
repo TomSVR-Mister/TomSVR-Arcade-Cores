@@ -1,0 +1,2 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 411 warnings
+Warning (10090): Verilog HDL syntax warning at jtcomad_main.v(4): extra block comment delimiter characters /* within block comment File: /jtcores/cores/comad/hdl/jtcomad_main.v Line: 4
