@@ -48,15 +48,15 @@ module jtothunder_obj(
 );
 
 // The scan reads word 0 of one entry per clock and only stops for sprites on this line.
-// Chunk fetches (sprite map + one tile row read from each of two SDRAM banks) run while the previous
-// chunk is drawn at two pixels per clock (even and odd x in separate line buffers);
+// Sprite map reads queue chunks in a small FIFO; a second stage reads each tile row from two SDRAM
+// banks at once while the previous chunk is drawn at two pixels per clock (even/odd x buffers);
 // chunks fully outside the 320 pixel window are skipped and each 32-bit map read serves two chunks.
 localparam [3:0] IDLE=0, SCAN=1, H1=2, H2=3, H3=4, H4=5, FINDJ=6, CHK=7, CHUNK=8,
-                 MAPW=9, T0W0=10, T0W=11, HAND=14, NEXT=15;
+                 MAPW=9, PUSH=10, NEXT=15;
 
 reg  [ 3:0] st;
-reg  [ 7:0] sidx, tag1, tag2, hidx;
-reg         v1, v2, sdone;
+reg  [ 7:0] sidx, tag1, tag2, tag3, hidx;
+reg         v1, v2, v3, sdone;
 reg  [ 9:0] oaddr;
 wire [15:0] odata;
 reg  [15:0] w0r, w1, w2;
@@ -80,6 +80,18 @@ reg         map_vld;
 reg  [31:0] map_q;
 reg  [15:0] f0, f1, f2, f3;
 reg  [ 1:0] hs, got;
+// chunks waiting for their tile row: {flipx, prio, colour, x, width, step, code, row}
+localparam DW=65;
+reg  [DW-1:0] fifo[0:3];
+reg  [ 2:0] wr_ptr, rd_ptr;
+wire        f_full  = (wr_ptr[1:0]==rd_ptr[1:0]) && (wr_ptr[2]!=rd_ptr[2]);
+wire        f_empty = wr_ptr==rd_ptr;
+reg  [ 1:0] bst;
+reg         bhs, b_flipx, b_prio;
+reg  [ 7:0] b_col;
+reg  [ 8:0] b_x;
+reg  [ 5:0] b_zx;
+reg  [21:0] b_stepx;
 
 // drawer
 reg         d_busy, d_flipx, d_prio;
@@ -111,7 +123,7 @@ wire [ 9:0] ys0   = {1'b0, w0r[8:0]} + 10'd3;
 wire [10:0] ysig0 = {1'b0, ys0} - ((ys0 > 10'h140) ? 11'h200 : 11'd0);
 wire [10:0] dy0   = {2'd0, vrender} - ysig0;
 wire [ 7:0] zy0   = { 1'b0, w0r[15:9] } + 8'd1;
-wire        hit0  = v2 && !dy0[10] && dy0 < {3'd0, zy0};
+wire        hit0  = v3 && !dy0[10] && dy0 < {3'd0, zy0};
 wire [ 5:0] cz    = xnext[7:2] - xacc[7:2];
 wire [11:0] xend  = { curx[10], curx } + { 6'd0, cz };
 wire [16:0] mtag  = { tilenum, jrow, kc[1]^flipx };
@@ -121,7 +133,7 @@ wire [14:0] mcode = (kc[0]^flipx) ? map_q[30:16] : map_q[14:0];
 integer short_lines=0, c_map=0, c_rom=0, c_r1=0, c_r2=0, c_hand=0, c_scan=0, n_chunk=0;
 always @(posedge clk) begin
     if( start ) begin
-        if( st!=IDLE ) begin
+        if( st!=IDLE || bst!=0 || !f_empty || d_busy ) begin
             short_lines <= short_lines+1;
             $display("OBJ short line %0d (total %0d) map %0d rom %0d (r1 %0d r2 %0d) hand %0d scan %0d chunks %0d",
                 vrender, short_lines+1, c_map, c_rom, c_r1, c_r2, c_hand, c_scan, n_chunk);
@@ -129,12 +141,12 @@ always @(posedge clk) begin
         c_map<=0; c_rom<=0; c_r1<=0; c_r2<=0; c_hand<=0; c_scan<=0; n_chunk<=0;
     end else begin
         if( st==MAPW ) c_map <= c_map+1;
-        if( st==T0W  ) c_rom <= c_rom+1;
-        if( st==T0W && !got[0] ) c_r1 <= c_r1+1;
-        if( st==T0W && !got[1] ) c_r2 <= c_r2+1;
-        if( st==HAND ) c_hand <= c_hand+1;
+        if( bst==1 ) c_rom <= c_rom+1;
+        if( bst==1 && !got[0] ) c_r1 <= c_r1+1;
+        if( bst==1 && !got[1] ) c_r2 <= c_r2+1;
+        if( st==PUSH && f_full ) c_hand <= c_hand+1;
         if( st==SCAN ) c_scan <= c_scan+1;
-        if( st==HAND && !d_busy ) n_chunk <= n_chunk+1;
+        if( bst==2 && !d_busy ) n_chunk <= n_chunk+1;
     end
 end
 `endif
@@ -171,18 +183,20 @@ end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        st <= IDLE; map_cs <= 0; rom_cs <= 0; rom2_cs <= 0; d_busy <= 0; v1 <= 0; v2 <= 0; map_vld <= 0;
+        st <= IDLE; bst <= 0; wr_ptr <= 0; rd_ptr <= 0; map_cs <= 0; rom_cs <= 0; rom2_cs <= 0; d_busy <= 0; v1 <= 0; v2 <= 0; v3 <= 0; map_vld <= 0;
     end else begin
-        // pipeline of the scan: address at E, data at E+2, registered at E+2, tested at E+3
+        // pipeline of the scan: address register set at E, RAM output at E+1, registered at E+2, tested at E+3
         if( st==SCAN ) begin
             oaddr <= { sidx, 2'd0 };
             tag1  <= sidx;
             v1    <= !sdone;
             if( sidx==0 ) sdone <= 1;
             if( !sdone ) sidx <= sidx - 1'd1;
-            w0r   <= odata;
-            tag2  <= tag1;
+            tag2  <= tag1;      // address in the RAM's input register
             v2    <= v1;
+            w0r   <= odata;     // its data, one clock later
+            tag3  <= tag2;
+            v3    <= v2;
         end
         // drawer
         if( d_busy ) begin
@@ -191,10 +205,47 @@ always @(posedge clk, posedge rst) begin
             sxacc <= d_flipx ? sxnx - {4'd0,d_stepx} : sxnx + {4'd0,d_stepx};
             if( icnt+2'd2 >= d_zx ) d_busy <= 0;
         end
+        // tile row fetch: both plane pairs at once, then on to the drawer
+        case( bst )
+            0: if( !f_empty ) begin
+                { b_flipx, b_prio, b_col, b_x, b_zx, b_stepx, rom_addr } <= fifo[rd_ptr[1:0]];
+                rom2_addr <= fifo[rd_ptr[1:0]][17:0];
+                rd_ptr    <= rd_ptr + 1'd1;
+                rom_cs    <= 1;
+                rom2_cs   <= 1;
+                got       <= 0;
+                bhs       <= 0;
+                bst       <= 1;
+            end
+            1: begin
+                bhs <= 1;
+                if( bhs ) begin
+                    if( rom_ok  && !got[0] ) begin { f1, f0 } <= rom_data;  got[0] <= 1; rom_cs  <= 0; end
+                    if( rom2_ok && !got[1] ) begin { f3, f2 } <= rom2_data; got[1] <= 1; rom2_cs <= 0; end
+                    if( got==3 ) bst <= 2;
+                end
+            end
+            default: if( !d_busy ) begin
+                { pl3, pl2, pl1, pl0 } <= { f3, f2, f1, f0 };
+                wx      <= b_x;
+                d_zx    <= b_zx;
+                d_stepx <= b_stepx;
+                d_flipx <= b_flipx;
+                d_col   <= b_col;
+                d_prio  <= b_prio;
+                icnt    <= 0;
+                sxacc   <= b_flipx ? ({20'd0,b_zx}-26'd1)*b_stepx : 26'd0;
+                d_busy  <= 1;
+                bst     <= 0;
+            end
+        endcase
         if( start ) begin
+            wr_ptr <= 0;
+            rd_ptr <= 0;
+            bst    <= 0;
             sidx  <= 8'd191;
             sdone <= 0;
-            v1 <= 0; v2 <= 0;
+            v1 <= 0; v2 <= 0; v3 <= 0;
             st  <= SCAN;
             map_cs <= 0;
             rom_cs <= 0;
@@ -205,13 +256,13 @@ always @(posedge clk, posedge rst) begin
             IDLE:;
             SCAN: begin
                 if( hit0 ) begin
-                    hidx  <= tag2;
-                    oaddr <= { tag2, 2'd1 };
+                    hidx  <= tag3;
+                    oaddr <= { tag3, 2'd1 };
                     zoomy <= zy0;
                     dy    <= dy0;
-                    v1 <= 0; v2 <= 0;
+                    v1 <= 0; v2 <= 0; v3 <= 0;
                     st <= H1;
-                end else if( sdone && !v1 && !v2 ) st <= IDLE;
+                end else if( sdone && !v1 && !v2 && !v3 ) st <= IDLE;
             end
             H1: begin oaddr <= { hidx, 2'd2 }; st <= H2; end
             H2: begin oaddr <= { hidx, 2'd3 }; w1 <= odata; st <= H3; end
@@ -267,7 +318,7 @@ always @(posedge clk, posedge rst) begin
                 zx    <= cz;
                 stepx <= step16( cz );
                 if( cz==0 || !curx[10] && curx>=11'd320 || xend[11] || xend==0 ) st <= NEXT;
-                else if( map_vld && map_tag==mtag ) st <= T0W0;
+                else if( map_vld && map_tag==mtag ) st <= PUSH;
                 else begin
                     map_addr <= mtag;
                     map_tag  <= mtag;
@@ -283,38 +334,13 @@ always @(posedge clk, posedge rst) begin
                     map_cs  <= 0;
                     map_q   <= map_data;
                     map_vld <= 1;
-                    st <= T0W0;
+                    st <= PUSH;
                 end
             end
-            T0W0: begin
-                rom_addr  <= { mcode, srow };
-                rom2_addr <= { mcode, srow };
-                rom_cs    <= 1;
-                rom2_cs   <= 1;
-                got       <= 0;
-                st <= T0W;
-                hs <= 0;
-            end
-            T0W: begin
-                hs <= 1;
-                if( hs==1 ) begin
-                    if( rom_ok  && !got[0] ) begin { f1, f0 } <= rom_data;  got[0] <= 1; rom_cs  <= 0; end
-                    if( rom2_ok && !got[1] ) begin { f3, f2 } <= rom2_data; got[1] <= 1; rom2_cs <= 0; end
-                    if( got==3 ) st <= HAND;
-                end
-            end
-            HAND: if( !d_busy ) begin
-                { pl3, pl2, pl1, pl0 } <= { f3, f2, f1, f0 };
-                wx      <= curx[8:0];
-                d_zx    <= zx;
-                d_stepx <= stepx;
-                d_flipx <= flipx;
-                d_col   <= ocol;
-                d_prio  <= oprio;
-                icnt    <= 0;
-                sxacc   <= flipx ? ({20'd0,zx}-26'd1)*stepx : 26'd0;
-                d_busy  <= 1;
-                st      <= NEXT;
+            PUSH: if( !f_full ) begin
+                fifo[wr_ptr[1:0]] <= { flipx, oprio, ocol, curx[8:0], zx, stepx, mcode, srow };
+                wr_ptr <= wr_ptr + 1'd1;
+                st     <= NEXT;
             end
             NEXT: begin
                 // next chunk of this sprite, or back to the scan
