@@ -78,6 +78,9 @@ for name, (title, ev, od, region) in SETS.items():
     <rom index="0" zip="othunder.zip" md5="None">
 {nl.join('        ' + p for p in parts)}
     </rom>
+    <rom index="1">
+        <part>02 00</part>
+    </rom>
     <nvram index="2" size="128"/>
     <switches page_id="1" page_name="Switches" base="16" default="ff,7f">
 {nl.join('        ' + d for d in DIPS)}
