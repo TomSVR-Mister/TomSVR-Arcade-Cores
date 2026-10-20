@@ -7,6 +7,10 @@ on:
         description: "core folder (comad or galpin)"
         default: comad
         required: true
+      trials:
+        description: "seed trials before giving up on timing"
+        default: "4"
+        required: false
 
 permissions:
   contents: write
@@ -48,7 +52,7 @@ jobs:
           mkdir -p $JTUTIL
           source $JTFRAME/bin/setprj.sh > /dev/null
           export PATH=$PATH:/usr/local/go/bin
-          jtutil seed --max-trials 4 ${{ inputs.core }} -mister --nodbg --nolinter
+          jtutil seed --max-trials ${{ inputs.trials || 4 }} ${{ inputs.core }} -mister --nodbg --nolinter
           EOS
           sed -i 's/^          //' jtcores/build-core.sh
           chmod +x jtcores/build-core.sh
