@@ -1,0 +1,2 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 208 warnings
+Warning (10027): Verilog HDL or VHDL warning at the jtmissb_gfx.v(179): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/missb/hdl/jtmissb_gfx.v Line: 179
