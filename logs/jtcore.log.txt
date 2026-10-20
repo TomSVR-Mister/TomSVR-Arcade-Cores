@@ -1,0 +1,3 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 277 warnings
+Warning (10027): Verilog HDL or VHDL warning at the jtesd_obj.v(79): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/esd/hdl/jtesd_obj.v Line: 79
+Warning (10027): Verilog HDL or VHDL warning at the jtesd_obj.v(80): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/esd/hdl/jtesd_obj.v Line: 80
