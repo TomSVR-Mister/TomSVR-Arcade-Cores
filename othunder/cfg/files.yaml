@@ -1,0 +1,37 @@
+othunder:
+  - get:
+    - jtothunder_game.v
+    - jtothunder_main.v
+    - jtothunder_snd.v
+    - jtothunder_video.v
+    - jtothunder_scn.v
+    - jtothunder_scn_layer.v
+    - jtothunder_obj.v
+    - jtothunder_colmix.v
+taitox:
+  - get:
+    - jttaitox_sup_snd.v
+    - jttaitox_tc0140syc.v
+rastan:
+  - get:
+    - jtrastan_pc060.v
+jtframe:
+  - get:
+      - jtframe_edge.v
+      - jtframe_8bit_reg.v
+  - from: ram
+    get:
+      - jtframe_dual_ram.v
+      - jtframe_dual_ram16.v
+  - from: clocking
+    get:
+      - jtframe_frac_cen.v
+  - from: video
+    get:
+      - jtframe_vtimer.v
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+      - jtframe_m68k.yaml
+jt12:
+jteeprom:

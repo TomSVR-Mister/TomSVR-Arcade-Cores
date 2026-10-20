@@ -1,0 +1,60 @@
+params:
+  - { name: ADPCMA_OFFSET, value: "(`ADPCMA_START-`JTFRAME_BA1_START)>>1" }
+  - { name: ADPCMB_OFFSET, value: "(`ADPCMB_START-`JTFRAME_BA1_START)>>1" }
+  - { name: SPRMAP_OFFSET, value: "(`SPRMAP_START-`JTFRAME_BA2_START)>>1" }
+clocks:
+  clk:
+    - freq: 8 MHz
+      gate: [ adpcma, adpcmb ]
+      outputs:
+        - cen8
+    - freq: 4 MHz
+      gate: [ snd ]
+      outputs:
+        - snd_cen
+audio:
+  rsum: 33k
+  rsum_feedback_res: true
+  channels:
+    - { name: sup, data_width: 16, rsum: 33k, vpp: 0.5, stereo: true, fir: "fir_192k_6k.csv" }
+    - { name: psg, data_width: 10, rsum: 150k, vpp: 1.0, dcrm: true }
+sdram:
+  banks:
+    - buses:
+      - name: main
+        addr_width: 19
+        data_width: 16
+    - buses:
+      - name: snd
+        addr_width: 16
+        data_width: 8
+      - name: adpcma
+        addr_width: 19
+        data_width: 8
+        offset: ADPCMA_OFFSET
+      - name: adpcmb
+        addr_width: 19
+        data_width: 8
+        offset: ADPCMB_OFFSET
+    - buses:
+      - name: bg0
+        addr_width: 19
+        data_width: 32
+      - name: bg1
+        addr_width: 19
+        data_width: 32
+      - name: smap
+        addr_width: 19
+        data_width: 32
+        offset: SPRMAP_OFFSET
+    - buses:
+      - name: orom
+        addr_width: 21
+        data_width: 32
+bram:
+  - name: ram
+    addr_width: 16
+    data_width: 16
+    addr: main_addr[15:1]
+    din: cpu_dout
+    rw: true

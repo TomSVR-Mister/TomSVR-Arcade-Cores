@@ -1,0 +1,65 @@
+params:
+  - { name: PCM1_OFFSET, value: "(`PCM1_START-`JTFRAME_BA1_START) >> 1" }
+  - { name: PCM2_OFFSET, value: "(`PCM2_START-`JTFRAME_BA1_START) >> 1" }
+  - { name: ROZ1_OFFSET, value: "(`ROZ1_START-`JTFRAME_BA1_START) >> 1" }
+clocks:
+  clk48:
+    - freq: 24M
+      outputs:
+        - cen24
+        - cen12
+    - freq: 3579545
+      outputs:
+        - cen_fm
+        - cen_fm2
+audio:
+  rsum: 10k
+  rsum_feedback_res: true
+  channels:
+    - {name: fm,   rsum:  4.7k,  rc: [{ r: 687, c: 33n  }, {r: 1rout, c: 2.2n }], module: jt51   }
+    - {name: pcm1, rsum: 10.00k, rc: [{ r: 33k,  c: 470p }], pre: 0.16,  module: jt007232_stereo }
+    - {name: pcm2, rsum: 10.00k, rc: [{ r: 33k,  c: 470p }], pre: 0.16,  module: jt007232 }
+sdram:
+  banks:
+    - buses:
+        - name: main
+          addr_width: 19
+          data_width: 8
+    - buses:
+        - name: snd
+          addr_width: 15
+          data_width: 8
+        - name: pcm1a
+          addr_width: 19
+          data_width: 8
+          offset: PCM1_OFFSET
+        - name: pcm1b
+          addr_width: 19
+          data_width: 8
+          offset: PCM1_OFFSET
+        - name: pcm2a
+          addr_width: 19
+          data_width: 8
+          offset: PCM2_OFFSET
+        - name: pcm2b
+          addr_width: 19
+          data_width: 8
+          offset: PCM2_OFFSET
+        - name: roza
+          addr_width: 17
+          data_width: 8
+          offset: ROZ1_OFFSET
+    - buses:
+        - name: rozb
+          addr_width: 20
+          data_width: 8
+    - buses:
+        - name: lyro
+          addr_width: 20
+          data_width: 32
+bram:
+  - name: ram
+    addr_width: 13
+    data_width: 8
+    rw: true
+    addr: main_addr[12:0]
