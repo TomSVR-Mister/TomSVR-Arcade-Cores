@@ -56,6 +56,9 @@ for name, (title, prog2, region) in SETS.items():
     <rom index="0" zip="chqflag.zip" md5="None">
 {nl.join('        ' + p for p in parts)}
     </rom>
+    <rom index="1">
+        <part>01 00</part>
+    </rom>
     <switches page_id="1" page_name="Switches" base="16" default="ff,5f,0f">
 {nl.join('        ' + d for d in DIPS)}
     </switches>

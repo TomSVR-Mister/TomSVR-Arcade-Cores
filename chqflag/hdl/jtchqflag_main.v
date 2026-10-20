@@ -129,9 +129,11 @@ end
 // Accelerator (button 1 or analog stick up) and steering wheel (joystick or analog stick).
 // MAME ranges: pedal 38-A0, wheel 60-A0 centred at 80
 wire [7:0] pedal = !joystick1[4] ? 8'ha0 : 8'h38;
+// JTFRAME rotates the d-pad on the rotated (vertical) screen: physical left/right then arrive as up/down
 wire signed [7:0] anax = joyana[7:0];
+wire steer_l = !joystick1[1] | !joystick1[3], steer_r = !joystick1[0] | !joystick1[2];
 wire [7:0] wheel_tgt = (anax > 8'sd8 || anax < -8'sd8) ? 8'h80 + {{2{anax[7]}}, anax[7:2]} :
-                       !joystick1[1] ? 8'h60 : !joystick1[0] ? 8'ha0 : 8'h80;
+                       steer_l ? 8'h60 : steer_r ? 8'ha0 : 8'h80;
 
 always @(posedge clk) begin
     if( rst ) begin
