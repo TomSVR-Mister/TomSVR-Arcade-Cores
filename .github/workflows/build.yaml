@@ -62,6 +62,8 @@ jobs:
           {
             tail -n 120 build.log 2>/dev/null
             for f in $(find jtcores/log jtcores/cores/${{ inputs.core }} -name '*.log' 2>/dev/null | head -5); do echo "== $f"; tail -n 60 "$f"; done
+            # worst setup paths, so a timing failure can be traced
+            for f in $(find jtcores/cores/${{ inputs.core }} -name '*.sta.rpt' 2>/dev/null | head -1); do echo "== $f"; grep -A 16 "^; Setup: '" "$f" | grep -v -- "^--$" | head -90; done
           } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
           split -l 25 tail.txt part_ || true
           for f in part_*; do
