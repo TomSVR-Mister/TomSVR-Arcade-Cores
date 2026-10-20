@@ -1,0 +1,88 @@
+<!-- Dynamite Duke (Europe, 25JUL89) on TomSVR_dynduke, a personal MiSTer core for Seibu's Dynamite Duke board (MAME dynduke.cpp),
+     built on JTFRAME by Jose Tejada (jotego), with the V30 CPU model of the MiSTer Irem M72 core by Martin Donlon
+     (GPL-2). The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_dynduke.rbf. -->
+<misterromdescription>
+    <name>Dynamite Duke (Europe, 25JUL89) [TomSVR]</name>
+    <setname>dyndukea</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1989</year>
+    <manufacturer>Seibu Kaihatsu</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_dynduke</rbf>
+    <joystick>8</joystick>
+    <region>Europe</region>
+    <rom index="0" zip="dynduke.zip" md5="None">
+        <part>00 00 00 00</part>
+        <interleave output="16">
+            <part name="1.cd8" crc="a5e2a95a" map="01"/>
+            <part name="2.cd7" crc="7e51af22" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="3.e8" crc="a56f8692" map="01"/>
+            <part name="4e.e7" crc="384c0635" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="5.p8" crc="883d319c" map="01"/>
+            <part name="6.p7" crc="d94cb4ff" map="10"/>
+        </interleave>
+        <part name="8.w8" crc="3c29480b"/>
+        <part name="8.w8" crc="3c29480b" length="0x8000"/>
+        <part repeat="0x8000">FF</part>
+        <part name="7.x10" crc="9cbc7b41"/>
+        <interleave output="32">
+            <part name="9.5k" crc="f2bc9af4" map="0021"/>
+            <part name="10.34k" crc="c2a9f19b" map="2100"/>
+        </interleave>
+        <part repeat="0x48000">FF</part>
+        <interleave output="64">
+            <part name="dd.a2" crc="598f343f" map="00000021"/>
+            <part name="dd.c2" crc="cc341b42" map="00002100"/>
+            <part name="dd.de3" crc="44a4cb62" map="00210000"/>
+            <part name="dd.de3" crc="44a4cb62" map="21000000"/>
+        </interleave>
+        <interleave output="64">
+            <part name="dd.b2" crc="41a9088d" map="00000021"/>
+            <part name="dd.d2" crc="4752b4d7" map="00002100"/>
+            <part name="dd.ef3" crc="aa8aee1a" map="00210000"/>
+            <part name="dd.ef3" crc="aa8aee1a" map="21000000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="dd.mn3" crc="2ee0ca98" map="0021"/>
+            <part name="dd.n45" crc="85d918e1" map="2100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="dd.mn4" crc="6c71e2df" map="0021"/>
+            <part name="dd.mn5" crc="e71e34df" map="2100"/>
+        </interleave>
+        <interleave output="16">
+            <part name="dd.n1" crc="cf1db927" map="01"/>
+            <part name="dd.n2" crc="5328150f" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="dd.m1" crc="80776452" map="01"/>
+            <part name="dd.m2" crc="ff61a573" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="dd.e1" crc="84a0b87c" map="01"/>
+            <part name="dd.e2" crc="a9585df2" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="dd.f1" crc="9aed24ba" map="01"/>
+            <part name="dd.f2" crc="3eb5783f" map="10"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>00</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,f7">
+        <dip name="Coin Mode" bits="0" ids="Mode 2,Mode 1"/>
+        <dip name="Coinage (Mode 1)" bits="1,2,3,4" ids="Free Play,-,-,-,-,-,-,-,-,-,-,-,4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Starting Coin" bits="5" ids="X 2,Normal"/>
+        <dip name="Bonus D.Punch" bits="10,11" ids="120K 120K+,120K 100K+,100K 100K+,80K 100K+"/>
+        <dip name="Difficulty" bits="12,13" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Allow Continue" bits="14" ids="Off,On"/>
+        <dip name="Demo Sounds" bits="15" ids="Off,On"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
