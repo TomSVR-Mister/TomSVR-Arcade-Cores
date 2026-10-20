@@ -88,5 +88,10 @@ jobs:
           git init -q
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           cp "../$rbf" .
+          # keep the Quartus warnings and timing summary next to the core for hardware debugging
+          mkdir -p logs
+          find ../jtcores/cores/${{ inputs.core }} -name '*.map.rpt' -o -name '*.fit.rpt' -o -name 'jtcore.log' -o -name '*.sta.summary' | while read f; do
+            grep -i "warning\|critical\|slack\|error" "$f" | grep -v "truncated value\|never read" > "logs/$(basename "$f").txt" || true
+          done
           git add -A && git commit -q -m "jt${{ inputs.core }} build ${GITHUB_SHA::7}"
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${{ inputs.core == 'comad' && 'builds' || format('builds-{0}', inputs.core) }}
