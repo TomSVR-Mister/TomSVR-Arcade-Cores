@@ -1,0 +1,60 @@
+<!-- Operation Thunderbolt (US) on TomSVR_othunder, a personal MiSTer core for Taito's Operation Thunderbolt board (MAME othunder.cpp),
+     built on JTFRAME and jotego's CPU and sound models. The ROM is assembled from your own MAME zip, unmodified.
+     Controls: aim with a mouse, light gun or the left analog stick; button 1 fires, button 2 launches a rocket.
+     The picture is mirrored like the original cabinet, which is viewed through a mirror. Requires TomSVR_othunder.rbf. -->
+<misterromdescription>
+    <name>Operation Thunderbolt (US) [TomSVR]</name>
+    <setname>othunderua</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1988</year>
+    <manufacturer>Taito</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_othunder</rbf>
+    <joystick>lightgun</joystick>
+    <region>USA</region>
+    <rom index="0" zip="othunder.zip" md5="None">
+        <interleave output="16">
+            <part name="b67-20.ic63" crc="21439ea2" map="10"/>
+            <part name="b67-22.ic64" crc="0f99ad3c" map="01"/>
+        </interleave>
+        <interleave output="16">
+            <part name="b67-14.ic61" crc="7f3dd724" map="10"/>
+            <part name="b67-15.ic62" crc="e84f62d0" map="01"/>
+        </interleave>
+        <part name="b67-13.ic40" crc="2936b4b1"/>
+        <part name="b67-08.ic67" crc="458f41fb"/>
+        <part name="b67-07.ic44" crc="4f834357"/>
+        <part repeat="0x70000">FF</part>
+        <interleave output="32">
+            <part name="b67-03.ic3" crc="bc9019ed" map="0021"/>
+            <part name="b67-04.ic4" crc="2af4c8af" map="2100"/>
+        </interleave>
+        <part name="b67-06.ic66" crc="b9a38d64"/>
+        <part name="b67-05.ic43" crc="9593e42b"/>
+        <interleave output="32">
+            <part name="b67-01.ic1" crc="81ad9acb" map="0021"/>
+            <part name="b67-02.ic2" crc="c20cd2fb" map="2100"/>
+        </interleave>
+        <part repeat="0x100000">FF</part>
+        <interleave output="16">
+            <part name="93c46_eeprom-othunder.ic86" crc="3729b844" map="12"/>
+        </interleave>
+    </rom>
+    <rom index="1">
+        <part>02 00</part>
+    </rom>
+    <nvram index="2" size="128"/>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,7f">
+        <dip name="Allow Continue" bits="1" ids="No,Yes"/>
+        <dip name="Service Mode" bits="2" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="3" ids="Off,On"/>
+        <dip name="Coin A" bits="4,5" ids="4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Coin B" bits="6,7" ids="1C/6C,1C/4C,1C/3C,1C/2C"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Medium"/>
+        <dip name="Magazines/Rockets" bits="10,11" ids="8/6,7/5,6/4,5/3"/>
+        <dip name="Bullets per Magazine" bits="12,13" ids="30,35,50,40"/>
+        <dip name="Language" bits="15" ids="English,Japanese"/>
+    </switches>
+    <buttons names="Fire,Rocket,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>
