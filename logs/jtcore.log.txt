@@ -1,0 +1,1 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 298 warnings
