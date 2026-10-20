@@ -1,0 +1,6 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 286 warnings
+Warning (10240): Verilog HDL Always Construct warning at jtothunder_scn.v(64): inferring latch(es) for variable "k", which holds its previous value in one or more paths through the always construct File: /jtcores/cores/othunder/hdl/jtothunder_scn.v Line: 64
+Warning: latch inferred
+Warning (10850): Verilog HDL warning at jtframe_dual_ram.v(328): number of words (1024) in memory file does not match the number of elements in the address range [0:4095] File: /jtcores/modules/jtframe/hdl/ram/jtframe_dual_ram.v Line: 328
+Warning (10240): Verilog HDL Always Construct warning at jtothunder_scn.v(64): inferring latch(es) for variable "k", which holds its previous value in one or more paths through the always construct File: /jtcores/cores/othunder/hdl/jtothunder_scn.v Line: 64
+Warning (10034): Output port "rom_addr" at jtothunder_scn_layer.v(26) has no driver File: /jtcores/cores/othunder/hdl/jtothunder_scn_layer.v Line: 26
