@@ -49,12 +49,10 @@ sdram:
           addr_width: 17
           data_width: 8
           offset: ROZ1_OFFSET
-          cache_size: 2kB
     - buses:
         - name: rozb
           addr_width: 20
           data_width: 8
-          cache_size: 2kB
     - buses:
         - name: lyro
           addr_width: 20
