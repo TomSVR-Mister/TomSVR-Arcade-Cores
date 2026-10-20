@@ -64,10 +64,12 @@ jobs:
         shell: bash
         run: |
           {
-            tail -n 120 build.log 2>/dev/null
-            for f in $(find jtcores/log jtcores/cores/${{ inputs.core }} -name '*.log' 2>/dev/null | head -5); do echo "== $f"; tail -n 60 "$f"; done
+            # GitHub keeps only 10 notices per step, so the useful lines go first
+            echo "== errors and timing"; grep -aiE "error \(|slack|timing|fail|pass|seed" build.log | grep -v "Verifying\|Download\|Waiting" | tail -n 45
+            echo "== end of build.log"; grep -av "Verifying\|Download complete\|Waiting\|Pull complete\|Extracting" build.log | tail -n 60
             # worst setup paths, so a timing failure can be traced
             for f in $(find jtcores/cores/${{ inputs.core }} -name '*.sta.rpt' 2>/dev/null | head -1); do echo "== $f"; grep -A 16 "^; Setup: '" "$f" | grep -v -- "^--$" | head -90; done
+            for f in $(find jtcores/log jtcores/cores/${{ inputs.core }} -name '*.log' 2>/dev/null | head -3); do echo "== $f"; tail -n 30 "$f"; done
           } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
           split -l 25 tail.txt part_ || true
           for f in part_*; do
