@@ -104,8 +104,8 @@ jtframe_tilemap #(
     .vram_addr ( vram0_addr           ),
     .code      ( vram0_dout[29:16]    ),
     .pal       ( vram0_dout[5:0]      ),
-    .hflip     ( vram0_dout[7]        ),
-    .vflip     ( vram0_dout[6]        ),
+    .hflip     ( vram0_dout[6]        ),   // MAME TILE_FLIPYX: bit 6 = flip x, bit 7 = flip y
+    .vflip     ( vram0_dout[7]        ),
     .rom_addr  ( scr0_addr            ),
     .rom_data  ( scr0_data            ),
     .rom_cs    ( scr0_cs              ),
@@ -140,8 +140,8 @@ jtframe_tilemap #(
     .vram_addr ( vram1_addr           ),
     .code      ( vram1_dout[29:16]    ),
     .pal       ( vram1_dout[5:0]      ),
-    .hflip     ( vram1_dout[7]        ),
-    .vflip     ( vram1_dout[6]        ),
+    .hflip     ( vram1_dout[6]        ),   // MAME TILE_FLIPYX: bit 6 = flip x, bit 7 = flip y
+    .vflip     ( vram1_dout[7]        ),
     .rom_addr  ( scr1_addr            ),
     .rom_data  ( scr1_data            ),
     .rom_cs    ( scr1_cs              ),
