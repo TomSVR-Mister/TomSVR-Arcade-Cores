@@ -10,6 +10,8 @@
  *   32x32: 128 bytes per sprite and plane, word at { code, y[4], x[4:3], y[3:0] }
  *   16x16:  32 bytes,                       word at { code, x[3], y[3:0] }
  * hm (Hot Mind): 16x16 as Excelsior, 512 entries, x - 9 and y - 8 more (MAME m_xoffset / m_yoffset), 32 colours.
+ * ht (Hard Times): as hm, 1 pixel further right (MAME m_xoffset -8), codes up to 16383.
+ * bb (Big Twin No Girls, with exc and hm clear): Big Twin sprites 1 pixel right, colour = w1 bits 15-12 (palette 300), no priority.
  * Line buffer output { pri[1:0], colour[4:0], pen[3:0] }, cleared as it is read. */
 
 module jtplaymark_obj(
@@ -18,6 +20,8 @@ module jtplaymark_obj(
     input              pxl_cen,
     input              exc,         // Excelsior: 16x16, 416 entries   Big Twin: 32x32, 128 entries
     input              hm,          // Hot Mind (16x16, set exc too)
+    input              ht,
+    input              bb,
     input       [ 8:0] hdump,
     input              hs_start,
     input       [ 8:0] vrender,
@@ -57,12 +61,12 @@ wire        done = q3 == 16'h2000 || t1 > last;
 wire [ 1:0] xs   = xg ^ { 2{fx} };                   // source column group
 wire [ 2:0] b    = fx ? px : ~px;
 wire [ 3:0] pen  = { wa[24+b], wa[16+b], wa[8+b], wa[b] };
-wire [ 9:0] wx   = { 1'b0, c1[8:0] } - (hm ? 10'd32 : 10'd23) + { 5'd0, exc ? 1'b0 : xg[1], xg[0], px };
-wire [ 4:0] col  = c1[13:9];
-wire [ 1:0] pri  = c1[15] ? 2'd1 : col[3:2]==2'b11 ? 2'd2 : 2'd0;
+wire [ 9:0] wx   = { 1'b0, c1[8:0] } - (ht ? 10'd31 : hm ? 10'd32 : bb ? 10'd22 : 10'd23) + { 5'd0, exc ? 1'b0 : xg[1], xg[0], px };
+wire [ 4:0] col  = bb ? { 1'b1, c1[15:12] } : c1[13:9];
+wire [ 1:0] pri  = bb ? 2'd0 : c1[15] ? 2'd1 : col[3:2]==2'b11 ? 2'd2 : 2'd0;
 wire [ 1:0] nw   = exc ? 2'd1 : 2'd3;                // words per row - 1
 
-assign rom_addr = exc ? { c2[15:14] & {2{~hm}}, c2[13:2], xs[0], dy[3:0] } : { 2'd0, c2[13:4], dy[4], xs, dy[3:0] };
+assign rom_addr = exc ? { c2[15:14] & {2{~hm | ht}}, c2[13:2], xs[0], dy[3:0] } : { 2'd0, c2[13:4], dy[4], xs, dy[3:0] };
 
 always @(posedge clk) begin
     if( rst ) begin

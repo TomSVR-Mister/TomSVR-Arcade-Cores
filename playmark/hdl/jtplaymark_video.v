@@ -11,7 +11,13 @@
  *   Palette: 1024 words RRRRGGGGBBBBRGBx.
  * hm: Hot Mind (MAME screen_update_hrdtimes, video_start hotmind): visible rows 16-239, black unless scroll register 6
  *   bit 0 is set. bg 16x16 (opaque, palette 000) < fg 16x16 (pen 0 transparent, palette 080) < sprites < tx 8x8 64x64
- *   (palette 100). Sprites with priority 1 go under the fg pixels. Scroll: 0/1 tx, 2/3 fg, 4/5 bg, x + 14 (MAME scrolldx -14: the map origin sits at dx - scroll). */
+ *   (palette 100). Sprites with priority 1 go under the fg pixels. Scroll: 0/1 tx, 2/3 fg, 4/5 bg, x + 14 (MAME scrolldx -14: the map origin sits at dx - scroll).
+ * hv (other Hard Times board games, with hm set):
+ *   1 Hard Times: 8192 tiles per layer (fg from ROM word 40000), text from word 7e000 (1024 characters), fg map 128x32
+ *     in pages, scroll x + 14 (tx), + 10 (fg), + 12 (bg), sprites 1 pixel right of Hot Mind and 16384 codes.
+ *   2 Lucky Boom: bg and fg share 4096 tiles from word 0, scroll x + 9 / + 11 / + 13.
+ *   3 Big Twin (No Girls): rows 16-255, IRQ 2, 4096 tiles (fg from word 20000), text from word 20000 with 16 colours
+ *     (palette 200), bg x + 4, Big Twin 32x32 sprites (palette 300, colour = w1 bits 15-12, no priority). */
 
 module jtplaymark_video(
     input              rst,
@@ -20,6 +26,7 @@ module jtplaymark_video(
     input              exc,
     input              hm,
     input              ven,
+    input       [ 1:0] hv,
     input       [ 3:0] gfx_en,
 
     input       [15:0] scr0, scr1, scr2, scr3, scr4, scr5,
@@ -30,7 +37,7 @@ module jtplaymark_video(
     input       [ 1:0] oram_we,
     input              bmp_wr,      // bitmap low byte write
 
-    output      [11:1] fgram_video_addr,
+    output      [12:1] fgram_video_addr,
     input       [15:0] fgram_video_dout,
     output      [12:1] txram_video_addr,
     input       [15:0] txram_video_dout,
@@ -77,6 +84,20 @@ assign LHBL     = hbl_sh[2];
 assign LVBL     = vbl_sh[1];
 assign lvbl_irq = lvbl_i;      // Hot Mind: vblank interrupt after row 239, rows 240-255 shown black
 wire   hs_start = pxl_cen && hdump==0 && !hs_l;
+wire   ht = hm && hv==2'd1, lb = hm && hv==2'd2, bb = hm && hv==2'd3;
+// Hard Times board: tile ROM bases and code masks, x scroll offsets
+reg  [18:0] fg_base, tx_base;
+reg  [12:0] bg_mask, fg_mask, tx_mask;
+reg  [ 3:0] tx_dx, fg_dx, bg_dx;
+
+always @* begin
+    case( hv )
+        2'd1:    begin fg_base = 19'h40000; tx_base = 19'h7e000; bg_mask = 13'h1fff; fg_mask = 13'h1fff; tx_mask = 13'h03ff; tx_dx = 14; fg_dx = 10; bg_dx = 12; end
+        2'd2:    begin fg_base = 19'h00000; tx_base = 19'h18000; bg_mask = 13'h0fff; fg_mask = 13'h0fff; tx_mask = 13'h0fff; tx_dx =  9; fg_dx = 11; bg_dx = 13; end
+        2'd3:    begin fg_base = 19'h20000; tx_base = 19'h20000; bg_mask = 13'h0fff; fg_mask = 13'h0fff; tx_mask = 13'h0fff; tx_dx =  0; fg_dx =  0; bg_dx =  4; end
+        default: begin fg_base = 19'h10000; tx_base = 19'h18000; bg_mask = 13'h07ff; fg_mask = 13'h07ff; tx_mask = 13'h0fff; tx_dx = 14; fg_dx = 14; bg_dx = 14; end
+    endcase
+end
 
 always @(posedge clk) if( pxl_cen ) hs_l <= hdump==0;
 
@@ -86,7 +107,7 @@ always @(posedge clk) if( pxl_cen ) begin
         vdump   <= vrender;
         vrender <= vrender==VTOTAL ? 9'd0 : vrender+9'd1;
         lvbl    <= vrender >= VB_END && vrender < VB_START;
-        lvbl_i  <= vrender >= VB_END && vrender < (hm ? 9'd240 : VB_START);
+        lvbl_i  <= vrender >= VB_END && vrender < (hm && !bb ? 9'd240 : VB_START);
     end
     lhbl <= hdump==HTOTAL || hdump < 9'd319;
     if( hdump==HS_START ) begin
@@ -100,10 +121,10 @@ always @(posedge clk) if( pxl_cen ) begin
 end
 
 // ---------------- tile maps ----------------
-wire [ 6:0] fg_pxl, tx_pxl, bg_pxl;
+wire [ 7:0] fg_pxl, tx_pxl, bg_pxl;
 wire [12:1] fg_vaddr, bg_vaddr;
 
-assign fgram_video_addr = fg_vaddr[11:1];
+assign fgram_video_addr = fg_vaddr;
 assign bgram_video_addr = bg_vaddr[10:1];
 
 jtplaymark_tile u_fg(
@@ -112,12 +133,15 @@ jtplaymark_tile u_fg(
     .t16        ( 1'b1          ),
     .c14        ( exc           ),
     .one        ( hm            ),
-    .hsel       ( 1'b1          ),
+    .c4         ( 1'b0          ),
+    .page       ( ht            ),
+    .tbase      ( fg_base       ),
+    .tmask      ( fg_mask       ),
     .hdump      ( hdump         ),
     .hs_start   ( hs_start      ),
     .vrender    ( vrender       ),
     .vdump      ( vdump         ),
-    .scrx       ( hm ? scr2[8:0] + 9'd14 : scr4[8:0] + 9'd6 ),
+    .scrx       ( hm ? scr2[10:0] + { 7'd0, fg_dx } : { 2'd0, scr4[8:0] + 9'd6 } ),
     .scry       ( hm ? scr3[8:0] : scr5[8:0] ),
     .vram_addr  ( fg_vaddr      ),
     .vram_dout  ( fgram_video_dout ),
@@ -134,12 +158,15 @@ jtplaymark_tile u_tx(
     .t16        ( exc && !hm    ),
     .c14        ( exc           ),
     .one        ( hm            ),
-    .hsel       ( 1'b0          ),
+    .c4         ( bb            ),
+    .page       ( 1'b0          ),
+    .tbase      ( tx_base       ),
+    .tmask      ( tx_mask       ),
     .hdump      ( hdump         ),
     .hs_start   ( hs_start      ),
     .vrender    ( vrender       ),
     .vdump      ( vdump         ),
-    .scrx       ( hm ? scr0[8:0] + 9'd14 : scr0[8:0] + 9'd2 ),
+    .scrx       ( { 2'd0, scr0[8:0] + (hm ? { 5'd0, tx_dx } : 9'd2) } ),
     .scry       ( scr1[8:0]     ),
     .vram_addr  ( txram_video_addr ),
     .vram_dout  ( txram_video_dout ),
@@ -156,12 +183,15 @@ jtplaymark_tile u_bg(       // Hot Mind only
     .t16        ( 1'b1          ),
     .c14        ( 1'b0          ),
     .one        ( 1'b1          ),
-    .hsel       ( 1'b0          ),
+    .c4         ( 1'b0          ),
+    .page       ( 1'b0          ),
+    .tbase      ( 19'd0         ),
+    .tmask      ( bg_mask       ),
     .hdump      ( hdump         ),
     .hs_start   ( hs_start & hm ),
     .vrender    ( vrender       ),
     .vdump      ( vdump         ),
-    .scrx       ( scr4[8:0] + 9'd14 ),
+    .scrx       ( { 2'd0, scr4[8:0] + { 5'd0, bg_dx } } ),
     .scry       ( scr5[8:0]     ),
     .vram_addr  ( bg_vaddr      ),
     .vram_dout  ( bgram_video_dout ),
@@ -179,8 +209,10 @@ jtplaymark_obj u_obj(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .pxl_cen    ( pxl_cen       ),
-    .exc        ( exc | hm      ),
-    .hm         ( hm            ),
+    .exc        ( exc | (hm & ~bb) ),
+    .hm         ( hm & ~bb      ),
+    .ht         ( ht            ),
+    .bb         ( bb            ),
     .hdump      ( hdump         ),
     .hs_start   ( hs_start      ),
     .vrender    ( vrender       ),
@@ -219,7 +251,7 @@ jtframe_dual_ram #(.DW(8),.AW(18)) u_bitmap(
 );
 
 // ---------------- mixer ----------------
-reg  [ 6:0] fg_l, tx_l, bg_l;
+reg  [ 7:0] fg_l, tx_l, bg_l;
 reg  [ 7:0] bm_l;
 reg  [10:0] obj_l;
 reg         bm_ok, blank;
@@ -230,7 +262,7 @@ wire        obj_op = obj_l[3:0] != 0 && gfx_en[3];
 wire        obj_vis = !exc || obj_l[10:9]==0 || (obj_l[10:9]==1 ? !bm_op && !tx_op : !tx_op);
 wire        fg_op  = fg_l[3:0] != 0 && gfx_en[0];
 wire        hobj   = obj_op && (obj_l[10:9]!=1 || !fg_op);
-wire [ 9:0] base   = { 3'd0, gfx_en[0] ? fg_l : 7'd0 };
+wire [ 9:0] base   = { 3'd0, gfx_en[0] ? fg_l[6:0] : 7'd0 };
 
 always @(posedge clk) if( pxl_cen ) begin
     fg_l  <= fg_pxl;
@@ -239,18 +271,18 @@ always @(posedge clk) if( pxl_cen ) begin
     bm_ok <= bm_en && !bm_out;
     obj_l <= obj_pxl;
     bg_l  <= bg_pxl;
-    blank <= hm && (!ven || vdump >= 9'd240);
+    blank <= hm && (!ven || (!bb && vdump >= 9'd240));
     if( hm )
-        pal_video_addr <= tx_op  ? { 3'b010, tx_l } :
+        pal_video_addr <= tx_op  ? (bb ? { 2'b10, tx_l } : { 3'b010, tx_l[6:0] }) :
                           hobj   ? { 1'b1, obj_l[8:0] } :
-                          fg_op  ? { 3'b001, fg_l } :
-                          { 3'b000, gfx_en[2] ? bg_l : 7'd0 };
+                          fg_op  ? { 3'b001, fg_l[6:0] } :
+                          { 3'b000, gfx_en[2] ? bg_l[6:0] : 7'd0 };
     else if( exc )
         pal_video_addr <= obj_op && obj_vis ? { 2'b10, obj_l[7:0] } :
-                          tx_op ? { 3'b001, tx_l } :
+                          tx_op ? { 3'b001, tx_l[6:0] } :
                           bm_op ? { 2'b01, bm_l } : base;
     else
-        pal_video_addr <= tx_op  ? { 3'b001, tx_l } :
+        pal_video_addr <= tx_op  ? { 3'b001, tx_l[6:0] } :
                           obj_op ? { 2'b10, obj_l[7:0] } :
                           bm_op  ? { 2'b01, bm_l } : base;
     red   <= blank ? 5'd0 : { pal_video_dout[15:12], pal_video_dout[3] };

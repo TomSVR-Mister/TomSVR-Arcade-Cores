@@ -2,7 +2,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Playmark Big Twin / Excelsior (MAME playmark.cpp) on JTFRAME (Jose Tejada, jotego). Personal build.
  * Header byte 0: bit 0 Excelsior board (3 MB program, 16x16 text layer and sprites, sprite priorities, 4 OKI banks),
- *   bit 1 Hot Mind (Hard Times board: three tile maps, 93C46 EEPROM, IRQ 6).
+ *   bit 1 Hot Mind (Hard Times board: three tile maps, 93C46 EEPROM, IRQ 6),
+ *   bits 3-2 with bit 1: other Hard Times board games: 1 Hard Times, 2 Lucky Boom, 3 Big Twin (No Girls Conversion).
  * The PIC16C57 program is the MAME Intel HEX dump, loaded as the PROM section and decoded by jtplaymark_sound. */
 
 module jtplaymark_game(
@@ -14,6 +15,8 @@ wire [ 7:0] snd_latch, sys, p1, p2;
 wire [21:1] cpu_addr;
 wire        snd_wr, lvbl_irq;
 reg         exc = 0, hm = 0;
+reg  [ 1:0] hv = 0;
+wire        ht = hm && hv==2'd1, bb = hm && hv==2'd3;
 wire        eep_cs, eep_clk, eep_di, eep_do, ven;
 wire [ 7:0] disp;
 reg  [13:0] hex_last;
@@ -29,13 +32,14 @@ end
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 always @(posedge clk) if( header && prog_we ) begin
-    if( prog_addr[1:0]==0 ) { hm, exc } <= prog_data[1:0];
+    if( prog_addr[1:0]==0 ) { hv, hm, exc } <= prog_data[3:0];
 end
 
 // SYSTEM: coin 1 bit 4, coin 2 bit 5   P1/P2: up, down, left, right, B1, B2, B3, start (all active low)
 assign sys = { 2'b11, coin[1], coin[0], 4'hf };
-assign p1  = { cab_1p[0], joystick1[6:4], joystick1[0], joystick1[1], joystick1[2], joystick1[3] };
-assign p2  = { cab_1p[1], joystick2[6:4], joystick2[0], joystick2[1], joystick2[2], joystick2[3] };
+// Big Twin No Girls: right, left, down, up
+assign p1  = { cab_1p[0], joystick1[6:4], bb ? joystick1[3:0] : { joystick1[0], joystick1[1], joystick1[2], joystick1[3] } };
+assign p2  = { cab_1p[1], joystick2[6:4], bb ? joystick2[3:0] : { joystick2[0], joystick2[1], joystick2[2], joystick2[3] } };
 // jt9346 reports ready as soon as CS rises again after a write; the 93C46 (and MAME) stays busy (DO low) for the
 // write cycle, and Hot Mind waits for DO to go low and then high. Hold DO low for 1.75 ms (MAME's write time).
 wire        eep_wflag;
@@ -86,6 +90,8 @@ jtplaymark_main u_main(
     .dip_pause   ( dip_pause    ),
     .exc         ( exc          ),
     .hm          ( hm           ),
+    .hv          ( hv           ),
+    .service     ( service      ),
     .disp        ( disp         ),
     .eep_cs      ( eep_cs       ),
     .eep_clk     ( eep_clk      ),
@@ -142,8 +148,9 @@ jtplaymark_sound u_sound(
     .clk        ( clk           ),
     .cen_pic    ( cen_3         ),
     .cen_oki    ( cen_1         ),
-    .nbank      ( exc ? 2'd3 : 2'd1 ),
-    .hm         ( hm            ),
+    .nbank      ( exc || ht ? 2'd3 : 2'd1 ),
+    .hm         ( hm & ~bb      ),
+    .ht         ( ht            ),
     .hex_we     ( hex_we        ),
     .hex_data   ( prog_data     ),
     .hex_first  ( prog_addr[13:0]==0 ),
@@ -162,6 +169,7 @@ jtplaymark_video u_video(
     .pxl_cen          ( pxl_cen          ),
     .exc              ( exc              ),
     .hm               ( hm               ),
+    .hv               ( hv               ),
     .ven              ( ven              ),
     .gfx_en           ( gfx_en           ),
     .scr0             ( scr0             ),

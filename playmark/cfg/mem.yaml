@@ -47,7 +47,7 @@ bram:
     rw: true
     din: cpu_dout
   - name: fgram
-    size: 4kB
+    size: 8kB
     data_width: 16
     rw: true
     din: cpu_dout

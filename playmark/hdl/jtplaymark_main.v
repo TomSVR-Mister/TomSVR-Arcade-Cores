@@ -11,7 +11,11 @@
  *   000000-03ffff ROM   100000 bg map   104000 fg map   108000 text map   110000-11000d scroll / video enable
  *   200000-200fff sprites   280000-2807ff palette   300010 COINS  300012 P1  300014 DISPENSER (bit 6 EEPROM out)
  *   300015 coin counters / EEPROM (bit 0 CS, bit 1 clock, bit 2 data)   30001a DSW2  30001c DSW1  30001f sound latch
- *   ff0000-ffffff RAM. The bg/fg maps only use their first 2 kB (32x32 tiles) and are mirrored. */
+ *   ff0000-ffffff RAM. The bg/fg maps only use their first 2 kB (32x32 tiles) and are mirrored.
+ * hv (with hm): 1 Hard Times (hrdtimes_main_map): ROM 000000-07ffff and 0c0000-0fffff, RAM 080000-0bffff (the game only
+ *   uses its first 64 kB: mirrored), fg map 8 kB, 300014 P2, no EEPROM.
+ *   2 Lucky Boom (luckboomh_main_map): 30001c SERVICE (bit 0), no DIP switches or EEPROM.
+ *   3 Big Twin No Girls (bigtwinb_main_map): sprites 201000-2013ff, 300014 P2, IRQ 2. */
 
 module jtplaymark_main(
     input              rst,
@@ -20,6 +24,8 @@ module jtplaymark_main(
     input              dip_pause,
     input              exc,
     input              hm,
+    input       [ 1:0] hv,
+    input              service,
     input       [ 7:0] disp,        // Hot Mind DISPENSER port
     output reg         eep_cs, eep_clk, eep_di,
 
@@ -46,7 +52,7 @@ module jtplaymark_main(
     output      [11:1] oram_addr,
     output      [ 1:0] oram_we,
     input       [15:0] oram_dout,
-    output      [11:1] fgram_addr,
+    output      [12:1] fgram_addr,
     output      [ 1:0] fgram_we,
     input       [15:0] fgram_dout,
     output      [12:1] txram_addr,
@@ -73,6 +79,7 @@ reg  [15:0] cpu_din;
 reg         wram_cs, pal_cs, oram_cs, fg_cs, tx_cs, io_cs, scr_cs, bg_cs;
 reg         irq, lvbl_l, wr_l;
 wire [ 7:0] pg = A[23:16];
+wire        ht = hv==2'd1, lb = hv==2'd2, bb = hv==2'd3;
 
 assign dsn       = { uds_n, lds_n };
 assign bus_n     = as_n | (lds_n & uds_n);
@@ -85,7 +92,7 @@ assign bmp_we    = !wr_n;
 assign wram_addr = A[15:1];
 assign pal_addr  = A[10:1];
 assign oram_addr = A[11:1];
-assign fgram_addr= A[11:1];
+assign fgram_addr= A[12:1];
 assign txram_addr= exc ? { 1'b0, A[11:1] } : A[12:1];
 assign bgram_addr= A[10:1];
 assign bgram_we  = bg_cs ? wen : 2'b00;
@@ -101,15 +108,15 @@ assign bus_busy  = (rom_cs && !rom_ok) || (bmp_cs && !bmp_ok);
 always @* begin
     rom_cs = 0; bmp_cs = 0; wram_cs = 0; pal_cs = 0; oram_cs = 0; fg_cs = 0; tx_cs = 0; io_cs = 0; scr_cs = 0; bg_cs = 0;
     if( !bus_n && hm ) begin
-        rom_cs  = A[23:18] == 0;
+        rom_cs  = ht ? A[23:20] == 0 && A[19:18] != 2'b10 : A[23:18] == 0;
         bg_cs   = pg == 8'h10 && A[15:14] == 2'b00;
         fg_cs   = pg == 8'h10 && A[15:14] == 2'b01;
         tx_cs   = pg == 8'h10 && A[15];
         scr_cs  = pg == 8'h11 && A[15:4] == 0;
-        oram_cs = pg == 8'h20 && A[15:12] == 0;
+        oram_cs = pg == 8'h20 && (bb ? A[15:10] == 6'b0001_00 : A[15:12] == 0);
         pal_cs  = pg == 8'h28 && A[15:11] == 0;
         io_cs   = pg == 8'h30 && A[15:5] == 0;
-        wram_cs = pg == 8'hff;
+        wram_cs = ht ? A[23:18] == 6'b0000_10 : pg == 8'hff;
     end else if( !bus_n ) begin
         rom_cs  = exc ? A[23:20] < 4'h3 : A[23:20] == 0;
         oram_cs = pg == 8'h44 && A[15:12] == 0;
@@ -132,8 +139,10 @@ always @(posedge clk) begin
                fg_cs   ? fgram_dout :
                tx_cs   ? txram_dout :
                bg_cs   ? bgram_dout :
-               io_cs   ? ( A[4:1]==4'h8 ? { 8'hff, sys } : A[4:1]==4'h9 ? { 8'hff, p1 } : A[4:1]==4'ha ? { 8'hff, hm ? disp : p2 } :
-                           A[4:1]==4'hd ? { 8'hff, dsw2 } : A[4:1]==4'he ? { 8'hff, dsw1 } : 16'hffff ) :
+               io_cs   ? ( A[4:1]==4'h8 ? { 8'hff, sys } : A[4:1]==4'h9 ? { 8'hff, p1 } :
+                           A[4:1]==4'ha ? { 8'hff, hm && hv==0 ? disp : hm && lb ? 8'hff : p2 } :
+                           A[4:1]==4'hd ? { 8'hff, hm && lb ? 8'hff : dsw2 } :
+                           A[4:1]==4'he ? { 8'hff, hm && lb ? { 7'h7f, service } : dsw1 } : 16'hffff ) :
                16'hffff;
 end
 
@@ -147,7 +156,7 @@ always @(posedge clk) begin
     end else begin
         if( !lvbl && lvbl_l && dip_pause ) irq <= 1;
         if( int_ack ) irq <= 0;
-        if( hm && io_cs && !wr_n && A[4:1]==4'ha && !lds_n ) begin   // 300015
+        if( hm && hv==0 && io_cs && !wr_n && A[4:1]==4'ha && !lds_n ) begin   // 300015
             eep_cs  <= cpu_dout[0];
             eep_clk <= cpu_dout[1];
             eep_di  <= cpu_dout[2];
@@ -189,7 +198,7 @@ jtframe_m68k u_cpu(
     .oEdb    ( cpu_dout  ),
     .BRn     ( 1'b1      ),
     .BGn     (           ),
-    .IPLn    ( irq ? (hm ? 3'b001 : 3'b101) : 3'b111 ),
+    .IPLn    ( irq ? (hm && !bb ? 3'b001 : 3'b101) : 3'b111 ),
     .FC      ( fc        )
 );
 

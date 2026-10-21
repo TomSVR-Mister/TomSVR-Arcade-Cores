@@ -7,6 +7,8 @@
  *   Port C write: control; (data & 38) = 18 writes the command byte to the OKI.
  *   OKI address space: 00000-1ffff fixed, 20000-3ffff banked (bank * 20000 of the sample ROM).
  *   hm (Hot Mind): port A not wired, the bank comes from port C bits 1-0 (MAME snd_control_w<3>).
+ *   ht (Hard Times): banked from both ports, as MAME wires both handlers; the PIC program is a plain binary dump
+ *   (little-endian 16-bit words) instead of HEX text.
  * The PIC program comes in the download as the Intel HEX text MAME uses: the ":10" records are decoded here,
  * 8 little-endian words each, in file order (as MAME's decode_pic_hex_dump does). */
 
@@ -17,6 +19,7 @@ module jtplaymark_sound(
     input              cen_oki,     // 1 MHz
     input       [ 1:0] nbank,       // number of OKI banks - 1 (1: 2 banks, 3: 4 banks)
     input              hm,
+    input              ht,
     // PIC HEX download
     input              hex_we,
     input       [ 7:0] hex_data,
@@ -43,9 +46,19 @@ wire [ 3:0] nib = hex_data >= "a" ? hex_data - "a" + 4'd10 :
                   hex_data >= "A" ? hex_data - "A" + 4'd10 : hex_data[3:0];
 localparam [3:0] H_IDLE=0, H_L1=1, H_L0=2, H_SKIP=3, H_DATA=4, H_DONE=5;
 
+reg  [7:0] raw_lo;
+reg        raw_odd;
+
 always @(posedge clk) begin
     pwe <= 0;
-    if( hex_we && hex_first ) begin
+    if( ht ) begin
+        if( hex_we ) begin
+            raw_odd <= hex_first ? 1'b1 : ~raw_odd;
+            if( hex_first ) pwa <= 0;
+            if( hex_first || !raw_odd ) raw_lo <= hex_data;
+            else begin pwd <= { hex_data[3:0], raw_lo }; pwe <= 1; end
+        end
+    end else if( hex_we && hex_first ) begin
         hst <= hex_data == ":" ? H_L1 : H_IDLE;
         pwa <= 0;
     end else if( hex_we ) begin
@@ -124,7 +137,7 @@ always @(posedge clk) begin
     end else begin
         if( snd_wr ) pend <= 1;
         else if( pc_rd && pend ) pend <= 0;
-        if( pa_wr && !hm ) bank <= pa_out[2:0] & { 1'b0, nbank };
+        if( pa_wr && (!hm || ht) ) bank <= pa_out[2:0] & { 1'b0, nbank };
         if( pb_wr ) cmd  <= pb_out;
         if( pc_wr ) begin
             ctrl <= pc_out;
