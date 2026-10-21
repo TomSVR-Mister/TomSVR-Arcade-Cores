@@ -75,6 +75,8 @@ wire        pop0  = !turn && n0!=0 && rom_ok,
             pop   = pop0 | pop1,
             push0 = s1v & ~pushsel,
             push1 = s1v &  pushsel;
+wire [ 2:0] wi0w = n0 - {2'd0,pop0}, wi1w = n1 - {2'd0,pop1}; // FIFO write slots
+wire [ 1:0] wi0 = wi0w[1:0], wi1 = wi1w[1:0];
 wire [ 7:0] pdata = turn ? rom2_data : rom_data;
 wire [23:0] ga0 = h0[EW-1-:24], ga1 = h1[EW-1-:24], gad = hd[EW-1-:24];
 wire [23:0] vid0 = BPP==4 ? {1'b0,ga0[23:1]} : ga0,
@@ -130,10 +132,10 @@ always @(posedge clk) begin
             if( DUAL ) turn <= ~turn;
         end
         if( pop0 ) for( i=0; i<3; i=i+1 ) f0[i] <= f0[i+1];
-        if( push0 ) f0[n0-{2'd0,pop0}] <= s1e;
+        if( push0 ) f0[wi0] <= s1e;
         n0 <= n0 + {2'd0,push0} - {2'd0,pop0};
         if( pop1 ) for( i=0; i<3; i=i+1 ) f1[i] <= f1[i+1];
-        if( push1 ) f1[n1-{2'd0,pop1}] <= s1e;
+        if( push1 ) f1[wi1] <= s1e;
         n1 <= n1 + {2'd0,push1} - {2'd0,pop1};
         if( s1v && DUAL ) pushsel <= ~pushsel;
     end
