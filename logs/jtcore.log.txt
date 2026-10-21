@@ -1,0 +1,4 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 345 warnings
+WARNING: some SDRAM signals are not IO registers
+Warning (10027): Verilog HDL or VHDL warning at the jtplaymark_tile.v(56): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/playmark/hdl/jtplaymark_tile.v Line: 56
+Warning (10027): Verilog HDL or VHDL warning at the jtplaymark_obj.v(63): index expression is not wide enough to address all of the elements in the array File: /jtcores/cores/playmark/hdl/jtplaymark_obj.v Line: 63
