@@ -39,6 +39,11 @@ module jtchqflag_video(
     output            rozb_cs,
     input             rozb_rok,
     input      [ 7:0] rozb_data,
+    // second copy of the 8 bpp roz ROM (SDRAM bank 3) for the odd pixels
+    output     [19:0] rozb2_addr,
+    output            rozb2_cs,
+    input             rozb2_rok,
+    input      [ 7:0] rozb2_data,
 
     output     [ 7:0] red,
     output     [ 7:0] green,
@@ -53,7 +58,7 @@ wire [11:0] opxl;
 wire [12:0] ocode;
 wire [ 7:0] opal;
 wire [ 6:0] nca;
-wire [ 3:0] ncb;
+wire [ 3:0] ncb, ncb2;
 wire        nco;
 wire        oblnk_n, oshadow, rblka_n, rblkb_n;
 reg         hl_mode;
@@ -120,13 +125,17 @@ jtchqflag_roz #(.BPP(4),.RD_DLY(9'h011),.WR_STRT(9'h058),.RST_CT(9'h058),
     .rom_cs     ( roza_cs   ),
     .rom_ok     ( roza_rok  ),
     .rom_data   ( roza_data ),
+    .rom2_addr  (           ),
+    .rom2_cs    (           ),
+    .rom2_ok    ( 1'b0      ),
+    .rom2_data  ( 8'd0      ),
     .ioctl_addr ( 11'd0     ),
     .ioctl_ram  ( 1'b0      ),
     .ioctl_din  (           ),
     .mmr_dump   (           )
 );
 
-jtchqflag_roz #(.BPP(8),.RD_DLY(9'h011),.WR_STRT(9'h058),.RST_CT(9'h058),
+jtchqflag_roz #(.BPP(8),.DUAL(1),.RD_DLY(9'h011),.WR_STRT(9'h058),.RST_CT(9'h058),
     .MMRFILE("rozb_mmr.bin"),.RAM0FILE("rozb0.bin"),.RAM1FILE("rozb1.bin")) u_rozb(
     .rst        ( rst       ),
     .clk        ( clk       ),
@@ -153,6 +162,10 @@ jtchqflag_roz #(.BPP(8),.RD_DLY(9'h011),.WR_STRT(9'h058),.RST_CT(9'h058),
     .rom_cs     ( rozb_cs   ),
     .rom_ok     ( rozb_rok  ),
     .rom_data   ( rozb_data ),
+    .rom2_addr  ({ncb2,rozb2_addr}),
+    .rom2_cs    ( rozb2_cs  ),
+    .rom2_ok    ( rozb2_rok ),
+    .rom2_data  ( rozb2_data),
     .ioctl_addr ( 11'd0     ),
     .ioctl_ram  ( 1'b0      ),
     .ioctl_din  (           ),

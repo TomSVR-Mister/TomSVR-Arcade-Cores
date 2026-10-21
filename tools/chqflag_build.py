@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # chqflag_build.py outdir : JTCHQFLAG images + MRAs for Chequered Flag (user's merged chqflag.zip)
 # Image: 052001 program 0 (320 kB), Z80 0x80000, 051316 #1 (4 bpp) 0x88000, 007232 #1 0x100000,
-# 007232 #2 0x180000, 051316 #2 (8 bpp) 0x200000, sprites 0x400000 (32-bit words, bytes reversed).
+# 007232 #2 0x180000, 051316 #2 (8 bpp) 0x200000, sprites 0x400000 (32-bit words, bytes reversed),
+# 051316 #2 again at 0x500000 (read in parallel with the first copy).
 import sys, os, zipfile, hashlib
 S = '/tmp/claude-0/-home-claude/183009bc-02e0-578a-b0ba-00b6083aaf64/scratchpad'
 COIN = 'Free Play,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/7C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C'
@@ -31,11 +32,13 @@ for name, (title, prog2, region) in SETS.items():
     spr = bytearray()
     for k in range(0, len(a), 2): spr += bytes([b[k+1], b[k], a[k+1], a[k]])
     img += spr
-    assert len(img) == 0x500000, hex(len(img))
+    img += rd('717e07.l20') + rd('717e08.l22') + rd('717e11.n20') + rd('717e12.n22')   # second road ROM copy
+    assert len(img) == 0x600000, hex(len(img))
     parts = [P('717e10'), P(prog2), '<part repeat="0x30000">FF</part>', P('717e01'), P('717e06.n16'), '<part repeat="0x58000">FF</part>',
              P('717e03'), P('717e09'), P('717e07.l20'), P('717e08.l22'), P('717e11.n20'), P('717e12.n22'),
              '<part repeat="0x100000">FF</part>',
-             '<interleave output="32">', '    ' + P('717e04', ' map="1200"'), '    ' + P('717e05', ' map="0012"'), '</interleave>']
+             '<interleave output="32">', '    ' + P('717e04', ' map="1200"'), '    ' + P('717e05', ' map="0012"'), '</interleave>',
+             P('717e07.l20'), P('717e08.l22'), P('717e11.n20'), P('717e12.n22')]
     open(f'{out}/{name}.rom', 'wb').write(img)
     md5 = hashlib.md5(img).hexdigest()
     mra = f'''<!-- {title} on JTCHQFLAG, a personal MiSTer core for Konami's Chequered Flag board (MAME chqflag.cpp),
