@@ -1,0 +1,13 @@
+semicom:
+  - get:
+    - jtsemicom_game.v
+    - jtsemicom_main.v
+    - jtsemicom_sound.v
+    - jtsemicom_video.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_m68k.yaml
+      - jtframe_z80.yaml
+jt51:
+jt6295:

@@ -1,0 +1,5 @@
+[global]
+author=["TomSVR-Mister"]
+
+[parse]
+sourcefile=[ "snowbros.cpp" ]
