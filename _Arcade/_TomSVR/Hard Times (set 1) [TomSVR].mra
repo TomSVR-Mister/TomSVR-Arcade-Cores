@@ -1,0 +1,50 @@
+<!-- Hard Times (set 1) on TomSVR_playmark, a personal MiSTer core for the Playmark Hard Times board (MAME playmark.cpp "hrdtimes"),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified;
+     the PIC16C57 sound program is MAME's binary dump, decoded by the core. Requires TomSVR_playmark.rbf. -->
+<misterromdescription>
+    <name>Hard Times (set 1) [TomSVR]</name>
+    <setname>hrdtimes</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1994</year>
+    <manufacturer>Playmark</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_playmark</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="hrdtimes.zip" md5="None">
+        <part>06 00 00 00</part>
+        <interleave output="16">
+            <part name="31.u67" crc="53eb041b" map="10"/>
+            <part name="32.u66" crc="f2c6b382" map="01"/>
+        </interleave>
+        <part repeat="0x200000"> FF</part>
+        <part name="30.io13" crc="fa5e50ae"/>
+        <part repeat="0x80000"> FF</part>
+        <interleave output="32">
+            <part name="36.u86" crc="f2fc1ca3" map="0001"/>
+            <part name="40.u85" crc="368c15f4" map="0010"/>
+            <part name="35.u84" crc="7bde46ec" map="0100"/>
+            <part name="39.u83" crc="a0bae586" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="33.u36" crc="d1239ce5" map="0001"/>
+            <part name="37.u42" crc="aa692005" map="0010"/>
+            <part name="34.u39" crc="e4108c59" map="0100"/>
+            <part name="38.u45" crc="ff7cacf3" map="1000"/>
+        </interleave>
+        <part name="pic16c57.bin" crc="db307198"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,7f">
+        <dip name="Coinage" bits="1,2,3,4" ids="Free Play,8C/3C,5C/3C,3C/2C,2C/3C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,6C/1C,5C/1C,4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Credits to Start" bits="5" ids="2,1"/>
+        <dip name="1 Life If Continue" bits="6" ids="Yes,No"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Lives" bits="8,9" ids="1,5,2,3"/>
+        <dip name="Bonus Life" bits="10,11" ids="None,Only 500k,Every 500k,Every 300k-500k"/>
+        <dip name="Difficulty" bits="12,13" ids="Very Hard,Hard,Easy,Normal"/>
+        <dip name="Allow Continue" bits="14" ids="No,Yes"/>
+        <dip name="Demo Sounds" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

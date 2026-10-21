@@ -1,0 +1,42 @@
+<!-- Super Qix (bootleg of V1.0, 8031 MCU) on TomSVR_sqix, a personal MiSTer core for the Super Qix board (MAME superqix.cpp),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified
+     (the i8751 MCU runs its own dumped program). Requires TomSVR_sqix.rbf. -->
+<misterromdescription>
+    <name>Super Qix (bootleg of V1.0, 8031 MCU) [TomSVR]</name>
+    <setname>sqixb1</setname>
+    <rotation>vertical (cw)</rotation>
+    <mameversion>0264</mameversion>
+    <year>1987</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_sqix</rbf>
+    <joystick>4</joystick>
+    <region>World</region>
+    <rom index="0" zip="sqix.zip" md5="None">
+        <part>06 00 00 00</part>
+        <part name="sq01.97" crc="0888b7de"/>
+        <part repeat="0x8000"> 00</part>
+        <part name="b03__02.h3" crc="9c23cb64"/>
+        <part name="b03__04.s8" crc="f815ef45"/>
+        <part name="b03__04.s8" crc="f815ef45"/>
+        <part name="b03-03" crc="6e8b6a67"/>
+        <part name="b03-06" crc="38154517"/>
+        <part name="b03__05.t8" crc="df326540"/>
+        <part name="sq07.ic108" crc="d11411fb"/>
+    </rom>
+    <rom index="1">
+        <part>01 80</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="f6,ff">
+        <dip name="Cabinet" bits="0" ids="Upright,Cocktail"/>
+        <dip name="Freeze" bits="2" ids="On,Off"/>
+        <dip name="Allow Continue" bits="3" ids="Yes,No"/>
+        <dip name="Coin A" bits="4,5" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="6,7" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Bonus Life" bits="10,11" ids="None,50000 100000,20000 50000,30000 100000"/>
+        <dip name="Lives" bits="12,13" ids="5,4,2,3"/>
+        <dip name="Fill Area" bits="14,15" ids="85%,80%,70%,75%"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>

@@ -1,0 +1,41 @@
+<!-- Lucky Boom (Hard Times hardware) on TomSVR_playmark, a personal MiSTer core for the Playmark Hard Times board (MAME playmark.cpp "luckboomh"),
+     built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own MAME zip, unmodified;
+     the PIC16C57 sound program is MAME's HEX dump, decoded by the core. Requires TomSVR_playmark.rbf. -->
+<misterromdescription>
+    <name>Lucky Boom (Hard Times hardware) [TomSVR]</name>
+    <setname>luckboomh</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1996</year>
+    <manufacturer>Playmark</manufacturer>
+    <players>1</players>
+    <rbf>TomSVR_playmark</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="luckboom.zip" md5="None">
+        <part>0A 00 00 00</part>
+        <interleave output="16">
+            <part name="21.u67" crc="5578dd75" map="10"/>
+            <part name="22.u66" crc="1eb72a39" map="01"/>
+        </interleave>
+        <part repeat="0x2c0000"> FF</part>
+        <part name="20.io13" crc="0d42c0a3"/>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="26.u86" crc="d3ee7d82" map="0001"/>
+            <part name="30.u85" crc="4b8a9558" map="0010"/>
+            <part name="25.u84" crc="e1ab5cf5" map="0100"/>
+            <part name="29.u83" crc="9572d2d4" map="1000"/>
+        </interleave>
+        <part repeat="0x180000"> FF</part>
+        <interleave output="32">
+            <part name="23.u36" crc="71840dd9" map="0001"/>
+            <part name="27.u42" crc="2f86b37f" map="0010"/>
+            <part name="24.u39" crc="c6725797" map="0100"/>
+            <part name="28.u40" crc="40e65ed1" map="1000"/>
+        </interleave>
+        <part repeat="0x180000"> FF</part>
+        <part name="luckyboom_pic16c57.hex" crc="5c4b5c39"/>
+    </rom>
+    <buttons names="Button 1,Button 2,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
