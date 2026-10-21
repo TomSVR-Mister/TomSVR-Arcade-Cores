@@ -1,0 +1,51 @@
+<!-- Chequered Flag (Japan) on TomSVR_chqflag, a personal MiSTer core for Konami's Chequered Flag board (MAME chqflag.cpp),
+     built on JTFRAME and jotego's Konami chip models. The ROM is assembled from your own MAME zip, unmodified.
+     Controls: button 1 accelerates, button 2 brakes, button 3 shifts gear (toggle). Steer with left/right
+     or the left analog stick. Requires TomSVR_chqflag.rbf. -->
+<misterromdescription>
+    <name>Chequered Flag (Japan) [TomSVR]</name>
+    <setname>chqflagj</setname>
+    <rotation>vertical (ccw)</rotation>
+    <mameversion>0264</mameversion>
+    <year>1988</year>
+    <manufacturer>Konami</manufacturer>
+    <players>1</players>
+    <rbf>TomSVR_chqflag</rbf>
+    <joystick>2-way horizontal</joystick>
+    <region>Japan</region>
+    <rom index="0" zip="chqflag.zip" md5="None">
+        <part name="717e10" crc="72fc56f6"/>
+        <part name="717j02.bin" crc="05355daa"/>
+        <part repeat="0x30000">FF</part>
+        <part name="717e01" crc="966b8ba8"/>
+        <part name="717e06.n16" crc="1ec26c7a"/>
+        <part repeat="0x58000">FF</part>
+        <part name="717e03" crc="ebe73c22"/>
+        <part name="717e09" crc="d74e857d"/>
+        <part name="717e07.l20" crc="b9a565a8"/>
+        <part name="717e08.l22" crc="b68a212e"/>
+        <part name="717e11.n20" crc="ebb171ec"/>
+        <part name="717e12.n22" crc="9269335d"/>
+        <part repeat="0x100000">FF</part>
+        <interleave output="32">
+            <part name="717e04" crc="1a50a1cc" map="1200"/>
+            <part name="717e05" crc="46ccb506" map="0012"/>
+        </interleave>
+        <part name="717e07.l20" crc="b9a565a8"/>
+        <part name="717e08.l22" crc="b68a212e"/>
+        <part name="717e11.n20" crc="ebb171ec"/>
+        <part name="717e12.n22" crc="9269335d"/>
+    </rom>
+    <rom index="1">
+        <part>01 00</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,5f,0f">
+        <dip name="Coin A" bits="0,1,2,3" ids="Free Play,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/7C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="4,5,6,7" ids="Invalid,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/7C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="13,14" ids="Very Difficult,Difficult,Normal,Easy"/>
+        <dip name="Demo Sounds" bits="15" ids="On,Off"/>
+        <dip name="Title" bits="17" ids="Checkered Flag,Chequered Flag"/>
+        <dip name="Service Mode" bits="18" ids="On,Off"/>
+    </switches>
+    <buttons names="Accelerate,Brake,Shift,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
