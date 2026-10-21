@@ -193,7 +193,7 @@ def build(setname):
     <rbf>jtsemicom</rbf>
     <joystick>8</joystick>
     <region>World</region>
-    <rom index="0" zip="{zips}" md5="{md5}">
+    <rom index="0" zip="{zips}" md5="None">
 {nl.join(parts)}
     </rom>
     <switches page_id="1" page_name="Switches" base="16" default="{default & 0xff:02x},{default >> 8:02x}">
