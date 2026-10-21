@@ -2,7 +2,7 @@
 # sqix_build.py outdir : JTSQIX images + MRAs for Super Qix (user's sqix.zip) and Perestroika Girls (perestro.zip)
 # Image after the 4-byte header: program 0 (0x20000), chars 0x20000 (0x10000), tiles 0x30000 (0x20000),
 # sprites 0x50000 (0x10000), i8751 program 0x60000 (0x1000, MCU sets only).
-# Header byte 0: bit 0 Perestroika byte shuffle, bit 1 i8751 fitted.
+# Header byte 0: bit 0 Perestroika byte shuffle, bit 1 i8751 fitted, bit 2 8031 bootleg MCU glue (sqixb1).
 import sys, os, zipfile, hashlib
 S = '/tmp/claude-0/-home-claude/183009bc-02e0-578a-b0ba-00b6083aaf64/scratchpad'
 P8, S8 = ('taito_sq-iu3__lh231041__sharp_japan__8709_d.p8', 'b8d0c493'), ('b03__04.s8', 'f815ef45')
@@ -26,6 +26,8 @@ SETS = {
   'sqixr0': dict(SQ, title='Super Qix (World-Japan, V1.0)', hdr=2, prog=[('b03__01.ef3', '0888b7de'), H3], spr=T8, mcu=MCU),
   'sqixu':  dict(SQ, title='Super Qix (US)', man='Kaneko / Taito (Romstar license)', hdr=2,
                  prog=[('b03__06.ef3', '4f59f7af'), ('b03__07.h3', '4c417d4a')], spr=('b03__09.t8', '69d2a84a'), mcu=('b03__08.l2', '7c338c0f')),
+  'sqixb1': dict(SQ, title='Super Qix (bootleg of V1.0, 8031 MCU)', man='bootleg', hdr=6, prog=[('sq01.97', '0888b7de'), H3],
+                 tiles=None, tiles2=[('b03-03', '6e8b6a67'), ('b03-06', '38154517')], spr=T8, mcu=('sq07.ic108', 'd11411fb')),
   'sqixb2': dict(SQ, title='Super Qix (bootleg, No MCU)', man='bootleg', hdr=0, prog=[('cpu.2', '682e28e3'), H3], spr=T8, mcu=None),
   'perestro':  dict(zip='perestro.zip', title='Perestroika Girls', man='Promat', year='1994', hdr=1, prog=[('rom1.bin', '0cbf96c1')],
                     chars=[('rom4.bin', 'c56122a8')], tiles=('rom2.bin', '36f93701'), spr=('rom3a.bin', '7a2a563f'), mcu=None),
@@ -48,7 +50,8 @@ for name, a in SETS.items():
     if len(a['prog']) > 1: pad(0x10000 - len(img)); add(a['prog'][1])
     pad(0x20000 - len(img))
     for f in a['chars']: add(f)
-    add(a['tiles']); add(a['spr'])
+    for f in (a.get('tiles2') or [a['tiles']]): add(f)
+    add(a['spr'])
     assert len(img) == 0x60000, hex(len(img))
     if a['mcu']: add(a['mcu'])
     full = bytes([a['hdr'], 0, 0, 0]) + img

@@ -13,9 +13,9 @@ wire [ 8:0] vdump;
 wire [ 1:0] tbank;
 wire        bpage, hs_start;
 wire        z80_sem, mcu_sem;
-reg         shuf, mcu;
+reg         shuf, mcu, bl;
 
-always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) { mcu, shuf } <= prog_data[1:0];
+always @(posedge clk) if( header && prog_we && prog_addr[1:0]==0 ) { bl, mcu, shuf } <= prog_data[2:0];
 // e000-e0ff (sprites) is mirrored into a second RAM for the sprite engine
 wire        spr_wr = ram_we && ram_addr[12:8]==0;
 
@@ -44,6 +44,7 @@ jtsqix_main u_main(
     .dsw2        ( dipsw[15:8]  ),
     .shuf        ( shuf         ),
     .mcu         ( mcu          ),
+    .bl          ( bl           ),
     .z80_sem     ( z80_sem      ),
     .mcu_sem     ( mcu_sem      ),
     .cen_mcu     ( cen_6        ),

@@ -26,6 +26,7 @@ module jtsqix_main(
     input       [ 7:0] p1, p2, system, dsw1, dsw2,
     input              shuf,
     input              mcu,
+    input              bl,      // 8031 bootleg (sqixb1): ports 0/2 replaced by glue on port 1
     output             z80_sem, mcu_sem,
     input              cen_mcu,
     input       [11:0] prog_addr,
@@ -92,9 +93,24 @@ assign bdir = { ay2_dw | ay2_aw, ay1_dw | ay1_aw };
 assign bc1  = { ay2_rd | ay2_aw, ay1_rd | ay1_aw };
 
 // MCU interface
-wire [ 7:0] mcu_p2, mcu_p3, ay2_iob_out;
-reg  [ 7:0] p2_l;
 reg         z80_run, z80_has_written, mcu_has_written;
+wire [ 7:0] mcu_p2o, mcu_p1o, mcu_p3, ay2_iob_out;
+wire [ 7:0] mcu_p2, sys_mcu = { z80_has_written, system[6:0] };
+reg  [ 7:0] p2_l, bl_p2, bl_from;
+reg         bl_p17;
+// 8031 bootleg: p1[3:1] picks a bit of a latch that stands in for port 2, p1[0] is its value; p1[6:4] select
+// the port 3 input (DSW1, SYSTEM, Z80 data, active low) and the rising edge of p1[7] latches port 3 for the Z80
+assign mcu_p2 = bl ? bl_p2 : mcu_p2o;
+wire [ 7:0] mcu_p3i = !bl ? ay2_iob_out : !mcu_p1o[4] ? dsw1 : !mcu_p1o[5] ? sys_mcu : !mcu_p1o[6] ? ay2_iob_out : 8'hff;
+always @(posedge clk) begin
+    if( rst ) begin
+        bl_p2 <= 8'hff; bl_from <= 8'hff; bl_p17 <= 1;
+    end else begin
+        bl_p17 <= mcu_p1o[7];
+        bl_p2[mcu_p1o[3:1]] <= mcu_p1o[0];
+        if( mcu_p1o[7] && !bl_p17 ) bl_from <= mcu_p3;
+    end
+end
 assign z80_sem = z80_has_written;
 assign mcu_sem = mcu_has_written;
 
@@ -213,7 +229,7 @@ jt49_bus u_ay2(
     .IOA_in ( dsw2      ),
     .IOA_out(           ),
     .IOA_oe (           ),
-    .IOB_in ( mcu ? mcu_p3 : { dsw1[0], dsw1[1], dsw1[2], dsw1[3], dsw1[4], dsw1[5], dsw1[6], dsw1[7] } ),
+    .IOB_in ( mcu ? (bl ? bl_from : mcu_p3) : { dsw1[0], dsw1[1], dsw1[2], dsw1[3], dsw1[4], dsw1[5], dsw1[6], dsw1[7] } ),
     .IOB_out( ay2_iob_out ),
     .IOB_oe (           ),
     .A(), .B(), .C()
@@ -224,13 +240,13 @@ jtframe_8751mcu #(.SYNC_XDATA(0)) u_mcu(
     .cen        ( cen_mcu     ),
     .int0n      ( 1'b1        ),
     .int1n      ( 1'b1        ),
-    .p0_i       ( { z80_has_written, system[6:0] } ),
+    .p0_i       ( sys_mcu     ),
     .p1_i       ( dsw1        ),
-    .p2_i       ( mcu_p2      ),
-    .p3_i       ( ay2_iob_out ),
+    .p2_i       ( mcu_p2o     ),
+    .p3_i       ( mcu_p3i     ),
     .p0_o       (             ),
-    .p1_o       (             ),
-    .p2_o       ( mcu_p2      ),
+    .p1_o       ( mcu_p1o     ),
+    .p2_o       ( mcu_p2o     ),
     .p3_o       ( mcu_p3      ),
     .x_din      ( 8'hff       ),
     .x_dout     (             ),

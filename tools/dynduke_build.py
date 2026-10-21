@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# dynduke_build.py outdir : JTDYNDUKE images + MRAs for Dynamite Duke (user's merged dynduke.zip)
-# Image after the 4-byte header (byte 0 bit 0 = Double Dynamites I/O map): master V30 0 (0x60000, little endian
+# dynduke_build.py outdir : JTDYNDUKE images + MRAs for Dynamite Duke and The Double Dynamites (user's dynduke.zip, dbldynj.zip)
+# Image after the 4-byte header (byte 0 bit 0 = Double Dynamites Japan main CPU map): master V30 0 (0x60000, little endian
 # words), slave V30 0x60000, Z80 0x80000 (8.w8 + its first half again), OKI 0xa0000, characters 0xb0000
 # (32-bit rows: ROM 9 word, ROM 10 word), background 0x100000 (64-bit rows: one word per third, the third
 # repeated), foreground 0x300000 (32-bit rows: first half word, second half word), sprites 0x400000.
@@ -21,7 +21,11 @@ SETS = {
     'dyndukej':  ('Dynamite Duke (Japan, 03SEP89)',  ('dyndukej/3.e8', '98b9d243'),     ('dyndukej/4.e7', '4f575177'),     'Japan'),
     'dyndukeja': ('Dynamite Duke (Japan, 25JUL89)',  ('dyndukeja/3.e8', '2f06ddce'),    ('dyndukeja/4j.e7', '63092078'),   'Japan'),
     'dyndukeu':  ('Dynamite Duke (US, 25JUL89)',     ('dyndukea/3.e8', 'a56f8692'),     ('dyndukeu/dd4.ef7', 'ee4b87b3'),  'USA'),
+    # The Double Dynamites: same board and graphics ROMs; the Japanese set uses its own main CPU map (header bit 0)
+    'dbldynj':   ('The Double Dynamites (Japan, 13NOV89)', ('3x.e8', '633db1fe'),       ('4x.e7', 'dc9ee263'),         'Japan'),
+    'dbldynu':   ('The Double Dynamites (US, 13NOV89)',    ('dbldynu/dd3x.8e', '9b785028'), ('dbldynu/dd4x.7e', '0d0f6350'), 'USA'),
 }
+DBL = {'5.p8': '5x.p8', '6.p7': '6x.p7', '8.w8': '8x.w8', '9.5k': '9x.5k', '10.34k': '10x.34k'}
 out = sys.argv[1]; os.makedirs(f'{out}/mra', exist_ok=True)
 z = zipfile.ZipFile(f'{S}/userzips/dynduke.zip')
 rd = lambda n: z.read(n)
@@ -51,8 +55,13 @@ def ilx(names, lanes, width, outbytes):
 
 for name, (title, e3, o4, region) in SETS.items():
     e3, o4 = e3[0], o4[0]
-    img = bytearray(b'\0\0\0\0')
-    parts = ['<part>00 00 00 00</part>']
+    dbl = name.startswith('dbldyn')
+    zipname = 'dbldynj.zip' if dbl else 'dynduke.zip'
+    z = zipfile.ZipFile(f'{S}/userzips/{zipname}')
+    N = (lambda n: DBL.get(n, n)) if dbl else (lambda n: n)
+    hdr = 1 if name == 'dbldynj' else 0
+    img = bytearray(bytes([hdr, 0, 0, 0]))
+    parts = [f'<part>{hdr:02X} 00 00 00</part>']
     def add(data, xml):
         img.extend(data); parts.extend(xml)
     def pad(to):
@@ -60,11 +69,11 @@ for name, (title, e3, o4, region) in SETS.items():
         if n: img.extend(b'\xff' * n); parts.append(f'<part repeat="0x{n:x}">FF</part>')
     def il16(a, b):
         add(il([rd(a), rd(b)], [0, 1], 1), ilx([a, b], [0, 1], 1, 2))
-    il16('1.cd8', '2.cd7'); il16(e3, o4); il16('5.p8', '6.p7')
-    snd = rd('8.w8')
-    add(snd + snd[:0x8000], [P('8.w8'), P('8.w8', ' length="0x8000"')])
+    il16('1.cd8', '2.cd7'); il16(e3, o4); il16(N('5.p8'), N('6.p7'))
+    snd = rd(N('8.w8'))
+    add(snd + snd[:0x8000], [P(N('8.w8')), P(N('8.w8'), ' length="0x8000"')])
     pad(0xa0000); add(rd('7.x10'), [P('7.x10')])
-    add(il([rd('9.5k'), rd('10.34k')], [0, 1], 2), ilx(['9.5k', '10.34k'], [0, 1], 2, 4))
+    add(il([rd(N('9.5k')), rd(N('10.34k'))], [0, 1], 2), ilx([N('9.5k'), N('10.34k')], [0, 1], 2, 4))
     pad(0x100000)
     for t in (['dd.a2', 'dd.c2', 'dd.de3'], ['dd.b2', 'dd.d2', 'dd.ef3']):
         add(il([rd(t[0]), rd(t[1]), rd(t[2]), rd(t[2])], [0, 1, 2, 3], 2), ilx([t[0], t[1], t[2], t[2]], [0, 1, 2, 3], 2, 8))
@@ -89,7 +98,7 @@ for name, (title, e3, o4, region) in SETS.items():
     <rbf>jtdynduke</rbf>
     <joystick>8</joystick>
     <region>{region}</region>
-    <rom index="0" zip="dynduke.zip" md5="None">
+    <rom index="0" zip="{zipname}" md5="None">
 {nl.join('        ' + p for p in parts)}
     </rom>
     <rom index="1">
