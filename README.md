@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-22 MiSTer arcade cores and 143 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+23 MiSTer arcade cores and 152 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** They are built on jotego's JTFRAME framework, but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
@@ -48,7 +48,7 @@ why); the patch is applied in memory by the MRA.
 | Core | Games | MAME driver |
 |---|---|---|
 | comad | Comad Gals Panic clones (Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
-| dynduke | Dynamite Duke | dynduke.cpp |
+| dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
 | galpin | Gals Pinball, Hot Pinball | galspnbl.cpp |
@@ -61,7 +61,7 @@ why); the patch is applied in memory by the MRA.
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
-| playmark | Big Twin, Excelsior, Hot Mind | playmark.cpp |
+| playmark | Big Twin, Excelsior, Hot Mind, Hard Times, Lucky Boom | playmark.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix, Perestroika Girls | superqix.cpp |
 | wrally | World Rally (Gaelco, 1993) | wrally.cpp |

@@ -1,11 +1,11 @@
 # How the 22 released cores are put together
 
-This covers the 22 released cores and their 143 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 23 released cores and their 152 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
 
-All 22 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
+All 23 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
 `jotego/jtcores/cores/` at commit `bfced64` and built there with jotego's normal build flow. So every core
 depends on jtcores at that commit. Nothing in jotego's tree is changed; the cores only add new folders.
 
@@ -136,13 +136,13 @@ One core can run several board variants because the header tells it which one it
 | jtmissb | byte 0 bit 0: Bubble Pong Pong background layout |
 | jtnmg5 | byte 0: Puzzle Club map, 16 MB tile ROM, sprite tile count, Multi 5 / 7 Ordi input quirks, 55 Hz (Search Eye Plus); byte 1: protection value |
 | jtpara | byte 0: tile and sprite layout flags; byte 1: board mode and bank mask |
-| jtplaymark | byte 0 bit 0: Excelsior; bit 1: Hot Mind (Hard Times board) |
+| jtplaymark | byte 0 bit 0: Excelsior; bit 1: Hard Times board; bits 3-2 with bit 1: 0 Hot Mind, 1 Hard Times, 2 Lucky Boom, 3 Big Twin (No Girls Conversion) |
 | jtsplash | byte 0 bit 0: Splash! 1.0 sprite attribute; bit 1: The Return of Lady Frog |
 | jtys16 | byte 0 bit 0: Magic Bubble YS1302 board |
 | jtys8 | byte 0 bit 0: 2 MB background; bit 1: Cannon Ball vertical |
 | jthotblk | header present, all zero |
-| jtdynduke | byte 0 bit 0: The Double Dynamites I/O map (no MRAs yet) |
-| jtsqix | byte 0 bit 0: Perestroika Girls ROM byte shuffle; bit 1: i8751 MCU fitted |
+| jtdynduke | byte 0 bit 0: The Double Dynamites I/O map |
+| jtsqix | byte 0 bit 0: Perestroika Girls ROM byte shuffle; bit 1: MCU fitted; bit 2: the bootleg's 8031 MCU in place of the i8751 |
 | jtfunybubl, jtgalpin, jthdoll, jtothunder, jtwrally, jtxexex, jtzero | no header (one board layout) |
 
 ### Exceptions to know about
@@ -151,6 +151,6 @@ One core can run several board variants because the header tells it which one it
 
 - **jtsqix** undoes the bootleg's byte shuffle inside the core, so its MRAs are a plain copy of the zip.
 
-- **jtplaymark** loads the PIC16C57 sound program from MAME's hex dump as the PROM section.
+- **jtplaymark** loads the PIC16C57 sound program from MAME's hex dump as the PROM section (Hard Times: MAME's binary dump).
 
 - **How they were made:** Most MRAs are hand-made and were tested on real MiSTer hardware. jthdoll, jtfunybubl and jtplaymark MRAs come from `tools/<core>_build.py`. jotego's `jtframe mra` generator is not used, because its layouts don't match these cores.
