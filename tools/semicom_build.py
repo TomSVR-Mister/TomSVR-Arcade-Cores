@@ -3,13 +3,14 @@
 # The ROM layouts, DIP switches and game info are read from the MAME driver source (0.264); the zips are the
 # user's own MAME zips (merged sets: a clone is looked up in its own zip and in its parent's).
 # Download layout (after the 4-byte header): 000000 68000 (byte-swapped) | 080000 Z80 | 0C0000 OKI | 100000 sprites
-# (up to 2 MB) | 300000 protection data (0x200 bytes, PROM).
-# Header: byte 0 bits 1-0 = 0x200000 read (1 = 000a, 2 = 2a2a), bit 2 = protection data at 102000; byte 1 = bg pen.
+# (up to 2 MB) | 300000 PROM: protection data (0x200 bytes) | 302000 AT89C52 program (8 kB, MCU sets only).
+# Header: byte 0 bits 1-0 = 0x200000 read (1 = 000a, 2 = 2a2a), bit 2 = protection data at 102000, bit 4 = MCU
+# writes at 10e000 (Hyper Pacman); byte 1 = bg pen.
 import sys, os, re, zipfile, hashlib
 
-SETS = ['toppyrap', 'cookbib2b', 'cookbib2c', 'cookbib3', 'pzlbreak', 'pzlbreaka', 'suhosong', 'twinkle', 'twinklea',
+SETS = ['hyperpac', 'cookbib2', 'cookbib2a', 'toppyrap', 'cookbib2b', 'cookbib2c', 'cookbib3', 'pzlbreak', 'pzlbreaka', 'suhosong', 'twinkle', 'twinklea',
         '3in1semi', '3in1semia', 'mcheonru', 'moremore', 'moremorp', 'finalttr', 'hyperpacb']
-SNDA, OKIA, GFXA, PROTA, END = 0x80000, 0xC0000, 0x100000, 0x300000, 0x300200
+SNDA, OKIA, GFXA, PROTA, MCUA, END = 0x80000, 0xC0000, 0x100000, 0x300000, 0x302000, 0x304000
 
 src = open(sys.argv[1]).read()
 zipdir, out = sys.argv[2], sys.argv[3]
@@ -111,12 +112,13 @@ def build(setname):
     g = game_info(setname); r = rom_def(setname)
     files = zipfiles(setname, g['parent'])
     have = all(x['crc'] in files for reg in ('maincpu', 'soundcpu', 'oki', 'gfx1') for x in r[reg]) and \
-           all(x['crc'] in files for x in r.get('user1', []))
+           all(x['crc'] in files for x in r.get('user1', []) + r.get('protection', []))
     rd = lambda x: files[x['crc']][0].read(files[x['crc']][1])
     r200 = {'init_3in1semi': 1, 'init_cookbib3': 2}.get(g['init'], 0)
     pbase = 1 if g['machine'] == 'finalttr' else 0
     bgpen = 0xc0 if g['init'] == 'init_pzlbreak' else 0xf0
-    hdr = bytes([pbase << 2 | r200, bgpen, 0, 0])
+    mbase = 1 if g['init'] == 'init_hyperpac' else 0
+    hdr = bytes([mbase << 4 | pbase << 2 | r200, bgpen, 0, 0])
     img = bytearray(hdr) + bytearray(END)
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     parts = [f'        <part>{" ".join("%02X" % b for b in hdr)}</part>']
@@ -164,6 +166,11 @@ def build(setname):
         if have: img[4+PROTA:4+PROTA+0x200] = rd(pr[0])
     else:
         parts.append(f'        <part repeat="0x200"> 00</part>')
+    mcu = r.get('protection', [])
+    if mcu:
+        parts.append(f'        <part repeat="0x{MCUA-PROTA-0x200:x}"> 00</part>')
+        parts.append(f'        <part {P(mcu[0])}/>')
+        if have: img[4+MCUA:4+MCUA+mcu[0]['len']] = rd(mcu[0])
     dips, _ = dip_lines(ports(g['inp']))
     _, default = dip_lines(ports(g['inp']))
     md5 = hashlib.md5(img).hexdigest() if have else 'None'

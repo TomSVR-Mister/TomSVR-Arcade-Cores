@@ -18,6 +18,10 @@ module jtsemicom_main(
     input       [ 1:0] r200,        // 0x200000 read: 0 = 0, 1 = 000a, 2 = 2a2a
     input              pbase,       // protection data at 102000 instead of 10f000
     input              ocopy,       // the video is copying the sprite RAM: sprite RAM accesses wait
+    input              mbase,       // MCU writes go to 10e000 (Hyper Pacman) instead of 10f000
+    input              mcu_req,     // MCU word write to RAM
+    input       [ 7:0] mcu_off,
+    input       [15:0] mcu_data,
 
     input       [15:0] in1, in2, sys,
 
@@ -60,6 +64,10 @@ reg  [ 8:0] pcnt;               // protection copy: word counter, bit 8 = done
 reg  [ 7:0] pwa;                // write address (PROM data comes one clock after its address)
 reg         pwv, prst;
 wire        copying = pwv;
+reg         mpend;              // MCU write waiting for a clock without a CPU RAM access
+reg  [ 7:0] moff;
+reg  [15:0] mdata;
+wire        mwr = mpend && !copying && !wram_cs;
 wire [ 3:0] pg = A[23:20];
 
 assign dsn       = { uds_n, lds_n };
@@ -67,9 +75,9 @@ assign bus_n     = as_n | (lds_n & uds_n);
 assign wen       = {2{~wr_n}} & ~dsn;
 assign rom_addr  = A[18:1];
 assign prot_addr = pcnt[7:0];
-assign wram_addr = copying ? { pbase ? 4'h2 : 4'hf, 3'd0, pwa } : A[15:1];
-assign wram_din  = copying ? prot_data : cpu_dout;
-assign wram_we   = copying ? 2'b11 : wram_cs ? wen : 2'b00;
+assign wram_addr = copying ? { pbase ? 4'h2 : 4'hf, 3'd0, pwa } : mwr ? { mbase ? 4'he : 4'hf, 3'd0, moff } : A[15:1];
+assign wram_din  = copying ? prot_data : mwr ? mdata : cpu_dout;
+assign wram_we   = copying || mwr ? 2'b11 : wram_cs ? wen : 2'b00;
 assign pal_addr  = A[8:1];
 assign pal_we    = pal_cs  ? wen : 2'b00;
 assign oram_addr = A[12:1];
@@ -78,6 +86,14 @@ assign oram_din  = lds_n ? cpu_dout[15:8] : cpu_dout[7:0];
 assign int_ack   = fc == 3'b111 && !as_n;
 assign vpa_n     = !int_ack;
 assign bus_busy  = (rom_cs && !rom_ok) || (oram_cs && ocopy);
+
+always @(posedge clk) begin
+    if( rst ) mpend <= 0;
+    else begin
+        if( mcu_req ) begin mpend <= 1; moff <= mcu_off; mdata <= mcu_data; end
+        else if( mwr ) mpend <= 0;
+    end
+end
 
 // the protection copy starts when reset ends (the prot BRAM keeps its data, so a reset copies again, like MAME)
 always @(posedge clk) begin

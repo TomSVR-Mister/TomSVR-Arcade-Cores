@@ -3,8 +3,9 @@
  * SemiCom games on the Snow Bros-style board (MAME snowbros.cpp "semiprot"/"semicom" machines) on JTFRAME
  * (Jose Tejada, jotego). Personal build.
  * Header (4 bytes): byte 0 bits 1-0 = 0x200000 read (0 none, 1 = 000a, 2 = 2a2a), bit 2 = protection data at
- *   102000 (Final Tetris); byte 1 = background pen (f0, Puzzle Break c0).
- * PROM: protection data (MAME user1/protdata.bin, big-endian words), 0x200 bytes. */
+ *   102000 (Final Tetris), bit 4 = MCU writes at 10e000 (Hyper Pacman); byte 1 = background pen (f0, Puzzle Break c0).
+ * PROM: 0000 protection data (MAME user1/protdata.bin, big-endian words), 0x200 bytes;
+ *       2000 AT89C52 program, 8 kB (Hyper Pacman, Cookie & Bibi 2; zeros for the other sets). */
 
 module jtsemicom_game(
     `include "jtframe_game_ports.inc"
@@ -14,15 +15,18 @@ wire [15:0] in1, in2, sys, prot_data;
 wire [ 7:0] snd_latch, prot_addr;
 wire [ 8:0] vdump;
 wire        snd_wr, hs_start, ocopy;
-reg  [ 1:0] r200;
-reg         pbase;
+wire [15:0] mcu_data;
+wire [ 7:0] mcu_off;
+wire        mcu_req;
+reg  [ 1:0] r200, mcu_cnt;
+reg         pbase, mbase;
 reg  [ 7:0] bg_pen = 8'hf0;
 
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 
 always @(posedge clk) if( header && prog_we ) begin
-    if( prog_addr[1:0]==0 ) { pbase, r200 } <= prog_data[2:0];
+    if( prog_addr[1:0]==0 ) { mbase, pbase, r200 } <= { prog_data[4], prog_data[2:0] };
     if( prog_addr[1:0]==1 ) bg_pen <= prog_data;
 end
 
@@ -39,7 +43,7 @@ jtframe_prom #(.DW(8),.AW(8),.SIMFILE("prot_hi.bin")) u_prot_hi(
     .data   ( prog_data         ),
     .rd_addr( prot_addr         ),
     .wr_addr( prog_addr[8:1]    ),
-    .we     ( prom_we && !prog_addr[0] ),
+    .we     ( prom_we && !prog_addr[13] && !prog_addr[0] ),
     .q      ( prot_data[15:8]   )
 );
 
@@ -49,8 +53,22 @@ jtframe_prom #(.DW(8),.AW(8),.SIMFILE("prot_lo.bin")) u_prot_lo(
     .data   ( prog_data         ),
     .rd_addr( prot_addr         ),
     .wr_addr( prog_addr[8:1]    ),
-    .we     ( prom_we && prog_addr[0] ),
+    .we     ( prom_we && !prog_addr[13] && prog_addr[0] ),
     .q      ( prot_data[7:0]    )
+);
+
+always @(posedge clk) mcu_cnt <= mcu_cnt + 2'd1;    // 12 MHz
+
+jtsemicom_mcu u_mcu(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cen        ( mcu_cnt==0    ),
+    .wr_offset  ( mcu_off       ),
+    .wr_data    ( mcu_data      ),
+    .wr_req     ( mcu_req       ),
+    .prog_addr  ( prog_addr[12:0] ),
+    .prog_data  ( prog_data     ),
+    .prom_we    ( prom_we && prog_addr[13] )
 );
 
 jtsemicom_main u_main(
@@ -62,6 +80,10 @@ jtsemicom_main u_main(
     .r200        ( r200         ),
     .pbase       ( pbase        ),
     .ocopy       ( ocopy        ),
+    .mbase       ( mbase        ),
+    .mcu_req     ( mcu_req      ),
+    .mcu_off     ( mcu_off      ),
+    .mcu_data    ( mcu_data     ),
     .in1         ( in1          ),
     .in2         ( in2          ),
     .sys         ( sys          ),
