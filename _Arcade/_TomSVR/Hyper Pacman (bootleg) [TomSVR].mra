@@ -1,0 +1,39 @@
+<!-- Hyper Pacman (bootleg) on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "hyperpacb"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Hyper Pacman (bootleg) [TomSVR]</name>
+    <setname>hyperpacb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1995</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="hyperpacb.zip|hyperpac.zip" md5="None">
+        <part>00 F0 00 00</part>
+        <interleave output="16">
+            <part name="hpacui12.bin" crc="23dc00d1" map="10"/>
+            <part name="hpacuh12.bin" crc="633ab2c6" map="01"/>
+        </interleave>
+        <part repeat="0x40000"> 00</part>
+        <part name="hyperpac.u1" crc="03faf88e"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="hyperpac.j15" crc="fb9f468d"/>
+        <part name="hyperpac.a4" crc="bd8673da"/>
+        <part name="hyperpac.a5" crc="5d90cd82"/>
+        <part name="hyperpac.a6" crc="61d86e63"/>
+        <part repeat="0x140000"> FF</part>
+        <part repeat="0x200"> 00</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,00">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Lives" bits="1" ids="5,3"/>
+        <dip name="Coinage" bits="2,3,4" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="5,6" ids="Easy,Hardest,Hard,Normal"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

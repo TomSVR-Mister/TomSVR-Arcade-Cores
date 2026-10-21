@@ -1,0 +1,42 @@
+<!-- Cookie &amp; Bibi 3 on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "cookbib3"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Cookie &amp; Bibi 3 [TomSVR]</name>
+    <setname>cookbib3</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1997</year>
+    <manufacturer>SemiCom</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="cookbib3.zip" md5="None">
+        <part>02 F0 00 00</part>
+        <interleave output="16">
+            <part name="u74.bin" crc="c4ab8435" map="10"/>
+            <part name="u52.bin" crc="65134893" map="01"/>
+        </interleave>
+        <part name="u35.bin" crc="5dfd2a98" offset="0xc000" length="0x4000"/>
+        <part name="u35.bin" crc="5dfd2a98" offset="0x8000" length="0x4000"/>
+        <part name="u35.bin" crc="5dfd2a98" offset="0x4000" length="0x4000"/>
+        <part name="u35.bin" crc="5dfd2a98" offset="0x0" length="0x4000"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="u14.bin" crc="e5bf9288"/>
+        <part repeat="0x20000"> FF</part>
+        <part name="u75.bin" crc="cbe4d9c8"/>
+        <part name="u76.bin" crc="1be17b57"/>
+        <part name="u77.bin" crc="7823600d"/>
+        <part repeat="0x80000"> FF</part>
+        <part name="protdata.bin" crc="c819b9a8"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,80">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Coinage" bits="1,2,3" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="4,5,6" ids="Level 3,Level 2,Level 1,Level 8,Level 7,Level 6,Level 5,Level 4"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

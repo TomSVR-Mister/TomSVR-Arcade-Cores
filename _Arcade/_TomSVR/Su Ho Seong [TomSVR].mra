@@ -1,0 +1,36 @@
+<!-- Su Ho Seong on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "suhosong"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Su Ho Seong [TomSVR]</name>
+    <setname>suhosong</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1997</year>
+    <manufacturer>SemiCom</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="suhosong.zip" md5="None">
+        <part>00 F0 00 00</part>
+        <interleave output="16">
+            <part name="su_ho_sung.ui12" crc="79a4806e" map="10"/>
+            <part name="su_ho_sung.uh12" crc="6bd8bd08" map="01"/>
+        </interleave>
+        <part repeat="0x40000"> 00</part>
+        <part name="su_ho_sung.u1" crc="509ce74e"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="su_ho_sung.uj15" crc="266fcae8"/>
+        <part name="su_ho_sung.ua4" crc="bc83a944"/>
+        <part name="su_ho_sung.ua5" crc="a1907ea4"/>
+        <part name="su_ho_sung.ua6" crc="92fea02c"/>
+        <part repeat="0x80000"> FF</part>
+        <part name="protdata.bin" crc="4478e251"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="80,00">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

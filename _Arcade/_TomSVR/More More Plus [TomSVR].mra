@@ -1,0 +1,38 @@
+<!-- More More Plus on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "moremorp"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>More More Plus [TomSVR]</name>
+    <setname>moremorp</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>SemiCom / Exit</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="moremorp.zip" md5="None">
+        <part>01 F0 00 00</part>
+        <interleave output="16">
+            <part name="mmp_u74.bin" crc="7c6fede5" map="10"/>
+            <part name="mmp_u52.bin" crc="66baf9b2" map="01"/>
+        </interleave>
+        <part name="mmp_u35.bin" crc="4d098cad"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="mmp_u14.bin" crc="211a2566"/>
+        <part name="mmp_u75.bin" crc="af9e824e"/>
+        <part name="mmp_u76.bin" crc="c42af064"/>
+        <part name="mmp_u77.bin" crc="1d7396e1"/>
+        <part name="mmp_u78.bin" crc="5508d80b"/>
+        <part name="protdata.bin" crc="782dd2aa"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,80">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Coinage" bits="1,2,3" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="4,5,6" ids="Level 3,Level 2,Level 1,Level 8,Level 7,Level 6,Level 5,Level 4"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

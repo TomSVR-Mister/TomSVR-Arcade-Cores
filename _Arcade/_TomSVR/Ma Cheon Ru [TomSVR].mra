@@ -1,0 +1,45 @@
+<!-- Ma Cheon Ru on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "mcheonru"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Ma Cheon Ru [TomSVR]</name>
+    <setname>mcheonru</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1999</year>
+    <manufacturer>SemiCom / AceVer</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="mcheonru.zip" md5="None">
+        <part>01 F0 00 00</part>
+        <interleave output="16">
+            <part name="u74" crc="3edb17ce" map="10"/>
+            <part name="u52" crc="63fd8a9b" map="01"/>
+        </interleave>
+        <part name="u35" crc="79e965b4"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="u14" crc="28a62d23"/>
+        <part name="u75" crc="0142c085"/>
+        <part name="u76" crc="27fda507"/>
+        <part name="u77" crc="4dfe0550"/>
+        <part name="u78" crc="f1b74978"/>
+        <part name="protdata.bin" crc="d61f4f07"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,ff">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Coinage" bits="1,2,3" ids="-,-,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="4,5,6" ids="Level 3,Level 2,Level 1,Level 8,Level 7,Level 6,Level 5,Level 4"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Unknown" bits="8" ids="On,Off"/>
+        <dip name="Tile Type" bits="9" ids="Traditional,Picture"/>
+        <dip name="Mini Game Frequency" bits="10" ids="Every Round,Every 3 Rounds"/>
+        <dip name="Unknown" bits="11" ids="On,Off"/>
+        <dip name="Unknown" bits="12" ids="On,Off"/>
+        <dip name="Unknown" bits="13" ids="On,Off"/>
+        <dip name="Unknown" bits="14" ids="On,Off"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

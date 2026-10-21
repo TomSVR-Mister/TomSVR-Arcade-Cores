@@ -1,0 +1,38 @@
+<!-- Puzzle Break (set 1) on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "pzlbreak"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Puzzle Break (set 1) [TomSVR]</name>
+    <setname>pzlbreak</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1997</year>
+    <manufacturer>SemiCom / Tirano</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="pzlbreak.zip" md5="None">
+        <part>00 C0 00 00</part>
+        <interleave output="16">
+            <part name="5.ui12" crc="13c298a0" map="10"/>
+            <part name="4.uh12" crc="b3f04f80" map="01"/>
+        </interleave>
+        <part repeat="0x40000"> 00</part>
+        <part name="0.u1" crc="1ad646b7"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="1.uj15" crc="dbfae77c"/>
+        <part name="2.ua4" crc="d211705a"/>
+        <part name="3.ua5" crc="6cdb73e9"/>
+        <part repeat="0x100000"> FF</part>
+        <part name="protdata.bin" crc="092cb794"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,80">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Coinage" bits="1,2,3" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="4,5,6" ids="Level 3,Level 2,Level 1,Level 8,Level 7,Level 6,Level 5,Level 4"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

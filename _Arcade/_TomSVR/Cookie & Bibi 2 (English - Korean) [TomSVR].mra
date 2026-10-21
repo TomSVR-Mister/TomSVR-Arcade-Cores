@@ -1,0 +1,39 @@
+<!-- Cookie &amp; Bibi 2 (English / Korean) on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "cookbib2c"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Cookie &amp; Bibi 2 (English / Korean) [TomSVR]</name>
+    <setname>cookbib2c</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1996</year>
+    <manufacturer>SemiCom</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="cookbib2c.zip|cookbib2.zip" md5="None">
+        <part>00 F0 00 00</part>
+        <interleave output="16">
+            <part name="unico.ui12" crc="ed49a0e5" map="10"/>
+            <part name="unico.uh12" crc="be021efa" map="01"/>
+        </interleave>
+        <part name="unico.u1" crc="f1100b20"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="unico.uj15" crc="ae5cc9e5"/>
+        <part repeat="0x20000"> FF</part>
+        <part name="unico.ua4" crc="3de7a813"/>
+        <part name="unico.ua5" crc="6d543788"/>
+        <part name="unico.ua6" crc="13cc9bf4"/>
+        <part repeat="0xc0000"> FF</part>
+        <part name="protdata.bin" crc="b956f056"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,00">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Language" bits="1" ids="Korean,English"/>
+        <dip name="Coinage" bits="2,3,4" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="5,6" ids="Easy,Hardest,Hard,Normal"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

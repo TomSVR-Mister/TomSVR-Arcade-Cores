@@ -1,0 +1,43 @@
+<!-- Toppy &amp; Rappy on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "toppyrap"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Toppy &amp; Rappy [TomSVR]</name>
+    <setname>toppyrap</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1996</year>
+    <manufacturer>SemiCom</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="toppyrap.zip" md5="None">
+        <part>00 F0 00 00</part>
+        <interleave output="16">
+            <part name="ui12.bin" crc="caf5a7e1" map="10"/>
+            <part name="uh12.bin" crc="6f5ad699" map="01"/>
+        </interleave>
+        <part name="u1.bin" crc="07f50947"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="uj15.bin" crc="a3bacfd7"/>
+        <part repeat="0x20000"> FF</part>
+        <part name="ua4.bin" crc="a9577bcf"/>
+        <part name="ua5.bin" crc="7179d32d"/>
+        <part name="ua6.bin" crc="4834e5b1"/>
+        <part name="ua7.bin" crc="663dd099"/>
+        <part name="protdata.bin" crc="0704e6c7"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fc,ef">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Coinage" bits="2,3,4" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="5,6" ids="Easy,Hardest,Hard,Normal"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Lives" bits="8,9" ids="2,5,4,3"/>
+        <dip name="Time" bits="10,11" ids="70 Seconds,40 Seconds,50 Seconds,60 Seconds"/>
+        <dip name="God Mode" bits="13" ids="On,Off"/>
+        <dip name="Internal Test" bits="14" ids="On,Off"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

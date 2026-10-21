@@ -1,0 +1,39 @@
+<!-- Twinkle (set 1) on TomSVR_semicom, a personal MiSTer core for the SemiCom games on the Snow Bros-style board
+     (MAME snowbros.cpp "twinkle"), built on JTFRAME by Jose Tejada (jotego). The ROM is assembled from your own
+     MAME zip, unmodified. Requires TomSVR_semicom.rbf. -->
+<misterromdescription>
+    <name>Twinkle (set 1) [TomSVR]</name>
+    <setname>twinkle</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1997</year>
+    <manufacturer>SemiCom / Tirano</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_semicom</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="twinkle.zip" md5="None">
+        <part>00 F0 00 00</part>
+        <interleave output="16">
+            <part name="ui12.bin" crc="5af73684" map="10"/>
+            <part name="uh12.bin" crc="a99626fe" map="01"/>
+        </interleave>
+        <part repeat="0x40000"> 00</part>
+        <part name="u1.bin" crc="e40481da"/>
+        <part repeat="0x30000"> 00</part>
+        <part name="uj15.bin" crc="0a534b37"/>
+        <part name="ua4.bin" crc="6b64bb09"/>
+        <part repeat="0x180000"> FF</part>
+        <part name="protdata.bin" crc="00d3e4b4"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="fe,92">
+        <dip name="Demo Sounds" bits="0" ids="On,Off"/>
+        <dip name="Coinage" bits="1,2,3" ids="5C/1C,4C/1C,3C/1C,2C/1C,1C/3C,2C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="4,5,6" ids="Level 3,Level 2,Level 1,Level 8,Level 7,Level 6,Level 5,Level 4"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Lives" bits="8,9" ids="1,4,3,2"/>
+        <dip name="Pellet Animations" bits="12" ids="Off,On"/>
+        <dip name="Free Play" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
