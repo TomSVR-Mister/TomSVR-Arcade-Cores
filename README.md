@@ -47,6 +47,7 @@ why); the patch is applied in memory by the MRA.
 
 | Core | Games | MAME driver |
 |---|---|---|
+| chqflag | Chequered Flag (Konami, 1988; steering by joystick or analog stick) | chqflag.cpp |
 | comad | Comad Gals Panic clones (Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
@@ -63,15 +64,14 @@ why); the patch is applied in memory by the MRA.
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
 | playmark | Big Twin, Excelsior, Hot Mind, Hard Times, Lucky Boom | playmark.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
-| sqix | Super Qix, Perestroika Girls | superqix.cpp |
+| sqix | Super Qix (including the 8031 MCU bootleg), Perestroika Girls | superqix.cpp |
 | wrally | World Rally (Gaelco, 1993) | wrally.cpp |
 | xexex | Xexex, Orius | xexex.cpp |
 | ys16 | Paparazzi, Shocking, Bomb Kick, Magic Bubble | yunsun16.cpp |
 | ys8 | Cannon Ball, Magix / Rock, Rock Tris | yunsung8.cpp |
 | zero | Zero Zone, Las Vegas Girl | zerozone.cpp |
 
-`afega/` (Afega boards, already covered by kuzecores), `chqflag/` (Chequered Flag, still being fixed) and `pkladies/`
-(unfinished) are in the source but not released.
+`afega/` (Afega boards, already covered by kuzecores) and `pkladies/` (unfinished) are in the source but not released.
 
 Known issue: Miss Puzzle (more explicit) shows some picture corruption. Reports are welcome as GitHub issues
 (game, MRA name and what you see).

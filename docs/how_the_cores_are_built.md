@@ -65,7 +65,7 @@ These began as a copy of one of jotego's game cores, renamed and changed. The or
 
 | Core | Reused from | Notes |
 |---|---|---|
-| **jtdynduke** (5) | **JTTOKI** | Dynamite Duke. The Seibu sound board (Z80 with SEI80BU decryption, YM3812, OKI) comes from JTTOKI. Two NEC V30 CPUs from the MiSTer Irem M72 core (GPL-2, see below). Text, two scroll layers and sprites are new, from MAME's dynduke.cpp. |
+| **jtdynduke** (7) | **JTTOKI** | Dynamite Duke. The Seibu sound board (Z80 with SEI80BU decryption, YM3812, OKI) comes from JTTOKI. Two NEC V30 CPUs from the MiSTer Irem M72 core (GPL-2, see below). Text, two scroll layers and sprites are new, from MAME's dynduke.cpp. |
 | **jtxexex** (4) | **JTSIMSON / JTRIDERS** | Xexex and Orius. The K053246 sprite DMA and register blocks and the K054321 sound latch come from those cores. K056832 tilemaps, K053250 line background, K053251/K054338 mixing with alpha and a new K054539 PCM model are new, from MAME's xexex.cpp. 68000, Z80, jt51, jt5911 EEPROM saved as NVRAM. |
 | **jtgalpin** (2) | **JTGAIDEN** | Gals Pinball / Hot Pinball. The Tecmo sprite engine (`jtgalpin_obj*.v`) and the sound board module are adapted from JTGAIDEN. The bitmap, tilemap, memory map and colour mixer are new, from MAME's galspnbl.cpp. 68000 + Z80 + YM3812 + OKI. |
 
@@ -83,11 +83,12 @@ Each of these is a new driver written from the MAME source named, using only JTF
 | **jtmadd** | 2 | Promat VISYS (oneshot.cpp) | 68000, Z80 | YM3812 | m68k, z80, jtopl2 |
 | **jtnmg5** | 12 | Yun Sung YS-1300 (nmg5.cpp) | 68000, Z80 | YM3812, OKI | m68k, z80, jtopl2, jt6295 |
 | **jtpara** | 13 | Yun Sung Paradise (paradise.cpp) | Z80 | 2 x OKI | z80, jt6295, jtframe_edge |
-| **jtplaymark** | 5 | Playmark (playmark.cpp) | 68000, PIC16C57 | OKI | m68k, jt6295, jteeprom (Hot Mind). The PIC16C57 is new code (`jtplaymark_pic.v`, from the Microchip data sheet and MAME). |
+| **jtplaymark** | 9 | Playmark (playmark.cpp) | 68000, PIC16C57 | OKI | m68k, jt6295, jteeprom (Hot Mind). The PIC16C57 is new code (`jtplaymark_pic.v`, from the Microchip data sheet and MAME). |
 | **jtothunder** | 6 | Taito Operation Thunderbolt (othunder.cpp) | 68000, Z80 | YM2610 | m68k, z80, jt10, jteeprom (93C46 NVRAM). Light gun game; the MRA sets the JTFRAME light gun flag so a crosshair is drawn for mouse, stick or Sinden aiming. |
 | **jtsplash** | 11 | Gaelco Splash! (splash.cpp) | 68000, Z80 | YM3812, MSM5205; YM2203 for Lady Frog | m68k, z80, jtopl2, jt5205, jt03, jtframe obj draw |
-| **jtsqix** | 7 | Super Qix, Perestroika Girls (superqix.cpp) | Z80, i8751 MCU | 2 x AY-3-8910 | z80, jt49, jt8051 running the dumped MCU program. The bootleg's ROM byte shuffle is undone in the core. |
+| **jtsqix** | 8 | Super Qix, Perestroika Girls (superqix.cpp) | Z80, i8751 MCU | 2 x AY-3-8910 | z80, jt49, jt8051 running the dumped MCU program. The bootleg's ROM byte shuffle is undone in the core. |
 | **jtwrally** | 9 | Gaelco World Rally (wrally.cpp) | 68000, DS5002FP | OKI | m68k, jt8051 (DS5002FP running the dumped program), jt6295. VRAM writes are decrypted on the fly. |
+| **jtchqflag** | 2 | Konami Chequered Flag (chqflag.cpp) | 052001 (jtkcpu), Z80 | YM2151, 2 x 007232 | jtkcpu, z80, jt51, jt007232, K051960 sprites and K051733 from jotego's cores. Two K051316 zoom/rotate layers start from jt051316 (JTAJAX); the 8 bpp road layer fetches two pixels at a time from two SDRAM banks. Known issue: thin streaks at the right end of the road on some rotated views. |
 | **jtys16** | 10 | Yun Sung 16-bit (yunsun16.cpp) | 68000 (+ Z80 on Magic Bubble) | OKI, YM3812 | m68k, z80, jt6295, jtopl2, jtframe obj draw |
 | **jtys8** | 5 | Yun Sung 8-bit (yunsung8.cpp) | Z80, Z80 | YM3812, MSM5205 | z80, jtopl2, jt5205 |
 | **jtzero** | 2 | Comad 1993 (zerozone.cpp) | 68000, Z80 | OKI | m68k, z80, jt6295 |
