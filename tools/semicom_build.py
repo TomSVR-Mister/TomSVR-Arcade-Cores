@@ -118,7 +118,7 @@ def build(setname):
     pbase = 1 if g['machine'] == 'finalttr' else 0
     bgpen = 0xc0 if g['init'] == 'init_pzlbreak' else 0xf0
     mbase = 1 if g['init'] == 'init_hyperpac' else 0
-    hdr = bytes([mbase << 4 | pbase << 2 | r200, bgpen, 0, 0])
+    hdr = bytes([mbase << 4 | pbase << 3 | pbase << 2 | r200, bgpen, 0, 0])
     img = bytearray(hdr) + bytearray(END)
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     parts = [f'        <part>{" ".join("%02X" % b for b in hdr)}</part>']

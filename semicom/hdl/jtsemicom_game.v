@@ -3,7 +3,7 @@
  * SemiCom games on the Snow Bros-style board (MAME snowbros.cpp "semiprot"/"semicom" machines) on JTFRAME
  * (Jose Tejada, jotego). Personal build.
  * Header (4 bytes): byte 0 bits 1-0 = 0x200000 read (0 none, 1 = 000a, 2 = 2a2a), bit 2 = protection data at
- *   102000 (Final Tetris), bit 4 = MCU writes at 10e000 (Hyper Pacman); byte 1 = background pen (f0, Puzzle Break c0).
+ *   102000 (Final Tetris), bit 3 = active-low inputs (Final Tetris), bit 4 = MCU writes at 10e000 (Hyper Pacman); byte 1 = background pen (f0, Puzzle Break c0).
  * PROM: 0000 protection data (MAME user1/protdata.bin, big-endian words), 0x200 bytes;
  *       2000 AT89C52 program, 8 kB (Hyper Pacman, Cookie & Bibi 2; zeros for the other sets). */
 
@@ -19,22 +19,25 @@ wire [15:0] mcu_data;
 wire [ 7:0] mcu_off;
 wire        mcu_req;
 reg  [ 1:0] r200, mcu_cnt;
-reg         pbase, mbase;
+reg         pbase, mbase, alow;
 reg  [ 7:0] bg_pen = 8'hf0;
 
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 
 always @(posedge clk) if( header && prog_we ) begin
-    if( prog_addr[1:0]==0 ) { mbase, pbase, r200 } <= { prog_data[4], prog_data[2:0] };
+    if( prog_addr[1:0]==0 ) { mbase, alow, pbase, r200 } <= prog_data[4:0];
     if( prog_addr[1:0]==1 ) bg_pen <= prog_data;
 end
 
-// DSW in the low byte. High byte, active high: up, down, left, right, B1, B2, B3
-assign in1 = { 1'b0, ~joystick1[6:4], ~joystick1[0], ~joystick1[1], ~joystick1[2], ~joystick1[3], dipsw[ 7:0] };
-assign in2 = { 1'b0, ~joystick2[6:4], ~joystick2[0], ~joystick2[1], ~joystick2[2], ~joystick2[3], dipsw[15:8] };
-// SYSTEM high byte: start 1, start 2, coin 1, coin 2 (active high), bits 15-12 unused (high)
-assign sys = { 4'hf, ~coin[1], ~coin[0], ~cab_1p[1], ~cab_1p[0], 8'h00 };
+// DSW in the low byte. High byte, active high (Final Tetris: active low): up, down, left, right, B1, B2, B3
+wire [6:0] j1 = { joystick1[6:4], joystick1[0], joystick1[1], joystick1[2], joystick1[3] },
+           j2 = { joystick2[6:4], joystick2[0], joystick2[1], joystick2[2], joystick2[3] };
+wire [3:0] cs = { coin[1], coin[0], cab_1p[1], cab_1p[0] };
+assign in1 = { 1'b0, alow ? j1 : ~j1, dipsw[ 7:0] };
+assign in2 = { 1'b0, alow ? j2 : ~j2, dipsw[15:8] };
+// SYSTEM high byte: start 1, start 2, coin 1, coin 2, bits 15-12 unused (high)
+assign sys = { 4'hf, alow ? cs : ~cs, 8'h00 };
 
 // protection data: even bytes = high byte of each word
 jtframe_prom #(.DW(8),.AW(8),.SIMFILE("prot_hi.bin")) u_prot_hi(
