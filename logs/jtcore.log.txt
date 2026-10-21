@@ -1,0 +1,2 @@
+Info (293000): Quartus Prime Full Compilation was successful. 0 errors, 204 warnings
+Warning (10850): Verilog HDL warning at jtframe_dual_ram.v(328): number of words (1024) in memory file does not match the number of elements in the address range [0:4095] File: /jtcores/modules/jtframe/hdl/ram/jtframe_dual_ram.v Line: 328
