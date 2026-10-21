@@ -33,7 +33,7 @@ assign in2 = { 1'b0, ~joystick2[6:4], ~joystick2[0], ~joystick2[1], ~joystick2[2
 assign sys = { 4'hf, ~coin[1], ~coin[0], ~cab_1p[1], ~cab_1p[0], 8'h00 };
 
 // protection data: even bytes = high byte of each word
-jtframe_prom #(.DW(8),.AW(8)) u_prot_hi(
+jtframe_prom #(.DW(8),.AW(8),.SIMFILE("prot_hi.bin")) u_prot_hi(
     .clk    ( clk               ),
     .cen    ( 1'b1              ),
     .data   ( prog_data         ),
@@ -43,7 +43,7 @@ jtframe_prom #(.DW(8),.AW(8)) u_prot_hi(
     .q      ( prot_data[15:8]   )
 );
 
-jtframe_prom #(.DW(8),.AW(8)) u_prot_lo(
+jtframe_prom #(.DW(8),.AW(8),.SIMFILE("prot_lo.bin")) u_prot_lo(
     .clk    ( clk               ),
     .cen    ( 1'b1              ),
     .data   ( prog_data         ),
