@@ -1,0 +1,76 @@
+<!-- Snow Board Championship (version 2.1) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "snowboar"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Snow Board Championship (version 2.1) [TomSVR]</name>
+    <setname>snowboar</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1997</year>
+    <manufacturer>Gaelco / OMK</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="snowboar.zip" md5="None">
+        <part>03 20 04 0E 30 20 00 00</part>
+        <interleave output="16">
+            <part name="sb.53" crc="4742749e" map="10"/>
+            <part name="sb.55" crc="6ddc431f" map="01"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a0" crc="aa476e44" map="0010"/>
+            <part name="sb.b0" crc="96c714cd" map="0001"/>
+            <part name="sb.c0" crc="c9d57a71" map="1000"/>
+            <part name="sb.d0" crc="7434c1ae" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a1" crc="6bc99195" map="0010"/>
+            <part name="sb.b1" crc="39a4c30c" map="0001"/>
+            <part name="sb.c1" crc="1d14a3d4" map="1000"/>
+            <part name="sb.d1" crc="f00cc6c8" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a2" crc="fae2ebba" map="0010"/>
+            <part name="sb.b2" crc="b58fcdd6" map="0001"/>
+            <part name="sb.c2" crc="55026352" map="1000"/>
+            <part name="sb.d2" crc="019f9aec" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a3" crc="17ed9cf8" map="0010"/>
+            <part name="sb.b3" crc="96afdebf" map="0001"/>
+            <part name="sb.c3" crc="d9b62dee" map="1000"/>
+            <part name="sb.d3" crc="d05bd286" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a4" crc="2ba3a5c8" map="0010"/>
+            <part name="sb.b4" crc="e62cf8df" map="0001"/>
+            <part name="sb.a4" crc="2ba3a5c8" map="1000"/>
+            <part name="sb.b4" crc="e62cf8df" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a5" crc="ae011eb3" map="0010"/>
+            <part name="sb.b5" crc="caa90856" map="0001"/>
+            <part name="sb.a5" crc="ae011eb3" map="1000"/>
+            <part name="sb.b5" crc="caa90856" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a0" crc="aa476e44" map="0010"/>
+            <part name="sb.a0" crc="aa476e44" map="0001"/>
+            <part name="sb.a0" crc="aa476e44" map="1000"/>
+            <part name="sb.a0" crc="aa476e44" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb.a1" crc="6bc99195" map="0010"/>
+            <part name="sb.a1" crc="6bc99195" map="0001"/>
+            <part name="sb.a1" crc="6bc99195" map="1000"/>
+            <part name="sb.a1" crc="6bc99195" map="0100"/>
+        </interleave>
+        <part name="sb.e0" crc="e6195323"/>
+        <part name="sb.e1" crc="9f38910b"/>
+        <part name="sb.e2" crc="f5948c6c"/>
+        <part name="sb.e3" crc="4baa678f"/>
+        <part repeat="0x200000"> 00</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

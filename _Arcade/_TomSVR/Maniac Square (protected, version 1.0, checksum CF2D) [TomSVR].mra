@@ -1,0 +1,61 @@
+<!-- Maniac Square (protected, version 1.0, checksum CF2D) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "maniacsqb"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Maniac Square (protected, version 1.0, checksum CF2D) [TomSVR]</name>
+    <setname>maniacsqb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>Gaelco</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="maniacsqb.zip|maniacsq.zip" md5="None">
+        <part>00 02 04 01 00 00 00 00</part>
+        <interleave output="16">
+            <part name="ms_u_45.u45" crc="98f4fdc0" map="10"/>
+            <part name="ms_u_44.u44" crc="1785dd41" map="01"/>
+        </interleave>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="ms1" crc="d8551b2f" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" length="0x20000" map="0001"/>
+            <part name="ms3" crc="af4ea5e7" map="1000"/>
+            <part name="ms4" crc="578c3588" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ms1" crc="d8551b2f" offset="0x20000" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" offset="0x20000" length="0x20000" map="0001"/>
+            <part name="ms1" crc="d8551b2f" offset="0x20000" length="0x20000" map="1000"/>
+            <part name="ms2" crc="b269c427" offset="0x20000" length="0x20000" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ms1" crc="d8551b2f" offset="0x40000" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" offset="0x40000" length="0x20000" map="0001"/>
+            <part name="ms1" crc="d8551b2f" offset="0x40000" length="0x20000" map="1000"/>
+            <part name="ms2" crc="b269c427" offset="0x40000" length="0x20000" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ms1" crc="d8551b2f" offset="0x60000" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" offset="0x60000" length="0x20000" map="0001"/>
+            <part name="ms1" crc="d8551b2f" offset="0x60000" length="0x20000" map="1000"/>
+            <part name="ms2" crc="b269c427" offset="0x60000" length="0x20000" map="0100"/>
+        </interleave>
+        <part repeat="0x1200000"> 00</part>
+        <part name="maniacsq_ds5002fp_sram.bin" crc="afe9703d"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Coin A" bits="0,1,2,3" ids="Disabled or Free Play (if Coin B too),-,-,-,-,3C/2C,2C/3C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="4,5,6,7" ids="Disabled or Free Play (if Coin A too),-,-,-,-,3C/2C,2C/3C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Unknown" bits="10" ids="On,Off"/>
+        <dip name="Unknown" bits="11" ids="On,Off"/>
+        <dip name="Unknown" bits="12" ids="On,Off"/>
+        <dip name="Demo Sounds" bits="13" ids="Off,On"/>
+        <dip name="1P Continue" bits="14" ids="Off,On"/>
+        <dip name="Service Mode" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Rotate,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

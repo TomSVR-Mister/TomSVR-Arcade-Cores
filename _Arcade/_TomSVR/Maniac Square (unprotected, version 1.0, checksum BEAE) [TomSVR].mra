@@ -22,14 +22,26 @@
         <interleave output="32">
             <part name="ms1" crc="d8551b2f" length="0x20000" map="0010"/>
             <part name="ms2" crc="b269c427" length="0x20000" map="0001"/>
-            <part name="ms3" crc="af4ea5e7" length="0x20000" map="1000"/>
-            <part name="ms4" crc="578c3588" length="0x20000" map="0100"/>
+            <part name="ms3" crc="af4ea5e7" map="1000"/>
+            <part name="ms4" crc="578c3588" map="0100"/>
         </interleave>
         <interleave output="32">
-            <part name="ms1" crc="d8551b2f" offset="0x20000" length="0x60000" map="0010"/>
-            <part name="ms2" crc="b269c427" offset="0x20000" length="0x60000" map="0001"/>
-            <part name="ms1" crc="d8551b2f" offset="0x20000" length="0x60000" map="1000"/>
-            <part name="ms2" crc="b269c427" offset="0x20000" length="0x60000" map="0100"/>
+            <part name="ms1" crc="d8551b2f" offset="0x20000" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" offset="0x20000" length="0x20000" map="0001"/>
+            <part name="ms1" crc="d8551b2f" offset="0x20000" length="0x20000" map="1000"/>
+            <part name="ms2" crc="b269c427" offset="0x20000" length="0x20000" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ms1" crc="d8551b2f" offset="0x40000" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" offset="0x40000" length="0x20000" map="0001"/>
+            <part name="ms1" crc="d8551b2f" offset="0x40000" length="0x20000" map="1000"/>
+            <part name="ms2" crc="b269c427" offset="0x40000" length="0x20000" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ms1" crc="d8551b2f" offset="0x60000" length="0x20000" map="0010"/>
+            <part name="ms2" crc="b269c427" offset="0x60000" length="0x20000" map="0001"/>
+            <part name="ms1" crc="d8551b2f" offset="0x60000" length="0x20000" map="1000"/>
+            <part name="ms2" crc="b269c427" offset="0x60000" length="0x20000" map="0100"/>
         </interleave>
     </rom>
     <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
