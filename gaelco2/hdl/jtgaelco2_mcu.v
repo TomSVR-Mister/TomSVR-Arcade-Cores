@@ -66,7 +66,7 @@ always @(posedge clk) begin
     if( rst ) init_cnt <= 0;
     else if( init_on ) init_cnt <= init_cnt + 8'd1;
 end
-jtframe_dual_ram #(.AW(7)) u_scratch(
+jtframe_dual_ram #(.AW(7),.SIMFILE("scratch.bin")) u_scratch(
     .clk0   ( clk96     ),
     .data0  ( prog_data ),
     .addr0  ( prog_addr[6:0] ),
@@ -80,6 +80,12 @@ jtframe_dual_ram #(.AW(7)) u_scratch(
 );
 reg [7:0] scr_first;   // byte 0 (read before the counter starts)
 always @(posedge clk96) if( prom_we && prog_addr[15] && prog_addr[6:0]==0 ) scr_first <= prog_data;
+`ifdef SIMULATION
+initial begin : sim_scr0    // sim without download: byte 0 from the same file as the RAM
+    integer fd, c; scr_first = 0; fd = $fopen("scratch.bin","rb");
+    if( fd!=0 ) begin c = $fgetc(fd); scr_first = c[7:0]; $fclose(fd); end
+end
+`endif
 
 jtframe_dual_ram #(.AW(15),.SIMFILE("mcu.bin")) u_sram(
     .clk0   ( clk96     ),
