@@ -237,7 +237,7 @@ assign snd_left  = snd_l;
 assign snd_right = snd_r;
 
 `ifdef SIMULATION
-integer nv=0, np=0, nf=0, nfe=0, cyc=0, pfirst=-1, plast=-1, pn=0; reg lvbl_l=0, mok_l=0, pw_l=0;
+integer nmw=0, nmr=0, nv=0, np=0, nf=0, nfe=0, cyc=0, pfirst=-1, plast=-1, pn=0; reg lvbl_l=0, mok_l=0, pw_l=0;
 // palette write timing relative to the vblank IRQ (clk48 cycles; one frame = 812k)
 always @(posedge clkg) begin
     pw_l <= pal_cs & cpu_we;
@@ -259,11 +259,12 @@ end
 always @(posedge clkg) begin
     lvbl_l <= LVBL;
     if( vram_cs & cpu_we ) nv <= nv+1;
+    if( mcu_sw ) nmw <= nmw+1;
     if( pal_cs  & cpu_we ) np <= np+1;
     if( lvbl_l & ~LVBL ) begin
         nf <= nf+1;
-        if( nf<40 || nf%50==0 ) $display("G2 frame %0d pc~%h vram_wr=%0d pal_wr=%0d vregs=%h %h %h", nf,
-            {main_addr,1'b0}, nv, np, vreg0, vreg1, vreg2);
+        if( nf<40 || nf%50==0 ) $display("G2 frame %0d pc~%h vram_wr=%0d pal_wr=%0d vregs=%h %h %h mcu_shwr=%0d", nf,
+            {main_addr,1'b0}, nv, np, vreg0, vreg1, vreg2, nmw);
     end
 end
 `endif

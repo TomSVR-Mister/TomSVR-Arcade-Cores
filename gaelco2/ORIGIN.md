@@ -40,7 +40,7 @@ needs. The protected sets will use our own DS5002FP on jt8051 (from our JTWRALLY
 | 1 | jlrh sound: `volume_table.mem` missing from the repository | 2026-10-22, reading the code | fixed (computed from MAME) |
 | 2 | jlrh tilemap: line buffers not mappable to block RAM | 2026-10-22, first Quartus build (77k logic cells, did not fit) | fixed |
 | 3 | jlrh sprites read live sprite RAM; MAME draws from a copy buffered at vblank | 2026-10-22, reading the code | open: with the live read the sim matches MAME on every frame checked so far (to 470, sprites included); a vblank buffer was tried and reverted, recheck in gameplay |
-| 4 | JTFRAME_SDRAM_LARGE (as in jlrh's config) made the sim fetch the 68000 program from twice the address | 2026-10-22, sim (line-F trap at boot) | avoided: 8 MB banks |
+| 4 | With JTFRAME_SDRAM_LARGE the sim fetched the 68000 program from twice the address | 2026-10-22, sim (line-F trap at boot) | ours, sim only: tools/gen_sim.sh wrote the SDRAM files linearly, but the 64 MB controller puts address bit 22 in the column; fixed (LARGE=1), LARGE back on |
 | 5 | Ours: SDC file lost its closing brace when trimmed | 2026-10-22, first build | fixed |
 | 6 | Fades looked one step off vs MAME | 2026-10-22, sim vs MAME | not a bug: my comparison was one frame misaligned; sim frames 180-470 are pixel-identical to MAME frame for frame |
 | 7 | Ours: MRA button list had "-" for unused buttons; MiSTer shifted the default mapping (coin and start on face buttons) | 2026-10-22, Tom's hardware test | fixed in the MRAs |
