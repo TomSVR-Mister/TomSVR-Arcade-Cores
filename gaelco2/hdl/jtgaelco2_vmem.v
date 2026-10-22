@@ -4,14 +4,11 @@
     The video side needs four independent read ports into VRAM (the two tilemap fetchers read
     32-bit even/odd word pairs, the line/row scroll reader, and the sprite engine at 96 MHz), so
     VRAM is kept in four copies, all written by the CPU. Read ports match the one-clock latency
-    the jlrh GAE1 video modules expect.
-    The sprite engine reads its own copy, refreshed from a fifth VRAM copy at the start of each vblank, like
-    MAME's buffered sprite RAM (vblank_copy_rising): sprites are drawn from the previous frame's list. */
+    the jlrh GAE1 video modules expect. */
 
 module jtgaelco2_vmem(
     input              clk,
     input              clk96,
-    input              vb_start,     // one-clock pulse at vblank start (clk)
     // CPU
     input      [15:1]  cpu_addr,
     input      [ 1:0]  cpu_dsn,     // active high {upper, lower}
@@ -72,34 +69,14 @@ jtframe_dual_ram16 #(.AW(14)) u_t1o(
     .clk1( clk ), .data1( 16'd0 ),    .addr1( tp1_idx ),        .we1( 2'b0 ),  .q1( t1o )
 );
 
-// sprite RAM buffer: a live copy (u_sl) is copied word by word into the sprite engine's RAM at vblank
-reg  [15:0] cp_a = 0;   // bit 15 = copy running
-reg  [14:0] cp_wa;
-reg         cp_we;
-wire [15:0] cp_q;
-wire [ 1:0] cpwe_e = (cp_we & ~cp_wa[0]) ? 2'b11 : 2'b00;
-wire [ 1:0] cpwe_o = (cp_we &  cp_wa[0]) ? 2'b11 : 2'b00;
-
-always @(posedge clk) begin
-    cp_we <= cp_a[15];
-    cp_wa <= cp_a[14:0];
-    if( vb_start ) cp_a <= 16'h8000;
-    else if( cp_a[15] ) cp_a <= cp_a==16'hffff ? 16'h0 : cp_a + 16'd1;
-end
-
-jtframe_dual_ram16 #(.AW(15)) u_sl(
-    .clk0( clk ), .data0( cpu_dout ), .addr0( cpu_addr  ), .we0( vwe  ), .q0( ),
-    .clk1( clk ), .data1( 16'd0 ),    .addr1( cp_a[14:0]), .we1( 2'b0 ), .q1( cp_q )
-);
-
 // sprite engine (96 MHz side)
 jtframe_dual_ram16 #(.AW(14)) u_se(
-    .clk0( clk   ), .data0( cp_q  ), .addr0( cp_wa[14:1] ), .we0( cpwe_e ), .q0( ),
-    .clk1( clk96 ), .data1( 16'd0 ), .addr1( spr_a[14:1] ), .we1( 2'b0 ),   .q1( se )
+    .clk0( clk   ), .data0( cpu_dout ), .addr0( cpu_addr[15:2] ), .we0( vwe_e ), .q0( ),
+    .clk1( clk96 ), .data1( 16'd0 ),    .addr1( spr_a[14:1] ),     .we1( 2'b0 ),  .q1( se )
 );
 jtframe_dual_ram16 #(.AW(14)) u_so(
-    .clk0( clk   ), .data0( cp_q  ), .addr0( cp_wa[14:1] ), .we0( cpwe_o ), .q0( ),
-    .clk1( clk96 ), .data1( 16'd0 ), .addr1( spr_a[14:1] ), .we1( 2'b0 ),   .q1( so )
+    .clk0( clk   ), .data0( cpu_dout ), .addr0( cpu_addr[15:2] ), .we0( vwe_o ), .q0( ),
+    .clk1( clk96 ), .data1( 16'd0 ),    .addr1( spr_a[14:1] ),     .we1( 2'b0 ),  .q1( so )
 );
 
 // palette
