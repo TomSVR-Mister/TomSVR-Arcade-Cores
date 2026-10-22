@@ -35,8 +35,14 @@ reg   [1:0] mcu_cnt = 0;
 
 // pixel clock 48/8 = 6 MHz (384-pixel lines); wide screen 48/7 = 6.86 MHz (440-pixel lines, same 15.6 kHz)
 always @(posedge clkg) pxdiv <= (wide && pxdiv==6) ? 3'd0 : pxdiv + 3'd1;
-assign pxl_cen  = pxdiv==0;
-assign pxl2_cen = pxdiv==0 || pxdiv==4;
+wire   ce48     = pxdiv==0;                         // pixel enable of our 48 MHz video logic
+wire   ce48x2   = pxdiv==0 || pxdiv==4;
+// JTFRAME runs on clk (96 MHz): give it one-clock pulses. A 48 MHz enable is high for two 96 MHz clocks,
+// which made the light-gun overlay count every pixel twice (two crosshairs, neither on the aim point).
+reg    ce_l = 0, ce2_l = 0;
+always @(posedge clk) begin ce_l <= ce48; ce2_l <= ce48x2; end
+assign pxl_cen  = ce48   & ~ce_l;
+assign pxl2_cen = ce48x2 & ~ce2_l;
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
 
@@ -256,7 +262,7 @@ aligator_video_top u_video(
     .clk        ( clkg      ),
     .clk96      ( clk96     ),
     .rst        ( rst       ),
-    .ce_pix     ( pxl_cen   ),
+    .ce_pix     ( ce48      ),
     .vreg0      ( vreg0     ),
     .vreg1      ( vreg1     ),
     .vreg2      ( vreg2     ),
