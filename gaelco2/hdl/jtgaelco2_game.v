@@ -33,7 +33,11 @@ reg   [7:0] hilim, lolim, p4lim, bank_map;
 reg         mcu_en, snow, wide, bpp5, fast, bang, tg;
 reg   [1:0] mcu_cnt = 0;
 // Touch and Go: OSD "Screen" (status bits 14-13): 0 = screen 1, 1 = screen 2 (2 = side by side: not yet)
+`ifdef SIM_SCR2
+wire        scr = 1'b1;     // sim: show screen 2
+`else
 wire        scr = status[14:13]==2'd1;
+`endif
 
 // pixel clock 48/8 = 6 MHz (384-pixel lines); wide screen 48/7 = 6.86 MHz (440-pixel lines, same 15.6 kHz);
 // Touch and Go 48/5 = 9.6 MHz (616-pixel lines, 15.6 kHz)
