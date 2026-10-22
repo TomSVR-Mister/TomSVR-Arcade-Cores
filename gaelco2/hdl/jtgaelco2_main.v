@@ -10,7 +10,10 @@
     218004-218009  video registers (index 2-4)
     300000/300002  IN0 / IN1 (DSW in the high byte), 320000 COIN
     500000         coin lockout + counters (ignored)
-    FE0000-FE7FFF  work RAM, FE8000-FEFFFF shared RAM (the DS5002FP window on protected sets) */
+    FE0000-FE7FFF  work RAM, FE8000-FEFFFF shared RAM (the DS5002FP window on protected sets)
+    Snow Board board (snow=1, MAME snowboar_map): 15 MHz CPU, 212000-213FFF extra RAM, P1 300000, P2 300010,
+    COIN 300020 (bit 6 = EEPROM data out), LS259 latch on writes to 300000-30000F (D0, A3-A1 = bit:
+    0-1 coin counters, 4 EEPROM DI, 5 CLK, 6 CS), protection 310000-31FFFF (MAME snowboar_protection_r/w). */
 
 module jtgaelco2_main(
     input              clk,
@@ -41,7 +44,13 @@ module jtgaelco2_main(
     input      [ 1:0]  start,
     input              service,
     input              dip_test,
-    input              dip_pause
+    input              dip_pause,
+    // Snow Board board
+    input              snow,
+    output reg         xram_cs,
+    input      [15:0]  xram_dout,
+    output reg         eep_di, eep_clk, eep_cs,
+    input              eep_do
 );
 
 wire [23:1] A;
@@ -50,7 +59,9 @@ wire [ 2:0] FC;
 wire        RnW, UDSn, LDSn, ASn, DTACKn, cpu_cen, cpu_cenb, BUSn, VPAn;
 wire        IPL6n, ok_dly, int_clr;
 reg  [15:0] cpu_din, vregs[2:4];
-reg         vregs_cs, in0_cs, in1_cs, coin_cs;
+reg         prot_l;
+reg         vregs_cs, in0_cs, in1_cs, coin_cs, latch_cs, prot_cs, p2_cs;
+reg  [31:0] latch;
 
 assign main_addr = A[19:1];
 assign cpu_addr  = A[15:1];
@@ -67,9 +78,12 @@ always @* begin
     vram_cs  = !BUSn && addr[23:16] == 8'h20 && !snd_cs;
     pal_cs   = !BUSn && addr[23:13] == 11'h108;                 // 210000-211FFF
     vregs_cs = !BUSn && addr[23:4]  == 20'h21800 && addr[3:1] >= 3'd2 && addr[3:1] <= 3'd4;
-    in0_cs   = !BUSn && addr[23:1]  == 23'h180000;              // 300000
-    in1_cs   = !BUSn && addr[23:1]  == 23'h180001;              // 300002
-    coin_cs  = !BUSn && addr[23:1]  == 23'h190000;              // 320000
+    in0_cs   = !BUSn && addr[23:1]  == 23'h180000;              // 300000 (Snow Board: P1)
+    in1_cs   = !BUSn && addr[23:1]  == (snow ? 23'h180008 : 23'h180001); // 300002 (Snow Board: P2 at 300010)
+    coin_cs  = !BUSn && addr[23:1]  == (snow ? 23'h180010 : 23'h190000); // 320000 (Snow Board: 300020)
+    latch_cs = !BUSn && snow && addr[23:4] == 20'h30000;        // 300000-30000F writes
+    prot_cs  = !BUSn && snow && addr[23:16] == 8'h31;           // 310000-31FFFF
+    xram_cs  = !BUSn && snow && addr[23:13] == 11'h109;         // 212000-213FFF
     wram_cs  = !BUSn && addr[23:15] == 9'h1fc;                  // FE0000-FE7FFF
     shram_cs = !BUSn && addr[23:15] == 9'h1fd;                  // FE8000-FEFFFF
 end
@@ -81,7 +95,17 @@ wire [7:0] p2 = { start[1], joystick2[6:4], joystick2[1], joystick2[0], joystick
 wire [15:0] in0 = { dipsw[ 7:0], p1 };
 wire [15:0] in1 = { dipsw[15] & dip_test, dipsw[14:8], p2 };   // SW2:8 = service mode
 // COIN: coin 1, coin 2, -, -, service 2 (go to test), service 1
-wire [15:0] cin = { 10'h3ff, service, 1'b1, 2'b11, coin[1], coin[0] };
+wire [15:0] cin = snow ? { 8'hff, 1'b1, eep_do, start[1], start[0], service, dip_test, coin[1], coin[0] } :
+                         { 10'h3ff, service, 1'b1, 2'b11, coin[1], coin[0] };
+// Snow Board players: no DIPs (EEPROM), start buttons in COIN
+wire [15:0] sp1 = { 9'h1ff, joystick1[6:4], joystick1[1], joystick1[0], joystick1[2], joystick1[3] };
+wire [15:0] sp2 = { 9'h1ff, joystick2[6:4], joystick2[1], joystick2[0], joystick2[2], joystick2[3] };
+// pr_o = MAME mangle(latch) (gaelco2_m.cpp get_lo/get_hi/get_out), generated from MAME's code and checked
+// against it on 200 random values
+wire [15:0] pr_lo = { latch[6], latch[11], latch[18], latch[20], latch[3], latch[26], latch[14], latch[2], latch[17], latch[0], latch[4], latch[5], latch[30], latch[13], latch[15], latch[23] };
+wire [15:0] pr_hi = { latch[31], latch[22], latch[1], latch[12], latch[29], latch[10], latch[19], latch[21], latch[8], latch[27], latch[24], latch[16], latch[7], latch[28], latch[25], latch[9] };
+wire [15:0] pr_d  = (pr_lo ^ 16'h0010) - (pr_hi ^ 16'h0024) ^ 16'h5496;
+wire [15:0] pr_o = { pr_d[15], pr_d[14], pr_d[0], pr_d[4], pr_d[11], pr_d[1], pr_d[7], pr_d[3], pr_d[13], pr_d[6], pr_d[2], pr_d[12], pr_d[5], pr_d[10], pr_d[8], pr_d[9] };
 
 always @(posedge clk) begin
     cpu_din <= main_cs  ? main_data  :
@@ -91,17 +115,31 @@ always @(posedge clk) begin
                wram_cs  ? wram_dout  :
                shram_cs ? shram_dout :
                vregs_cs ? vregs[addr[3:1]] :
-               in0_cs   ? in0 :
-               in1_cs   ? in1 :
+               xram_cs  ? xram_dout :
+               prot_cs  ? { pr_o[7:0], pr_o[15:8] } :
+               in0_cs   ? (snow ? sp1 : in0) :
+               in1_cs   ? (snow ? sp2 : in1) :
                coin_cs  ? cin : 16'hffff;
 end
 
 always @(posedge clk) begin
     if( rst ) begin
         vregs[2] <= 0; vregs[3] <= 0; vregs[4] <= 0;
-    end else if( vregs_cs && !RnW ) begin
-        if( !UDSn ) vregs[addr[3:1]][15:8] <= cpu_dout[15:8];
-        if( !LDSn ) vregs[addr[3:1]][ 7:0] <= cpu_dout[ 7:0];
+        eep_di <= 0; eep_clk <= 0; eep_cs <= 0; latch <= 0; prot_l <= 0;
+    end else begin
+        prot_l <= prot_cs & ~RnW;
+        if( vregs_cs && !RnW ) begin
+            if( !UDSn ) vregs[addr[3:1]][15:8] <= cpu_dout[15:8];
+            if( !LDSn ) vregs[addr[3:1]][ 7:0] <= cpu_dout[ 7:0];
+        end
+        if( latch_cs && !RnW && !LDSn ) case( addr[3:1] )
+            3'd4: eep_di  <= cpu_dout[0];
+            3'd5: eep_clk <= cpu_dout[0];
+            3'd6: eep_cs  <= cpu_dout[0];
+            default:;
+        endcase
+        // MAME: m_snowboard_latch = (latch << 16) | data, once per write
+        if( prot_cs && !RnW && !prot_l ) latch <= { latch[15:0], cpu_dout };
     end
 end
 
@@ -133,8 +171,8 @@ jtframe_68kdtack_cen #(.W(6),.RECOVERY(1)) u_dtack(
     .bus_ack    ( 1'b0      ),
     .ASn        ( ASn       ),
     .DSn        ( {UDSn,LDSn} ),
-    .num        ( 5'd1      ),
-    .den        ( 6'd4      ),   // 48 MHz / 4 = 12 MHz
+    .num        ( snow ? 5'd5 : 5'd1 ),
+    .den        ( snow ? 6'd16 : 6'd4 ),   // 48 MHz * 1/4 = 12 MHz; Snow Board 48 * 5/16 = 15 MHz
     .DTACKn     ( DTACKn    ),
     .wait2      ( 1'b0      ),
     .wait3      ( 1'b0      ),

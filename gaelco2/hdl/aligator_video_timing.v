@@ -17,6 +17,7 @@ module aligator_video_timing #(
     input  wire        clk,
     input  wire        rst,
     input  wire        ce_pix,
+    input  wire        wide,       // TomSVR: 384 visible pixels in a 440-pixel line (Snow Board)
 
     output wire [9:0]  hpos,
     output wire [8:0]  vpos,
@@ -30,7 +31,8 @@ module aligator_video_timing #(
 
     output reg         vblank_irq
 );
-    localparam HTOTAL = HVIS + HFP + HSW + HBP;
+    wire [9:0] HV = wide ? 10'd384 : HVIS;
+    wire [9:0] HTOTAL = wide ? 10'd440 : HVIS + HFP + HSW + HBP;
     localparam VTOTAL = VVIS + VFP + VSW + VBP;
 
     reg [9:0] hcnt;
@@ -61,10 +63,10 @@ module aligator_video_timing #(
                 hcnt <= hcnt + 1'b1;
             end
 
-            hblank <= (hcnt >= HVIS) ? 1'b1 : 1'b0;
+            hblank <= (hcnt >= HV) ? 1'b1 : 1'b0;
             vblank <= (vcnt >= VVIS) ? 1'b1 : 1'b0;
 
-            hsync <= (hcnt >= HVIS+HFP && hcnt < HVIS+HFP+HSW) ? SYNC_ACTIVE : ~SYNC_ACTIVE;
+            hsync <= (hcnt >= HV+HFP && hcnt < HV+HFP+HSW) ? SYNC_ACTIVE : ~SYNC_ACTIVE;
             vsync <= (vcnt >= VVIS+VFP && vcnt < VVIS+VFP+VSW) ? SYNC_ACTIVE : ~SYNC_ACTIVE;
 
             if (hmax && vcnt == VVIS-1) vblank_irq <= 1'b1;
@@ -74,7 +76,7 @@ module aligator_video_timing #(
     assign hpos = hcnt;
     assign vpos = vcnt[8:0];
 
-    assign de   = (hcnt <= HVIS) && (vcnt < VVIS);
+    assign de   = (hcnt <= HV) && (vcnt < VVIS);
 
 endmodule
 

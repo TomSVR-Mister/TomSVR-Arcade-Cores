@@ -15,6 +15,7 @@ module aligator_gae1_tilemap (
 
     output reg  [21:0] rom_a,
     input  wire [7:0]  d_p0, d_p1, d_p2, d_p3,
+    input  wire [7:0]  d_p4,       // TomSVR: fifth plane (5 bpp games), 0 otherwise
     input  wire        gfx_ok,
 
     input  wire [9:0]  lb_x,
@@ -33,7 +34,7 @@ module aligator_gae1_tilemap (
     reg [9:0]  tmx_r;
 
     reg [18:0] code_r; reg flipx_r, flipy_r; reg [6:0] color_r;
-    reg [7:0]  g0, g1, g2, g3;
+    reg [7:0]  g0, g1, g2, g3, g4;
 `ifdef ALIGATOR_SWAPTRACE
     reg [12:0] swtn = 0;
 `endif
@@ -52,7 +53,7 @@ module aligator_gae1_tilemap (
     wire [3:0] col0 = tmx_r[3:0];
     wire [3:0] col1 = flipx_r ? ~col0 : col0;
     wire [2:0] bbit = 3'd7 - col1[2:0];
-    wire [4:0] pen  = {1'b0, g3[bbit], g2[bbit], g1[bbit], g0[bbit]};
+    wire [4:0] pen  = {g4[bbit], g3[bbit], g2[bbit], g1[bbit], g0[bbit]};
     wire [11:0] lb_wdata = {color_r, pen};
 
     wire [5:0]  tx_f       = tmx_r[9:4];
@@ -87,7 +88,7 @@ module aligator_gae1_tilemap (
                 state   <= WAITG;
             end
             WAITG: if (gfx_ok) begin
-                g0 <= d_p0; g1 <= d_p1; g2 <= d_p2; g3 <= d_p3;
+                g0 <= d_p0; g1 <= d_p1; g2 <= d_p2; g3 <= d_p3; g4 <= d_p4;
                 state <= PIX;
 `ifdef ALIGATOR_SWAPTRACE
 

@@ -14,10 +14,11 @@ JTFRAME_SDRAM96
 JTFRAME_STEREO
 JTFRAME_SDRAM_LARGE
 
-# SDRAM layout (download offsets, after the 8-byte header): 68000 program 0, graphics + sound 0x100000,
-# DS5002FP program (32 kB, BRAM) 0x900000
+# SDRAM layout (download offsets, after the 8-byte header): 68000 program 0 (bank 0), graphics + sound 0x100000
+# (bank 1, 16 MB), fifth graphics plane 0x1100000 (bank 2, 4 MB), DS5002FP program (32 kB, BRAM) 0x1500000
 JTFRAME_BA1_START=0x100000
-JTFRAME_PROM_START=0x900000
+JTFRAME_BA2_START=0x1100000
+JTFRAME_PROM_START=0x1500000
 
 [mist|sidi]
 JTFRAME_SKIP

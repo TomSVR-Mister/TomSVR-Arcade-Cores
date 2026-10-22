@@ -2,6 +2,7 @@
 
 module aligator_gae1_sprite (
     input  wire        clk,
+    input  wire        wide,       // TomSVR
     input  wire        ce,
     input  wire        start,
     input  wire [8:0]  line,
@@ -13,6 +14,7 @@ module aligator_gae1_sprite (
 
     output reg  [21:0] rom_a,
     input  wire [7:0]  d_p0, d_p1, d_p2, d_p3,
+    input  wire [7:0]  d_p4,       // TomSVR: fifth plane (5 bpp games), 0 otherwise
     input  wire        gfx_ok,
 
     input  wire [8:0]  lb_x,
@@ -51,14 +53,15 @@ module aligator_gae1_sprite (
     reg signed [11:0] cell_x0;
     reg [8:0]  row_off;
 
-    reg [7:0]  gl0,gl1,gl2,gl3, gr0,gr1,gr2,gr3;
+    reg [7:0]  gl0,gl1,gl2,gl3,gl4, gr0,gr1,gr2,gr3,gr4;
 
-    reg [16:0] lb0 [0:319];
-    reg [16:0] lb1 [0:319];
+    reg [16:0] lb0 [0:383];
+    reg [16:0] lb1 [0:383];
     assign lb_q = rbank ? lb1[lb_x] : lb0[lb_x];
 
     wire [14:0] base_word = vreg1[4] ? 15'h800 : 15'h0;
-    wire signed [11:0] spradj = -12'sd190 - {11'b0, vreg0[4]};
+    // MAME: spr_x_adjust = (visible width - 320) - 190 - vreg0 bit 4 (TomSVR: width from 'wide')
+    wire signed [11:0] spradj = (wide ? -12'sd126 : -12'sd190) - {11'b0, vreg0[4]};
 
     wire [4:0] ex      = xflip ? (xsize - 5'd1 - cx) : cx;
     wire [9:0] bx_cell = (sx0 + {1'b0, ex, 4'b0}) & 10'h3ff;
@@ -69,16 +72,18 @@ module aligator_gae1_sprite (
     wire [7:0] p1b   = gpx[3] ? gr1 : gl1;
     wire [7:0] p2b   = gpx[3] ? gr2 : gl2;
     wire [7:0] p3b   = gpx[3] ? gr3 : gl3;
-    wire [3:0] pen   = {p3b[bsel], p2b[bsel], p1b[bsel], p0b[bsel]};
+    wire [7:0] p4b   = gpx[3] ? gr4 : gl4;
+    wire [4:0] pen5  = {p4b[bsel], p3b[bsel], p2b[bsel], p1b[bsel], p0b[bsel]};
+    wire [3:0] pen   = pen5[3:0];   // shadow/highlight level (MAME skips pens >= 16 there)
     wire signed [11:0] xpos_s = cell_x0 + $signed({8'b0, px});
-    wire       xin   = (xpos_s >= 0) && (xpos_s < 12'sd320);
+    wire       xin   = (xpos_s >= 0) && (xpos_s < (wide ? 12'sd384 : 12'sd320));
     wire [8:0] lb_wa = xpos_s[8:0];
 
     wire [16:0] lb_cur = wbank_r ? lb1[lb_wa] : lb0[lb_wa];
     wire [16:0] lb_new = cell_shadow
         ? {1'b1, pen, (lb_cur[16] ? lb_cur[11:0] : 12'd0)}
-        : {1'b1, 4'd0, (cell_idx | {8'b0, pen})};
-    wire       do_write = (state==PWR) && (pen != 4'd0) && xin;
+        : {1'b1, 4'd0, (cell_idx | {7'b0, pen5})};
+    wire       do_write = (state==PWR) && (pen5 != 5'd0) && xin && !(cell_shadow && pen5[4]);
 
     wire [21:0] rom_a_l = {number, 1'b0, gpy};
     wire [21:0] rom_a_r = {number, 1'b1, gpy};
@@ -125,7 +130,7 @@ module aligator_gae1_sprite (
             IDLE: ;
             CLR: begin
                 clr_i <= clr_i + 1'b1;
-                if (clr_i == 10'd319) begin spr_e <= 10'd0; state <= RDW1F; end
+                if (clr_i == (wide ? 10'd383 : 10'd319)) begin spr_e <= 10'd0; state <= RDW1F; end
             end
 
             RDW1F: begin
@@ -164,9 +169,9 @@ module aligator_gae1_sprite (
                 state <= FSETL;
             end
             FSETL: begin rom_a <= rom_a_l; state <= FWL; end
-            FWL:   if (gfx_ok) begin gl0<=d_p0; gl1<=d_p1; gl2<=d_p2; gl3<=d_p3; rom_a<=rom_a_r; state<=FSETR; end
+            FWL:   if (gfx_ok) begin gl0<=d_p0; gl1<=d_p1; gl2<=d_p2; gl3<=d_p3; gl4<=d_p4; rom_a<=rom_a_r; state<=FSETR; end
             FSETR: state <= FWR;
-            FWR:   if (gfx_ok) begin gr0<=d_p0; gr1<=d_p1; gr2<=d_p2; gr3<=d_p3; px<=4'd0; bx<=bx_cell;
+            FWR:   if (gfx_ok) begin gr0<=d_p0; gr1<=d_p1; gr2<=d_p2; gr3<=d_p3; gr4<=d_p4; px<=4'd0; bx<=bx_cell;
                        cell_x0 <= $signed({2'b0, bx_cell}) + spradj;
                        state<=PWR; end
             PWR: begin
@@ -187,7 +192,7 @@ module aligator_gae1_sprite (
     // synthesis translate_off
     integer k;
     initial begin state=IDLE; busy=0; spr_e=0; px=0; clr_i=0; wbank_r=0; cx=0; number=0; wr_q=0;
-        for (k=0;k<320;k=k+1) begin lb0[k]=0; lb1[k]=0; end end
+        for (k=0;k<384;k=k+1) begin lb0[k]=0; lb1[k]=0; end end
     // synthesis translate_on
 endmodule
 

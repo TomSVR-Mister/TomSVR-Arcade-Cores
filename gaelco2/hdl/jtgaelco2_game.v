@@ -9,12 +9,17 @@
     Download layout (after the 8-byte header):
       0x000000  68000 program (up to 1 MB)
       0x100000  graphics: 32-bit words, word a = { plane2[a], plane3[a], plane0[a], plane1[a] }
-                (bytes 3..0), as the jlrh Alligator Hunt MRA builds it
+                (bytes 3..0), as the jlrh Alligator Hunt MRA builds it (SDRAM bank 1, up to 16 MB)
+      0x1100000 fifth plane, one byte per word address (5 bpp games only; SDRAM bank 2, up to 4 MB)
+      0x1500000 DS5002FP program (protected sets only; BRAM)
     Header (MRA rom index 0, first 8 bytes):
       byte 0 bits 2-0: plane size = 0x80000 << n bytes (0 Maniac Square, 3 Alligator Hunt)
       byte 1: planes 2 and 3 read as zero from word (byte1 << 16) up; 0 = never
       byte 2: sound bank map, 2 bits per bank: plane used by bank 0..3 (MAME set_bank_offsets)
-      byte 3 bit 0: DS5002FP protection CPU present (program at download offset JTFRAME_PROM_START) */
+      byte 3: bit 0 DS5002FP protection CPU present; bit 1 Snow Board board (map, 15 MHz, EEPROM, protection);
+              bit 2 384-pixel wide screen; bit 3 fifth graphics plane present (5 bpp)
+      byte 4: planes 0 and 1 read as zero from word (byte4 << 16) up; 0 = never
+      byte 5: the fifth plane reads as zero from word (byte5 << 16) up; 0 = never */
 
 module jtgaelco2_game(
     `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
@@ -23,11 +28,12 @@ module jtgaelco2_game(
 wire        clkg = clk48;
 reg   [2:0] pxdiv = 0;
 reg   [2:0] psize;
-reg   [7:0] hilim, bank_map;
-reg         mcu_en;
+reg   [7:0] hilim, lolim, p4lim, bank_map;
+reg         mcu_en, snow, wide, bpp5;
 reg   [1:0] mcu_cnt = 0;
 
-always @(posedge clkg) pxdiv <= pxdiv + 3'd1;
+// pixel clock 48/8 = 6 MHz (384-pixel lines); wide screen 48/7 = 6.86 MHz (440-pixel lines, same 15.6 kHz)
+always @(posedge clkg) pxdiv <= (wide && pxdiv==6) ? 3'd0 : pxdiv + 3'd1;
 assign pxl_cen  = pxdiv==0;
 assign pxl2_cen = pxdiv==0 || pxdiv==4;
 assign dip_flip   = 1'b0;
@@ -35,7 +41,11 @@ assign debug_view = 8'd0;
 
 `ifdef SIMULATION
 // without -load the header is not downloaded: Maniac Square values
-initial begin psize = 0; hilim = 8'h02; bank_map = 8'h04; mcu_en = 0;
+initial begin psize = 0; hilim = 8'h02; lolim = 0; p4lim = 0; bank_map = 8'h04;
+    mcu_en = 0; snow = 0; wide = 0; bpp5 = 0;
+`ifdef SIM_SNOW
+    psize = 3; hilim = 8'h20; lolim = 8'h30; p4lim = 8'h20; bank_map = 8'h04; snow = 1; wide = 1; bpp5 = 1;
+`endif
 `ifdef SIM_MCU
     mcu_en = 1;     // protected sets: jtsim -d SIM_MCU, mcu.bin in the sim folder
 `endif
@@ -46,7 +56,9 @@ always @(posedge clk) if( header && prog_we ) begin
     if( prog_addr[2:0]==0 ) psize    <= prog_data[2:0];
     if( prog_addr[2:0]==1 ) hilim    <= prog_data;
     if( prog_addr[2:0]==2 ) bank_map <= prog_data;
-    if( prog_addr[2:0]==3 ) mcu_en   <= prog_data[0];
+    if( prog_addr[2:0]==3 ) { bpp5, wide, snow, mcu_en } <= prog_data[3:0];
+    if( prog_addr[2:0]==4 ) lolim    <= prog_data;
+    if( prog_addr[2:0]==5 ) p4lim    <= prog_data;
 end
 
 // word address mask for one plane
@@ -92,7 +104,37 @@ jtgaelco2_main u_main(
     .start      ( cab_1p[1:0] ),
     .service    ( service   ),
     .dip_test   ( dip_test  ),
-    .dip_pause  ( dip_pause )
+    .dip_pause  ( dip_pause ),
+    .snow       ( snow      ),
+    .xram_cs    ( xram_cs   ),
+    .xram_dout  ( xram_dout ),
+    .eep_di     ( eep_di    ),
+    .eep_clk    ( eep_clk   ),
+    .eep_cs     ( eep_cs    ),
+    .eep_do     ( eep_do    )
+);
+
+// Snow Board: extra RAM at 212000-213FFF and the 93C66 EEPROM (256 x 16 bits) on the LS259 latch
+wire        xram_cs, eep_di, eep_clk, eep_cs, eep_do;
+wire [15:0] xram_dout;
+wire [ 1:0] xwe = (xram_cs & cpu_we) ? cpu_dsn : 2'b0;
+jtframe_ram16 #(.AW(12)) u_xram(
+    .clk( clkg ), .data( cpu_dout ), .addr( cpu_addr[12:1] ), .we( xwe ), .q( xram_dout )
+);
+jt9346 #(.AW(8),.DW(16)) u_eeprom(
+    .rst        ( rst       ),
+    .clk        ( clkg      ),
+    .sclk       ( eep_clk   ),
+    .sdi        ( eep_di    ),
+    .sdo        ( eep_do    ),
+    .scs        ( eep_cs    ),
+    .dump_clk   ( clkg      ),
+    .dump_addr  ( 8'd0      ),
+    .dump_we    ( 1'b0      ),
+    .dump_din   ( 16'd0     ),
+    .dump_dout  (           ),
+    .dump_clr   ( 1'b0      ),
+    .dump_flag  (           )
 );
 
 // work RAM and shared RAM (32 kB each)
@@ -165,9 +207,18 @@ wire [ 4:0] r5, g5, b5;
 wire        hs_w, vs_w, hb_w, vb_w, de_w;
 
 // planes 2-3 beyond their ROM size read as zero (Maniac Square: 128 kB ROMs in 512 kB planes)
+// planes beyond their ROMs read as zero, as MAME's ROM_FILL (bytes 3-2 = planes 2-3, 1-0 = planes 0-1)
 function [31:0] hicut(input [31:0] d, input [21:0] a);
-    hicut = (hilim!=0 && a[21:16] >= hilim[5:0]) ? { 16'd0, d[15:0] } : d;
+    hicut = { (hilim!=0 && a[21:16] >= hilim[5:0]) ? 16'd0 : d[31:16],
+              (lolim!=0 && a[21:16] >= lolim[5:0]) ? 16'd0 : d[15: 0] };
 endfunction
+function [7:0] p4cut(input [7:0] d, input [21:0] a);
+    p4cut = (!bpp5 || (p4lim!=0 && a[21:16] >= p4lim[5:0])) ? 8'd0 : d;
+endfunction
+// a fetch is complete when both the 32-bit word and (5 bpp games) the fifth-plane byte are there
+wire g0ok = gfx0_ok & (p4t0_ok | ~bpp5);
+wire g1ok = gfx1_ok & (p4t1_ok | ~bpp5);
+wire gsok = gfxs_ok & (p4s_ok  | ~bpp5);
 
 aligator_video_top u_video(
     .clk        ( clkg      ),
@@ -182,9 +233,13 @@ aligator_video_top u_video(
     .wrd_a      ( wrd_a     ), .wrd_q( wrd_q ),
     .spr_a      ( spr_a     ), .spr_q( spr_q ),
     .pal_a      ( pal_a     ), .pal_q( pal_q ),
-    .rom_a0     ( rom_a0    ), .gfx0_data( hicut(gfx0_data, gfx0_addr) ), .gfx0_ok( gfx0_ok ),
-    .rom_a1     ( rom_a1    ), .gfx1_data( hicut(gfx1_data, gfx1_addr) ), .gfx1_ok( gfx1_ok ),
-    .rom_as     ( rom_as    ), .gfxs_data( hicut(gfxs_data, gfxs_addr) ), .gfxs_ok( gfxs_ok ),
+    .rom_a0     ( rom_a0    ), .gfx0_data( hicut(gfx0_data, gfx0_addr) ), .gfx0_ok( g0ok ),
+    .rom_a1     ( rom_a1    ), .gfx1_data( hicut(gfx1_data, gfx1_addr) ), .gfx1_ok( g1ok ),
+    .rom_as     ( rom_as    ), .gfxs_data( hicut(gfxs_data, gfxs_addr) ), .gfxs_ok( gsok ),
+    .p4_0       ( p4cut(p4t0_data, p4t0_addr) ),
+    .p4_1       ( p4cut(p4t1_data, p4t1_addr) ),
+    .p4_s       ( p4cut(p4s_data,  p4s_addr ) ),
+    .wide       ( wide      ),
     .vga_r      ( r5        ),
     .vga_g      ( g5        ),
     .vga_b      ( b5        ),
@@ -199,6 +254,9 @@ aligator_video_top u_video(
 assign gfx0_addr = rom_a0 & amask;  assign gfx0_cs = 1'b1;
 assign gfx1_addr = rom_a1 & amask;  assign gfx1_cs = 1'b1;
 assign gfxs_addr = rom_as & amask;  assign gfxs_cs = 1'b1;
+assign p4t0_addr = gfx0_addr;       assign p4t0_cs = bpp5;
+assign p4t1_addr = gfx1_addr;       assign p4t1_cs = bpp5;
+assign p4s_addr  = gfxs_addr;       assign p4s_cs  = bpp5;
 
 assign red   = r5;
 assign green = g5;

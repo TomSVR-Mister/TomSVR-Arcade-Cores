@@ -13,10 +13,10 @@ module aligator_gae1_video (
     input  wire [15:0] wrd_q,
 
     output wire [13:0] tp0_idx, input wire [31:0] tp0_q,
-    output wire [21:0] rom_a0,  input wire [7:0] d0_p0, d0_p1, d0_p2, d0_p3, input wire gfx0_ok,
+    output wire [21:0] rom_a0,  input wire [7:0] d0_p0, d0_p1, d0_p2, d0_p3, d0_p4, input wire gfx0_ok,
 
     output wire [13:0] tp1_idx, input wire [31:0] tp1_q,
-    output wire [21:0] rom_a1,  input wire [7:0] d1_p0, d1_p1, d1_p2, d1_p3, input wire gfx1_ok,
+    output wire [21:0] rom_a1,  input wire [7:0] d1_p0, d1_p1, d1_p2, d1_p3, d1_p4, input wire gfx1_ok,
 
     output reg  [11:0] pal_index,
     output reg         opaque
@@ -80,14 +80,14 @@ module aligator_gae1_video (
         .clk(clk), .ce(1'b1), .start(start_r), .line(render_line),
         .scroll_x(sc0x), .scroll_y(scroll0y), .bank(bank0), .busy(),
         .tp_idx(tp0_idx), .tp_q(tp0_q),
-        .rom_a(rom_a0), .d_p0(d0_p0), .d_p1(d0_p1), .d_p2(d0_p2), .d_p3(d0_p3), .gfx_ok(gfx0_ok),
+        .rom_a(rom_a0), .d_p0(d0_p0), .d_p1(d0_p1), .d_p2(d0_p2), .d_p3(d0_p3), .d_p4(d0_p4), .gfx_ok(gfx0_ok),
         .lb_x(lb_rx), .lb_q(lb_q0), .wbank(wbank), .rbank(rbank)
     );
     aligator_gae1_tilemap u_l1 (
         .clk(clk), .ce(1'b1), .start(start_r), .line(render_line),
         .scroll_x(sc1x), .scroll_y(scroll1y), .bank(bank1), .busy(),
         .tp_idx(tp1_idx), .tp_q(tp1_q),
-        .rom_a(rom_a1), .d_p0(d1_p0), .d_p1(d1_p1), .d_p2(d1_p2), .d_p3(d1_p3), .gfx_ok(gfx1_ok),
+        .rom_a(rom_a1), .d_p0(d1_p0), .d_p1(d1_p1), .d_p2(d1_p2), .d_p3(d1_p3), .d_p4(d1_p4), .gfx_ok(gfx1_ok),
         .lb_x(lb_rx), .lb_q(lb_q1), .wbank(wbank), .rbank(rbank)
     );
 

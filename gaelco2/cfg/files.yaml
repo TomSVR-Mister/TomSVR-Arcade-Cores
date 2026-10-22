@@ -13,6 +13,9 @@ gaelco2:
     - aligator_gae1_palette.v
     - aligator_gae1_sound.v
     - timing.sdc
+jteeprom:
+  - get:
+    - jt9346.v
 jtframe:
   - get:
       - jtframe_edge.v

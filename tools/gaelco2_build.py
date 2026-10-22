@@ -10,8 +10,8 @@
 # byte 3 bit 0 = DS5002FP present, its 32 kB SRAM image at download offset 0x900000 (PROM).
 import sys, os, re, zipfile, hashlib
 
-SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb']
-GFXA, PROMA = 0x100000, 0x900000
+SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb', 'snowboar']
+GFXA, P4A, PROMA = 0x100000, 0x1100000, 0x1500000
 
 src = open(sys.argv[1]).read()
 zipdir, out = sys.argv[2], sys.argv[3]
@@ -45,6 +45,15 @@ def bank_offsets(machine):
     if b: return [eval(x.strip()) for x in b.group(1).split(',')]
     base = re.match(r'\s*(\w+)\(config\);', body)          # derived machine: e.g. maniacsq_d5002fp
     return bank_offsets(base.group(1))
+
+def machine_cfg(machine):
+    m = re.search(r'::%s\(machine_config &config\)\s*\{(.*?)^\}' % re.escape(machine), src, re.S | re.M)
+    body = m.group(1)
+    vis = re.search(r'set_visarea\(0,\s*(\d+)-1', body)
+    base = re.match(r'\s*(\w+)\(config\);', body)
+    if not vis and base: return machine_cfg(base.group(1))
+    return dict(wide=1 if vis and int(vis.group(1)) == 384 else 0,
+                snow=1 if 'snowboar_map' in body else 0)
 
 DEF = {'Off': 'Off', 'On': 'On', 'Demo_Sounds': 'Demo Sounds', 'Difficulty': 'Difficulty', 'Easy': 'Easy',
        'Normal': 'Normal', 'Hard': 'Hard', 'Hardest': 'Hardest', 'Unknown': 'Unknown', 'Free_Play': 'Free Play',
@@ -114,15 +123,24 @@ def build(setname):
     plane = gfx['size'] // 5
     psize = plane.bit_length() - 0x80000.bit_length()
     assert plane == 0x80000 << psize, setname
-    # each plane = ROMs loaded inside it; planes 2-3 may be shorter (zero above)
-    planes = [[x for x in gfx['roms'] if p * plane <= x['off'] < (p + 1) * plane] for p in range(4)]
+    # each plane = ROMs loaded inside it, in order; a plane may end early (MAME ROM_FILL zeros): the core zeroes
+    # planes 0-1 / 2-3 / 4 above lolim / hilim / p4lim, so the MRA may put any data there
+    planes = [sorted([x for x in gfx['roms'] if p * plane <= x['off'] < (p + 1) * plane], key=lambda x: x['off'])
+              for p in range(5)]
+    for p in range(5):   # ROMs contiguous from the plane start
+        o = p * plane
+        for x in planes[p]: assert x['off'] == o, (setname, p, x['name']); o += x['len']
     plen = [sum(x['len'] for x in pl) for pl in planes]
-    hilim = 0 if plen[2] == plane and plen[3] == plane else max(plen[2], plen[3]) >> 16
-    assert plen[0] == plane and plen[1] == plane and plen[2] == plen[3], (setname, plen)
+    assert plen[0] == plen[1] and plen[2] == plen[3], (setname, plen)
+    lim = lambda n: 0 if n >= plane else n >> 16
+    lolim, hilim, p4lim = lim(plen[0]), lim(plen[2]), lim(plen[4])
+    bpp5 = plen[4] > 0
+    m = machine_cfg(g['machine'])
+    snow, wide = m['snow'], m['wide']
     banks = bank_offsets(g['machine'])
     bmap = 0
     for i, o in enumerate(banks): bmap |= (o // plane) << (2 * i)
-    hdr = bytes([psize, hilim, bmap, 1 if mcu else 0, 0, 0, 0, 0])
+    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3, lolim, p4lim, 0, 0])
 
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     ev = [x for x in prog if x['off'] % 2 == 0]; od = [x for x in prog if x['off'] % 2 == 1]
@@ -132,21 +150,30 @@ def build(setname):
              '        <interleave output="16">', f'            <part {P(ev[0])} map="10"/>',
              f'            <part {P(od[0])} map="01"/>', '        </interleave>']
     if plen16 < GFXA: parts.append(f'        <part repeat="0x{GFXA - plen16:x}"> FF</part>')
-    # graphics: plane p ROM byte -> output byte (1, 0, 3, 2)[p]
+    # graphics as 32-bit words: plane p ROM byte -> output byte (1, 0, 3, 2)[p]. Cut the planes into chunks where
+    # no plane changes ROM; where a plane has no ROM, repeat another plane's bytes (the core zeroes them).
     MAP = ['0010', '0001', '1000', '0100']
-    assert all(len(pl) == 1 for pl in planes), setname
-    lo = plen[2]
-    parts.append('        <interleave output="32">')
-    for p in range(4):
-        parts.append(f'            <part {P(planes[p][0], f" length=\"0x{lo:x}\"")} map="{MAP[p]}"/>')
-    parts.append('        </interleave>')
-    if lo < plane:   # planes 0-1 continue, planes 2-3 are cut by the core (hilim): fill with planes 0-1 again
-        x = f' offset="0x{lo:x}" length="0x{plane - lo:x}"'
-        parts += ['        <interleave output="32">',
-                  f'            <part {P(planes[0][0], x)} map="0010"/>', f'            <part {P(planes[1][0], x)} map="0001"/>',
-                  f'            <part {P(planes[0][0], x)} map="1000"/>', f'            <part {P(planes[1][0], x)} map="0100"/>',
-                  '        </interleave>']
+    def at(p, a):        # (rom, offset in rom) holding plane p byte a, or None
+        for x in planes[p]:
+            if x['off'] - p * plane <= a < x['off'] - p * plane + x['len']: return x, a - (x['off'] - p * plane)
+        return None
+    cuts = sorted({0, plane} | {x['off'] - p * plane for p in range(4) for x in planes[p]} |
+                  {x['off'] - p * plane + x['len'] for p in range(4) for x in planes[p]})
+    step = min(x['len'] for p in range(4) for x in planes[p])
+    cuts = sorted(set(c for c in cuts if c <= plane) | set(range(0, plane + 1, step)))
+    for a, b in zip(cuts, cuts[1:]):
+        parts.append('        <interleave output="32">')
+        for p in range(4):
+            src = at(p, a) or at(p ^ 2, a) or at(0, a % plen[0])
+            x, off = src
+            ex = (f' offset="0x{off:x}"' if off else '') + (f' length="0x{b - a:x}"' if b - a != x['len'] else '')
+            parts.append(f'            <part {P(x, ex)} map="{MAP[p]}"/>')
+        parts.append('        </interleave>')
     gend = GFXA + 4 * plane
+    if bpp5:
+        for x in planes[4]: parts.append(f'        <part {P(x)}/>')
+        if plen[4] < plane: parts.append(f'        <part repeat="0x{plane - plen[4]:x}"> 00</part>')
+        gend = P4A + plane
     if mcu:
         assert len(mcu) == 1 and mcu[0]['len'] == 0x8000 and gend <= PROMA
         if gend < PROMA: parts.append(f'        <part repeat="0x{PROMA - gend:x}"> 00</part>')
@@ -155,13 +182,22 @@ def build(setname):
         img = bytearray(hdr) + bytearray(b'\xff' * GFXA)
         e, o = rd(ev[0]), rd(od[0])
         for k in range(len(e)): img[8 + 2 * k] = o[k]; img[8 + 2 * k + 1] = e[k]
-        pd = [rd(pl[0]) for pl in planes]
+        pdata = []
+        for p in range(4):
+            d = bytearray(plane)
+            for x in planes[p]: d[x['off'] - p * plane:x['off'] - p * plane + x['len']] = rd(x)
+            pdata.append(d)
+        # bytes of planes without ROM: the same substitute data the MRA uses
+        for p in range(4):
+            for a, b in zip(cuts, cuts[1:]):
+                if at(p, a) is None:
+                    x, off = at(p ^ 2, a) or at(0, a % plen[0]); r = rd(x)
+                    pdata[p][a:b] = r[off:off + b - a]
         g32 = bytearray(4 * plane)
-        for a in range(plane):
-            b0 = pd[1][a]; b1 = pd[0][a]
-            b2 = pd[3][a] if a < lo else pd[1][a]; b3 = pd[2][a] if a < lo else pd[0][a]
-            g32[4 * a:4 * a + 4] = bytes((b0, b1, b2, b3))
+        g32[0::4] = pdata[1]; g32[1::4] = pdata[0]; g32[2::4] = pdata[3]; g32[3::4] = pdata[2]
         img += g32
+        if bpp5:
+            p4 = b''.join(rd(x) for x in planes[4]); img += p4 + bytes(plane - len(p4))
         if mcu: img += bytes(PROMA - gend) + rd(mcu[0]); open(f'{out}/{setname}_mcu.bin', 'wb').write(rd(mcu[0]))
         md5 = hashlib.md5(img).hexdigest()
         open(f'{out}/{setname}.rom', 'wb').write(img); open(f'{out}/{setname}.md5', 'w').write(md5)
@@ -196,6 +232,6 @@ def build(setname):
 '''
     fn = re.sub(r'[/:]', '-', g['title'])
     open(f'{out}/mra/{fn} (JTGAELCO2).mra', 'w').write(mra)
-    print(f'{setname:10} {"ok " if have else "no zip"} hdr {hdr[:3].hex()} {md5}')
+    print(f'{setname:10} {"ok " if have else "no zip"} hdr {hdr[:6].hex()} {md5}')
 
 for s in sys.argv[4:] or SETS: build(s)

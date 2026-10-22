@@ -9,6 +9,7 @@ module aligator_video_top #(
     input  wire        clk96,
     input  wire        rst,
     input  wire        ce_pix,
+    input  wire        wide,       // TomSVR
 
     input  wire [15:0] vreg0, vreg1, vreg2,
 
@@ -21,6 +22,7 @@ module aligator_video_top #(
     output wire [21:0] rom_a0,  input wire [31:0] gfx0_data, input wire gfx0_ok,
     output wire [21:0] rom_a1,  input wire [31:0] gfx1_data, input wire gfx1_ok,
     output wire [21:0] rom_as,  input wire [31:0] gfxs_data, input wire gfxs_ok,
+    input  wire [7:0]  p4_0, p4_1, p4_s,   // TomSVR: fifth plane bytes for the three fetchers
 
     output wire [4:0]  vga_r, vga_g, vga_b,
     output wire        hsync, vsync, hblank, vblank, de,
@@ -30,7 +32,7 @@ module aligator_video_top #(
     wire [9:0] hpos; wire [8:0] vpos; wire frame_end;
     wire hs_i, vs_i, hb_i, vb_i, de_i;
     aligator_video_timing u_timing (
-        .clk(clk), .rst(rst), .ce_pix(ce_pix),
+        .clk(clk), .rst(rst), .ce_pix(ce_pix), .wide(wide),
         .hpos(hpos), .vpos(vpos), .frame_end(frame_end),
         .hsync(hs_i), .vsync(vs_i), .hblank(hb_i), .vblank(vb_i),
         .de(de_i), .vblank_irq(vblank_irq)
@@ -46,9 +48,9 @@ module aligator_video_top #(
         .vreg0(vreg0), .vreg1(vreg1),
         .wrd_a(wrd_a), .wrd_q(wrd_q),
         .tp0_idx(tp0_idx), .tp0_q(tp0_q),
-        .rom_a0(rom_a0), .d0_p0(d0_p0), .d0_p1(d0_p1), .d0_p2(d0_p2), .d0_p3(d0_p3), .gfx0_ok(gfx0_ok),
+        .rom_a0(rom_a0), .d0_p0(d0_p0), .d0_p1(d0_p1), .d0_p2(d0_p2), .d0_p3(d0_p3), .d0_p4(p4_0), .gfx0_ok(gfx0_ok),
         .tp1_idx(tp1_idx), .tp1_q(tp1_q),
-        .rom_a1(rom_a1), .d1_p0(d1_p0), .d1_p1(d1_p1), .d1_p2(d1_p2), .d1_p3(d1_p3), .gfx1_ok(gfx1_ok),
+        .rom_a1(rom_a1), .d1_p0(d1_p0), .d1_p1(d1_p1), .d1_p2(d1_p2), .d1_p3(d1_p3), .d1_p4(p4_1), .gfx1_ok(gfx1_ok),
         .pal_index(pal_index), .opaque(opaque)
     );
 
@@ -90,10 +92,10 @@ module aligator_video_top #(
     wire [9:0] hpos_lb = hd[SPR_HDLY-1];
     wire [16:0] lb_q;
     aligator_gae1_sprite u_spr (
-        .clk(clk96), .ce(1'b1), .start(spr_start), .line(render_line),
+        .clk(clk96), .wide(wide), .ce(1'b1), .start(spr_start), .line(render_line),
         .vreg0(vreg0), .vreg1(vreg1), .busy(),
         .spr_a(spr_a), .spr_q(spr_q),
-        .rom_a(rom_as), .d_p0(ds_p0), .d_p1(ds_p1), .d_p2(ds_p2), .d_p3(ds_p3), .gfx_ok(gfxs_ok),
+        .rom_a(rom_as), .d_p0(ds_p0), .d_p1(ds_p1), .d_p2(ds_p2), .d_p3(ds_p3), .d_p4(p4_s), .gfx_ok(gfxs_ok),
         .lb_x(hpos_lb[8:0]), .lb_q(lb_q),
         .wbank(wbank), .rbank(rbank)
     );
