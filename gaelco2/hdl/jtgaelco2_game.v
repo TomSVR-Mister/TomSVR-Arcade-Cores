@@ -68,14 +68,14 @@ wire [21:0] amask = { 3'd0, {19{1'b1}} } << psize | 22'h7ffff;
 wire [15:0] cpu_dout, vram_dout, pal_dout, snd_dout, wram_dout, shram_dout;
 wire [15:1] cpu_addr;
 wire [ 1:0] cpu_dsn;
-wire        cpu_we, vram_cs, pal_cs, sreg_cs, wram_cs, shram_cs, vblank_irq;
+wire        cpu_we, vram_cs, pal_cs, sreg_cs, wram_cs, shram_cs, vblank_irq, spr_done;
 wire [15:0] vreg0, vreg1, vreg2;
 reg         sreg_cs_l;
 
 jtgaelco2_main u_main(
     .clk        ( clkg      ),
     .rst        ( rst       ),
-    .lvbl       ( ~vblank_irq ),     // jtframe_edge catches the one-clock pulse
+    .lvbl       ( ~spr_done ),       // vblank IRQ once the sprite snapshot is taken
     .main_addr  ( main_addr ),
     .main_cs    ( main_cs   ),
     .main_data  ( main_data ),
@@ -182,6 +182,7 @@ jtgaelco2_vmem u_vmem(
     .clk        ( clkg      ),
     .clk96      ( clk96     ),
     .vb_start   ( vblank_irq),
+    .copy_done  ( spr_done  ),
     .cpu_addr   ( cpu_addr  ),
     .cpu_dsn    ( cpu_dsn   ),
     .cpu_we     ( cpu_we    ),

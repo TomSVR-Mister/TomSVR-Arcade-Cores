@@ -6,12 +6,15 @@
     VRAM is kept in four copies, all written by the CPU. Read ports match the one-clock latency
     the jlrh GAE1 video modules expect.
     The sprite engine reads its own copy, refreshed from a fifth VRAM copy at the start of each vblank, like
-    MAME's buffered sprite RAM (vblank_copy_rising): sprites are drawn from the previous frame's list. */
+    MAME's buffered sprite RAM (vblank_copy_rising): sprites are drawn from the previous frame's list.
+    MAME copies instantly, before the CPU sees the vblank IRQ; here the copy runs at 96 MHz (0.34 ms) and
+    copy_done (the CPU's vblank IRQ) comes when it ends, so the IRQ handler cannot change the snapshot. */
 
 module jtgaelco2_vmem(
     input              clk,
     input              clk96,
     input              vb_start,     // one-clock pulse at vblank start (clk)
+    output reg         copy_done,    // one-clock pulse (clk) when the sprite snapshot is complete
     // CPU
     input      [15:1]  cpu_addr,
     input      [ 1:0]  cpu_dsn,     // active high {upper, lower}
@@ -72,33 +75,43 @@ jtframe_dual_ram16 #(.AW(14)) u_t1o(
     .clk1( clk ), .data1( 16'd0 ),    .addr1( tp1_idx ),        .we1( 2'b0 ),  .q1( t1o )
 );
 
-// sprite RAM buffer: a live copy (u_sl) is copied word by word into the sprite engine's RAM at vblank
+// sprite RAM buffer: a live copy (u_sl) is copied word by word into the sprite engine's RAM at vblank (clk96)
 reg  [15:0] cp_a = 0;   // bit 15 = copy running
 reg  [14:0] cp_wa;
-reg         cp_we;
+reg         cp_we, vb96, vb96_l, run_l;
+reg  [ 2:0] done_sr = 0;
 wire [15:0] cp_q;
 wire [ 1:0] cpwe_e = (cp_we & ~cp_wa[0]) ? 2'b11 : 2'b00;
 wire [ 1:0] cpwe_o = (cp_we &  cp_wa[0]) ? 2'b11 : 2'b00;
 
-always @(posedge clk) begin
+always @(posedge clk96) begin
+    vb96  <= vb_start; vb96_l <= vb96;
     cp_we <= cp_a[15];
     cp_wa <= cp_a[14:0];
-    if( vb_start ) cp_a <= 16'h8000;
+    run_l <= cp_a[15];
+    if( vb96 & ~vb96_l ) cp_a <= 16'h8000;
     else if( cp_a[15] ) cp_a <= cp_a==16'hffff ? 16'h0 : cp_a + 16'd1;
+    done_sr <= { done_sr[1:0], run_l & ~cp_a[15] };  // stretched so the clk domain sees it
+end
+
+reg done_l;
+always @(posedge clk) begin
+    done_l    <= |done_sr;
+    copy_done <= |done_sr & ~done_l;
 end
 
 jtframe_dual_ram16 #(.AW(15)) u_sl(
-    .clk0( clk ), .data0( cpu_dout ), .addr0( cpu_addr  ), .we0( vwe  ), .q0( ),
-    .clk1( clk ), .data1( 16'd0 ),    .addr1( cp_a[14:0]), .we1( 2'b0 ), .q1( cp_q )
+    .clk0( clk   ), .data0( cpu_dout ), .addr0( cpu_addr  ), .we0( vwe  ), .q0( ),
+    .clk1( clk96 ), .data1( 16'd0 ),    .addr1( cp_a[14:0]), .we1( 2'b0 ), .q1( cp_q )
 );
 
 // sprite engine (96 MHz side)
 jtframe_dual_ram16 #(.AW(14)) u_se(
-    .clk0( clk   ), .data0( cp_q  ), .addr0( cp_wa[14:1] ), .we0( cpwe_e ), .q0( ),
+    .clk0( clk96 ), .data0( cp_q  ), .addr0( cp_wa[14:1] ), .we0( cpwe_e ), .q0( ),
     .clk1( clk96 ), .data1( 16'd0 ), .addr1( spr_a[14:1] ), .we1( 2'b0 ),   .q1( se )
 );
 jtframe_dual_ram16 #(.AW(14)) u_so(
-    .clk0( clk   ), .data0( cp_q  ), .addr0( cp_wa[14:1] ), .we0( cpwe_o ), .q0( ),
+    .clk0( clk96 ), .data0( cp_q  ), .addr0( cp_wa[14:1] ), .we0( cpwe_o ), .q0( ),
     .clk1( clk96 ), .data1( 16'd0 ), .addr1( spr_a[14:1] ), .we1( 2'b0 ),   .q1( so )
 );
 
