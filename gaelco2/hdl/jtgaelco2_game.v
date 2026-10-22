@@ -13,7 +13,8 @@
     Header (MRA rom index 0, first 8 bytes):
       byte 0 bits 2-0: plane size = 0x80000 << n bytes (0 Maniac Square, 3 Alligator Hunt)
       byte 1: planes 2 and 3 read as zero from word (byte1 << 16) up; 0 = never
-      byte 2: sound bank map, 2 bits per bank: plane used by bank 0..3 (MAME set_bank_offsets) */
+      byte 2: sound bank map, 2 bits per bank: plane used by bank 0..3 (MAME set_bank_offsets)
+      byte 3 bit 0: DS5002FP protection CPU present (program at download offset JTFRAME_PROM_START) */
 
 module jtgaelco2_game(
     `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
@@ -23,6 +24,8 @@ wire        clkg = clk48;
 reg   [2:0] pxdiv = 0;
 reg   [2:0] psize;
 reg   [7:0] hilim, bank_map;
+reg         mcu_en;
+reg   [1:0] mcu_cnt = 0;
 
 always @(posedge clkg) pxdiv <= pxdiv + 3'd1;
 assign pxl_cen  = pxdiv==0;
@@ -32,13 +35,18 @@ assign debug_view = 8'd0;
 
 `ifdef SIMULATION
 // without -load the header is not downloaded: Maniac Square values
-initial begin psize = 0; hilim = 8'h02; bank_map = 8'h04; end
+initial begin psize = 0; hilim = 8'h02; bank_map = 8'h04; mcu_en = 0;
+`ifdef SIM_MCU
+    mcu_en = 1;     // protected sets: jtsim -d SIM_MCU, mcu.bin in the sim folder
+`endif
+end
 `endif
 
 always @(posedge clk) if( header && prog_we ) begin
     if( prog_addr[2:0]==0 ) psize    <= prog_data[2:0];
     if( prog_addr[2:0]==1 ) hilim    <= prog_data;
     if( prog_addr[2:0]==2 ) bank_map <= prog_data;
+    if( prog_addr[2:0]==3 ) mcu_en   <= prog_data[0];
 end
 
 // word address mask for one plane
@@ -93,8 +101,32 @@ wire [1:0] swe = (shram_cs & cpu_we) ? cpu_dsn : 2'b0;
 jtframe_ram16 #(.AW(14)) u_wram(
     .clk( clkg ), .data( cpu_dout ), .addr( cpu_addr[14:1] ), .we( wwe ), .q( wram_dout )
 );
-jtframe_ram16 #(.AW(14)) u_shram(
-    .clk( clkg ), .data( cpu_dout ), .addr( cpu_addr[14:1] ), .we( swe ), .q( shram_dout )
+// shared RAM: the DS5002FP sees it as bytes, big endian
+wire [14:0] mcu_sa;
+wire [ 7:0] mcu_sd;
+wire        mcu_sw;
+wire [15:0] sh_mcu_q;
+jtframe_dual_ram16 #(.AW(14)) u_shram(
+    .clk0( clkg ), .data0( cpu_dout ), .addr0( cpu_addr[14:1] ), .we0( swe ), .q0( shram_dout ),
+    .clk1( clkg ), .data1( {mcu_sd, mcu_sd} ), .addr1( mcu_sa[14:1] ),
+    .we1 ( mcu_sw ? (mcu_sa[0] ? 2'b01 : 2'b10) : 2'b00 ), .q1( sh_mcu_q )
+);
+
+// DS5002FP (protected sets only), 12 MHz
+always @(posedge clkg) mcu_cnt <= mcu_cnt + 2'd1;
+
+jtgaelco2_mcu u_mcu(
+    .rst        ( rst | ~mcu_en ),
+    .clk        ( clkg      ),
+    .clk96      ( clk       ),
+    .cen        ( mcu_cnt==0 ),
+    .sh_addr    ( mcu_sa    ),
+    .sh_dout    ( mcu_sd    ),
+    .sh_wr      ( mcu_sw    ),
+    .sh_din     ( mcu_sa[0] ? sh_mcu_q[7:0] : sh_mcu_q[15:8] ),
+    .prog_addr  ( prog_addr[14:0] ),
+    .prog_data  ( prog_data ),
+    .prom_we    ( prom_we   )
 );
 
 // ---------------- video memories

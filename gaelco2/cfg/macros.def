@@ -13,8 +13,10 @@ JTFRAME_CLK48
 JTFRAME_SDRAM96
 JTFRAME_STEREO
 
-# SDRAM layout (download offsets, after the 8-byte header): 68000 program 0, graphics + sound 0x100000
+# SDRAM layout (download offsets, after the 8-byte header): 68000 program 0, graphics + sound 0x100000,
+# DS5002FP program (32 kB, BRAM) 0x900000
 JTFRAME_BA1_START=0x100000
+JTFRAME_PROM_START=0x900000
 
 [mist|sidi]
 JTFRAME_SKIP

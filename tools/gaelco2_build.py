@@ -6,11 +6,12 @@
 # 100000 graphics as 32-bit words: word a = bytes {plane1[a], plane0[a], plane3[a], plane2[a]} (byte 0 first),
 # the layout of jlrh's Alligator Hunt MRA. Planes are 1/5 of MAME's "gfx" region each (the fifth is always empty).
 # Header: byte 0 = log2(plane size / 0x80000); byte 1 = planes 2-3 read as zero from word (byte1 << 16) up
-# (0 = never); byte 2 = sound bank map, 2 bits per bank (plane used by bank 0..3, from set_bank_offsets).
+# (0 = never); byte 2 = sound bank map, 2 bits per bank (plane used by bank 0..3, from set_bank_offsets);
+# byte 3 bit 0 = DS5002FP present, its 32 kB SRAM image at download offset 0x900000 (PROM).
 import sys, os, re, zipfile, hashlib
 
-SETS = ['maniacsq', 'maniacsqc']
-GFXA = 0x100000
+SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb']
+GFXA, PROMA = 0x100000, 0x900000
 
 src = open(sys.argv[1]).read()
 zipdir, out = sys.argv[2], sys.argv[3]
@@ -107,7 +108,8 @@ def build(setname):
     g = game_info(setname); r = rom_def(setname)
     files = zipfiles(setname, g['parent'])
     prog, gfx = r['maincpu']['roms'], r['gfx']
-    have = all(x['crc'] in files for x in prog + gfx['roms'])
+    mcu = r.get('gaelco_ds5002fp:sram', {}).get('roms', [])
+    have = all(x['crc'] in files for x in prog + gfx['roms'] + mcu)
     rd = lambda x: files[x['crc']][0].read(files[x['crc']][1])
     plane = gfx['size'] // 5
     psize = plane.bit_length() - 0x80000.bit_length()
@@ -120,7 +122,7 @@ def build(setname):
     banks = bank_offsets(g['machine'])
     bmap = 0
     for i, o in enumerate(banks): bmap |= (o // plane) << (2 * i)
-    hdr = bytes([psize, hilim, bmap, 0, 0, 0, 0, 0])
+    hdr = bytes([psize, hilim, bmap, 1 if mcu else 0, 0, 0, 0, 0])
 
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     ev = [x for x in prog if x['off'] % 2 == 0]; od = [x for x in prog if x['off'] % 2 == 1]
@@ -144,6 +146,11 @@ def build(setname):
                   f'            <part {P(planes[0][0], x)} map="0010"/>', f'            <part {P(planes[1][0], x)} map="0001"/>',
                   f'            <part {P(planes[0][0], x)} map="1000"/>', f'            <part {P(planes[1][0], x)} map="0100"/>',
                   '        </interleave>']
+    gend = GFXA + 4 * plane
+    if mcu:
+        assert len(mcu) == 1 and mcu[0]['len'] == 0x8000 and gend <= PROMA
+        if gend < PROMA: parts.append(f'        <part repeat="0x{PROMA - gend:x}"> 00</part>')
+        parts.append(f'        <part {P(mcu[0])}/>')
     if have:
         img = bytearray(hdr) + bytearray(b'\xff' * GFXA)
         e, o = rd(ev[0]), rd(od[0])
@@ -155,6 +162,7 @@ def build(setname):
             b2 = pd[3][a] if a < lo else pd[1][a]; b3 = pd[2][a] if a < lo else pd[0][a]
             g32[4 * a:4 * a + 4] = bytes((b0, b1, b2, b3))
         img += g32
+        if mcu: img += bytes(PROMA - gend) + rd(mcu[0]); open(f'{out}/{setname}_mcu.bin', 'wb').write(rd(mcu[0]))
         md5 = hashlib.md5(img).hexdigest()
         open(f'{out}/{setname}.rom', 'wb').write(img); open(f'{out}/{setname}.md5', 'w').write(md5)
     else:

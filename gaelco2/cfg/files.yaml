@@ -3,6 +3,7 @@ gaelco2:
     - jtgaelco2_game.v
     - jtgaelco2_main.v
     - jtgaelco2_vmem.v
+    - jtgaelco2_mcu.v
     # Gaelco 2 video and GAE1 sound from jlrh/gaelco-fpga (GPLv3)
     - aligator_video_top.v
     - aligator_video_timing.v
@@ -18,7 +19,10 @@ jtframe:
   - from: cpu
     get:
       - jtframe_m68k.yaml
+      - jtframe_8751.yaml
   - from: ram
     get:
       - jtframe_dual_ram16.v
       - jtframe_ram16.v
+      - jtframe_dual_ram.v
+      - jtframe_ram_rst.v
