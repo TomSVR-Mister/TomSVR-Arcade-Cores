@@ -205,6 +205,10 @@ def build(setname):
         md5 = 'None'
     dips, default = dip_lines(ports(g['inp']))
     title = g['title'].replace('&', '&amp;')
+    # boards with an EEPROM (Snow Board) have no DIP switches: settings are in the game's service menu
+    switches = (f'    <switches page_id="1" page_name="Switches" base="16" default="{default & 0xff:02x},{default >> 8:02x}">\n'
+                + ''.join('        ' + d + '\n' for d in dips) + '    </switches>\n') if dips else ''
+    bnames = 'Rotate,Button 2,Button 3' if setname.startswith('maniacsq') else 'Button 1,Button 2,Button 3'
     zips = f'{setname}.zip|{g["parent"]}.zip' if g['parent'] else f'{setname}.zip'
     nl = '\n'
     mra = f'''<!-- {title} on JTGAELCO2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "{setname}"),
@@ -224,10 +228,7 @@ def build(setname):
     <rom index="0" zip="{zips}" md5="None">
 {nl.join(parts)}
     </rom>
-    <switches page_id="1" page_name="Switches" base="16" default="{default & 0xff:02x},{default >> 8:02x}">
-{nl.join('        ' + d for d in dips)}
-    </switches>
-    <buttons names="Rotate,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+{switches}    <buttons names="{bnames},Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
 </misterromdescription>
 '''
     fn = re.sub(r'[/:]', '-', g['title'])
