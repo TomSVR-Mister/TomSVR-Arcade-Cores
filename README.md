@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-24 MiSTer arcade cores and 172 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+25 MiSTer arcade cores and 174 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** They are built on jotego's JTFRAME framework, but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
@@ -52,6 +52,7 @@ why); the patch is applied in memory by the MRA.
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
+| gaelco2 | Maniac Square (Gaelco, 1996; two unprotected versions) | gaelco2.cpp |
 | galpin | Gals Pinball, Hot Pinball | galspnbl.cpp |
 | gumbo | Gumbo, Miss Puzzle, Miss Bingo, Double Point | gumbo.cpp |
 | hdoll | Honey Doll | snowbros.cpp |
@@ -95,6 +96,9 @@ used to compare against MAME.
 - **Martin Donlon (wickerwaka)**: the NEC V30 CPU model from the MiSTer Irem M72 core
   ([Arcade-IremM72_MiSTer](https://github.com/MiSTer-devel/Arcade-IremM72_MiSTer)), GPL-2, used in dynduke.
   It is used without asking the author first; if he objects, the dynduke core will be withdrawn.
+- **jlrh**: the Gaelco 2 video pipeline (tilemaps, sprites, palette) and GAE1 sound in gaelco2, from his
+  [gaelco-fpga](https://github.com/jlrh/gaelco-fpga) Alligator Hunt core (GPLv3). The CPU, memory and inputs are
+  JTFRAME; `gaelco2/ORIGIN.md` lists exactly what comes from where and what was changed.
 - **The MAME team**, whose drivers document these boards.
 
 GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,

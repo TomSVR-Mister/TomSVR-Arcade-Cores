@@ -1,11 +1,11 @@
 # How the 22 released cores are put together
 
-This covers the 24 released cores and their 172 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 25 released cores and their 174 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
 
-All 24 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
+All 25 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
 `jotego/jtcores/cores/` at commit `bfced64` and built there with jotego's normal build flow. So every core
 depends on jtcores at that commit. Nothing in jotego's tree is changed; the cores only add new folders.
 
@@ -82,6 +82,7 @@ Each of these is a new driver written from the MAME source named, using only JTF
 | **jthotblk** | 3 | Hot Blocks (hotblock.cpp) | 8088 | AY-3-8910 | jt49 only (no JTFRAME CPU). See below. |
 | **jtmadd** | 2 | Promat VISYS (oneshot.cpp) | 68000, Z80 | YM3812 | m68k, z80, jtopl2 |
 | **jtnmg5** | 12 | Yun Sung YS-1300 (nmg5.cpp) | 68000, Z80 | YM3812, OKI | m68k, z80, jtopl2, jt6295 |
+| **jtgaelco2** | 2 | Gaelco 2 boards (gaelco2.cpp): Maniac Square | 68000 | GAE1 (on the video chip) | m68k (jtframe_m68k), JTFRAME RAMs. Video and GAE1 sound from jlrh's gaelco-fpga (see Code not from jotego). |
 | **jtpara** | 13 | Yun Sung Paradise (paradise.cpp) | Z80 | 2 x OKI | z80, jt6295, jtframe_edge |
 | **jtplaymark** | 9 | Playmark (playmark.cpp) | 68000, PIC16C57 | OKI | m68k, jt6295, jteeprom (Hot Mind). The PIC16C57 is new code (`jtplaymark_pic.v`, from the Microchip data sheet and MAME). |
 | **jtothunder** | 6 | Taito Operation Thunderbolt (othunder.cpp) | 68000, Z80 | YM2610 | m68k, z80, jt10, jteeprom (93C46 NVRAM). Light gun game; the MRA sets the JTFRAME light gun flag so a crosshair is drawn for mouse, stick or Sinden aiming. |
@@ -97,6 +98,9 @@ Each of these is a new driver written from the MAME source named, using only JTF
 ### Code not from jotego
 
 - **jthotblk** uses the **MCL86** 8088 core by Ted Fried (MicroCore Labs), as packaged by Marcus Andrade (openGateware), and **KF8288** by Kitune-san. Both are MIT licensed and kept as copies in `hotblk/hdl/`. This is the only core that uses no JTFRAME CPU wrapper. The board's 24C02 EEPROM is a small new I2C module.
+
+- **jtgaelco2** uses the Gaelco 2 video pipeline and the GAE1 sound model from **jlrh's gaelco-fpga** (GPLv3,
+  Alligator Hunt core), with fixes; the CPU, bus, RAMs and inputs are JTFRAME. `gaelco2/ORIGIN.md` has the details.
 
 - **jtdynduke** uses the **NEC V30** model by Martin Donlon (wickerwaka) from the MiSTer Irem M72 core, GPL-2, kept in `dynduke/hdl/v30` with its licence. It is used without asking the author first; if he objects, the core will be withdrawn.
 
@@ -122,7 +126,7 @@ All the MRAs follow the same scheme, with a few exceptions listed at the end.
 
 - **`<buttons>`:** named buttons. The count must match `JTFRAME_BUTTONS`, or a button lands on Select. (This caused a coin bug on Big Twin / Hot Mind, now fixed.)
 
-- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 131 MRAs, 0282 on 38 (the Comad ones) and 0270 on 3.
+- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 131 MRAs, 0282 on 38 (the Comad ones), 0288 on 2 (Gaelco 2) and 0270 on 3.
 
 ### What the header bytes select, per core
 
@@ -145,6 +149,7 @@ One core can run several board variants because the header tells it which one it
 | jtys8 | byte 0 bit 0: 2 MB background; bit 1: Cannon Ball vertical |
 | jthotblk | header present, all zero |
 | jtdynduke | byte 0 bit 0: The Double Dynamites I/O map |
+| jtgaelco2 | byte 0: graphics plane size (0x80000 << n); byte 1: planes 2-3 read as zero from word byte1 << 16; byte 2: sound bank to plane map |
 | jtsqix | byte 0 bit 0: Perestroika Girls ROM byte shuffle; bit 1: MCU fitted; bit 2: the bootleg's 8031 MCU in place of the i8751 |
 | jtfunybubl, jtgalpin, jthdoll, jtothunder, jtwrally, jtxexex, jtzero | no header (one board layout) |
 
