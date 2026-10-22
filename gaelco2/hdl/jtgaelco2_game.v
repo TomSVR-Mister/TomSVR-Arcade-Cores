@@ -153,15 +153,21 @@ jtgaelco2_main u_main(
     .eep_do     ( eep_do    )
 );
 
-// Bang! gun interrupt timing: MAME runs a 512-line scanline timer and fires every 64 lines, i.e. eight evenly
-// spaced pulses per frame; here every 33 of the 264 lines, starting at vblank
+// Bang! gun interrupt timing: MAME runs a 512-line scanline timer, fires every 64 lines and turns the gun
+// interrupt off at vblank (line 256) before that line's pulse, so the game gets 7 pulses per frame at 1/8..7/8 of
+// the frame after vblank. Here: every 33 of the 264 lines after vblank, 7 pulses, none at vblank itself (an 8th
+// and 9th pulse overran the game's 7-entry gun sample table, and shots never hit).
 reg  [5:0] gsub;
+reg  [2:0] gnum;
 reg        lhbl_l, lvbl_l2, gun_tick;
 always @(posedge clkg) begin
     lhbl_l  <= LHBL; lvbl_l2 <= LVBL; gun_tick <= 0;
-    if( lvbl_l2 & ~LVBL ) begin gsub <= 0; gun_tick <= 1; end
+    if( lvbl_l2 & ~LVBL ) begin gsub <= 0; gnum <= 0; end
     else if( lhbl_l & ~LHBL ) begin
-        if( gsub==6'd32 ) begin gsub <= 0; gun_tick <= 1; end else gsub <= gsub + 6'd1;
+        if( gsub==6'd32 ) begin
+            gsub <= 0;
+            if( gnum != 3'd7 ) begin gun_tick <= 1; gnum <= gnum + 3'd1; end
+        end else gsub <= gsub + 6'd1;
     end
 end
 
@@ -188,6 +194,11 @@ jt9346 #(.AW(8),.DW(16)) u_eeprom(
     .dump_flag  (           )
 );
 
+`ifdef SIM_EEP
+// sim: start from MAME's EEPROM contents (eeprom.hex, 256 words) so the game skips its first-boot setup
+reg eep_loaded = 0;
+always @(posedge clkg) if( !eep_loaded ) begin $readmemh("eeprom.hex", u_eeprom.u_ram.mem); eep_loaded <= 1; end
+`endif
 // work RAM and shared RAM (32 kB each)
 wire [1:0] wwe = (wram_cs  & cpu_we) ? cpu_dsn : 2'b0;
 wire [1:0] swe = (shram_cs & cpu_we) ? cpu_dsn : 2'b0;
