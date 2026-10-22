@@ -183,7 +183,7 @@ def build(setname):
     <switches page_id="1" page_name="Switches" base="16" default="{default & 0xff:02x},{default >> 8:02x}">
 {nl.join('        ' + d for d in dips)}
     </switches>
-    <buttons names="Button 1,-,-,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+    <buttons names="Rotate,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
 </misterromdescription>
 '''
     fn = re.sub(r'[/:]', '-', g['title'])
