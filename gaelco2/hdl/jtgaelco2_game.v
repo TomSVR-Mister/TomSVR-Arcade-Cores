@@ -205,7 +205,18 @@ assign snd_left  = snd_l;
 assign snd_right = snd_r;
 
 `ifdef SIMULATION
-integer nv=0, np=0, nf=0, nfe=0; reg lvbl_l=0, mok_l=0;
+integer nv=0, np=0, nf=0, nfe=0, cyc=0, pfirst=-1, plast=-1, pn=0; reg lvbl_l=0, mok_l=0, pw_l=0;
+// palette write timing relative to the vblank IRQ (clk48 cycles; one frame = 812k)
+always @(posedge clkg) begin
+    pw_l <= pal_cs & cpu_we;
+    if( vblank_irq ) begin
+        if( nf>=380 && nf<=470 && pn>0 ) $display("PALT frame %0d writes %0d first %0d last %0d", nf, pn, pfirst, plast);
+        cyc <= 0; pn <= 0; pfirst <= -1; plast <= -1;
+    end else begin
+        cyc <= cyc + 1;
+        if( pal_cs & cpu_we & ~pw_l ) begin pn <= pn+1; if( pfirst<0 ) pfirst <= cyc; plast <= cyc; end
+    end
+end
 always @(posedge clkg) begin
     mok_l <= main_ok & main_cs;
     if( main_cs & main_ok & ~mok_l && nfe<120 ) begin
