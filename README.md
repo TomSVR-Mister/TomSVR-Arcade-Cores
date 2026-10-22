@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-23 MiSTer arcade cores and 152 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+24 MiSTer arcade cores and 172 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** They are built on jotego's JTFRAME framework, but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
@@ -40,7 +40,7 @@ To install only some cores, use update_all's download filter with the per-core t
 2. Copy the `.mra` files to `/media/fat/_Arcade/` (or a subfolder).
 3. Put your own MAME (0.264 or later) zips in `/media/fat/games/mame/`. Merged or split sets both work.
 
-Your zips are never modified. Ten of the Comad MRAs patch the game program as it loads (see the build document for
+Your zips are never modified. Eleven of the Comad MRAs patch the game program as it loads (see the build document for
 why); the patch is applied in memory by the MRA.
 
 ## Cores
@@ -48,7 +48,7 @@ why); the patch is applied in memory by the MRA.
 | Core | Games | MAME driver |
 |---|---|---|
 | chqflag | Chequered Flag (Konami, 1988; steering by joystick or analog stick) | chqflag.cpp |
-| comad | Comad Gals Panic clones (Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
+| comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
@@ -63,6 +63,7 @@ why); the patch is applied in memory by the MRA.
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
 | playmark | Big Twin, Excelsior, Hot Mind, Hard Times, Lucky Boom | playmark.cpp |
+| semicom | SemiCom games: Hyper Pacman, Cookie & Bibi 2 and 3, Toppy & Rappy, Puzzle Break, Su Ho Seong, Twinkle, New HyperMan 3-in-1, Ma Cheon Ru, More More / More More Plus, Final Tetris | snowbros.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix (including the 8031 MCU bootleg), Perestroika Girls | superqix.cpp |
 | wrally | World Rally (Gaelco, 1993) | wrally.cpp |

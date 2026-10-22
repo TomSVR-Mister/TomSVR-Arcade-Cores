@@ -1,11 +1,11 @@
 # How the 22 released cores are put together
 
-This covers the 23 released cores and their 152 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 24 released cores and their 172 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
 
-All 23 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
+All 24 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
 `jotego/jtcores/cores/` at commit `bfced64` and built there with jotego's normal build flow. So every core
 depends on jtcores at that commit. Nothing in jotego's tree is changed; the cores only add new folders.
 
@@ -57,7 +57,7 @@ These began as a copy of one of jotego's game cores, renamed and changed. The or
 
 | Core | Started from | Main changes |
 |---|---|---|
-| **jtcomad** (13 MRAs) | **JTGALS** (Kaneko Gals Panic) | 5 MB program ROM plus a 1 MB patch ROM at B00000. Work RAM at C80000. OKI moved to A80000. MAME's palette-based fg transparency. Header bit 1 selects the Afega Gals Hustler board (Pocket Gals V.I.P., Gals Hustler), which reads VU-002 sprites natively. Uses jtframe_m68k, jtframe_obj, jt6295. |
+| **jtcomad** (14 MRAs) | **JTGALS** (Kaneko Gals Panic) | 5 MB program ROM plus a 1 MB patch ROM at B00000. Work RAM at C80000. OKI moved to A80000. MAME's palette-based fg transparency. Header bit 1 selects the Afega Gals Hustler board (Pocket Gals V.I.P., Gals Hustler), which reads VU-002 sprites natively. Uses jtframe_m68k, jtframe_obj, jt6295. |
 | **jtjpop** (1) | **JTKIWI** (Taito TNZS / Seta X1) | Jumping Pop (Nics): JT51 YM2151 on the second CPU in place of the YM2203, inputs and DIP switches on the second CPU, a 1024-entry palette, dial support from JTKIWI. Keeps JTKIWI's Z80s and i8742 MCU module (upi41), jt03 and jt51. |
 | **jtmissb** (2) | **JTBUBL** (Bubble Bobble) | Miss Bubble II and Bubble Pong Pong. No MCU, a rewritten sub CPU for the picture background, 8 bpp tiles and sprites, and YM3526 + OKI in place of the YM2203. Z80s, jt26, jt6295. |
 
@@ -85,6 +85,7 @@ Each of these is a new driver written from the MAME source named, using only JTF
 | **jtpara** | 13 | Yun Sung Paradise (paradise.cpp) | Z80 | 2 x OKI | z80, jt6295, jtframe_edge |
 | **jtplaymark** | 9 | Playmark (playmark.cpp) | 68000, PIC16C57 | OKI | m68k, jt6295, jteeprom (Hot Mind). The PIC16C57 is new code (`jtplaymark_pic.v`, from the Microchip data sheet and MAME). |
 | **jtothunder** | 6 | Taito Operation Thunderbolt (othunder.cpp) | 68000, Z80 | YM2610 | m68k, z80, jt10, jteeprom (93C46 NVRAM). Light gun game; the MRA sets the JTFRAME light gun flag so a crosshair is drawn for mouse, stick or Sinden aiming. |
+| **jtsemicom** | 19 | SemiCom games on the Snow Bros-style board (snowbros.cpp) | 68000, Z80; AT89C52 MCU on Hyper Pacman and Cookie & Bibi 2 | YM2151, OKI | m68k, z80, jt51, jt6295, jt8051 (runs the dumped AT89C52 program, which writes the protection data into work RAM). Kaneko Pandora sprites are new code. The other protected sets copy a 0x200-byte data block from the MRA into work RAM at reset, as MAME does. |
 | **jtsplash** | 11 | Gaelco Splash! (splash.cpp) | 68000, Z80 | YM3812, MSM5205; YM2203 for Lady Frog | m68k, z80, jtopl2, jt5205, jt03, jtframe obj draw |
 | **jtsqix** | 8 | Super Qix, Perestroika Girls (superqix.cpp) | Z80, i8751 MCU | 2 x AY-3-8910 | z80, jt49, jt8051 running the dumped MCU program. The bootleg's ROM byte shuffle is undone in the core. |
 | **jtwrally** | 9 | Gaelco World Rally (wrally.cpp) | 68000, DS5002FP | OKI | m68k, jt8051 (DS5002FP running the dumped program), jt6295. VRAM writes are decrypted on the fly. |
@@ -121,7 +122,7 @@ All the MRAs follow the same scheme, with a few exceptions listed at the end.
 
 - **`<buttons>`:** named buttons. The count must match `JTFRAME_BUTTONS`, or a button lands on Select. (This caused a coin bug on Big Twin / Hot Mind, now fixed.)
 
-- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 103 MRAs, 0282 on 37 (the Comad ones) and 0270 on 3.
+- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 131 MRAs, 0282 on 38 (the Comad ones) and 0270 on 3.
 
 ### What the header bytes select, per core
 
@@ -138,6 +139,7 @@ One core can run several board variants because the header tells it which one it
 | jtnmg5 | byte 0: Puzzle Club map, 16 MB tile ROM, sprite tile count, Multi 5 / 7 Ordi input quirks, 55 Hz (Search Eye Plus); byte 1: protection value |
 | jtpara | byte 0: tile and sprite layout flags; byte 1: board mode and bank mask |
 | jtplaymark | byte 0 bit 0: Excelsior; bit 1: Hard Times board; bits 3-2 with bit 1: 0 Hot Mind, 1 Hard Times, 2 Lucky Boom, 3 Big Twin (No Girls Conversion) |
+| jtsemicom | byte 0 bits 1-0: value read at 0x200000; bit 2: protection data at 0x102000 (Final Tetris); bit 3: active-low inputs (Final Tetris); bit 4: MCU writes at 0x10e000 (Hyper Pacman) |
 | jtsplash | byte 0 bit 0: Splash! 1.0 sprite attribute; bit 1: The Return of Lady Frog |
 | jtys16 | byte 0 bit 0: Magic Bubble YS1302 board |
 | jtys8 | byte 0 bit 0: 2 MB background; bit 1: Cannon Ball vertical |
@@ -148,7 +150,7 @@ One core can run several board variants because the header tells it which one it
 
 ### Exceptions to know about
 
-- **Ten JTCOMAD MRAs patch the program as it loads** (Fantasia II x3, Fantasy '95, Hot Night, Miss World '96 set 1, Miss World 2002 x2, WOW New Fantasia Explicit, Zip & Zap Less Explicit). Most carry about 1,150 to 1,190 `<patch>` lines (Zip & Zap 111). The patches relocate work RAM and add code in the 1 MB extension ROM that converts the VU-002 sprite list to the Pandora format each frame. Your zip is never changed. Nothing needs to be applied by hand: the MRA does it at load time. The three Gals Hustler / Pocket Gals MRAs run unpatched because the core reads that board's sprites natively.
+- **Eleven JTCOMAD MRAs patch the program as it loads** (Fantasia 940803 PCB, Fantasia II x3, Fantasy '95, Hot Night, Miss World '96 set 1, Miss World 2002 x2, WOW New Fantasia Explicit, Zip & Zap Less Explicit). Most carry about 1,150 to 1,190 `<patch>` lines (Zip & Zap 111). The patches relocate work RAM and add code in the 1 MB extension ROM that converts the VU-002 sprite list to the Pandora format each frame. Your zip is never changed. Nothing needs to be applied by hand: the MRA does it at load time. The three Gals Hustler / Pocket Gals MRAs run unpatched because the core reads that board's sprites natively.
 
 - **jtsqix** undoes the bootleg's byte shuffle inside the core, so its MRAs are a plain copy of the zip.
 
