@@ -173,6 +173,11 @@ jt9346 #(.AW(8),.DW(16)) u_eeprom(
     .dump_flag  (           )
 );
 
+`ifdef SIM_EEP
+// sim: start from MAME's EEPROM contents (eeprom.hex, 256 words) so the game skips its first-boot setup
+reg eep_loaded = 0;
+always @(posedge clkg) if( !eep_loaded ) begin $readmemh("eeprom.hex", u_eeprom.u_ram.mem); eep_loaded <= 1; end
+`endif
 // work RAM and shared RAM (32 kB each)
 wire [1:0] wwe = (wram_cs  & cpu_we) ? cpu_dsn : 2'b0;
 wire [1:0] swe = (shram_cs & cpu_we) ? cpu_dsn : 2'b0;

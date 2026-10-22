@@ -113,10 +113,17 @@ wire [15:0] bp1 = { 8'h00, joystick1[4], 7'h00 };
 wire [15:0] bp2 = { 8'h00, joystick2[4], 7'h00 };
 reg  [15:0] gun_q;
 always @* case( addr[2:1] )
+`ifdef SIM_BANG     // sim: gun 1 where MAME's port value 0x80,0x80 puts it
+    2'd0: gun_q = 16'd161;
+    2'd1: gun_q = 16'd161;
+    2'd2: gun_q = 16'd116;
+    2'd3: gun_q = 16'd116;
+`else
     2'd0: gun_q = { 7'd0, gun1_x + 9'd1 };
     2'd1: gun_q = { 7'd0, gun2_x + 9'd1 };
     2'd2: gun_q = { {7{gun1_y < 9'd4}}, gun1_y - 9'd4 };
     2'd3: gun_q = { {7{gun2_y < 9'd4}}, gun2_y - 9'd4 };
+`endif
 endcase
 // pr_o = MAME mangle(latch) (gaelco2_m.cpp get_lo/get_hi/get_out), generated from MAME's code and checked
 // against it on 200 random values
@@ -245,4 +252,23 @@ jtframe_m68k u_cpu(
     .IPLn       ( ipln        )
 );
 
+`ifdef SIM_BANG
+// Bang! debug: gun sample counters, as MAME logs them (tools/mame/hook_bfast.lua)
+reg [15:0] dbg_cnt=0, dbg_s1=0; reg [7:0] dbg_ad7=0; integer dbg_f=0, dbg_i4=0, dbg_gr=0, dbg_gw=0; reg dbg_ia=0, dbg_gl=0;
+always @(posedge clk) begin
+    dbg_ia <= int_clr; dbg_gl <= gun_cs;
+    if( wram_cs && !RnW ) begin
+        if( addr[14:1]==14'h14d4 ) dbg_cnt <= cpu_dout;
+        if( addr[14:1]==14'h14d5 ) dbg_s1  <= cpu_dout;
+        if( addr[14:1]==14'h156b && !LDSn ) dbg_ad7 <= cpu_dout[7:0];
+    end
+    if( int_clr && !dbg_ia && A[3:1]==3'd4 ) dbg_i4 <= dbg_i4 + 1;
+    if( gun_cs && !dbg_gl ) begin if( RnW ) dbg_gr <= dbg_gr+1; else dbg_gw <= dbg_gw+1; end
+    if( vbl_pulse ) begin
+        dbg_f <= dbg_f + 1;
+        $display("BSHOOT %0d cnt=%0d s1=%0d ad7=%02x irq4=%0d gunrd=%0d gunwr=%0d ien=%b", dbg_f, dbg_cnt, dbg_s1, dbg_ad7, dbg_i4, dbg_gr, dbg_gw, gun_ien);
+        dbg_i4 <= 0; dbg_gr <= 0; dbg_gw <= 0;
+    end
+end
+`endif
 endmodule
