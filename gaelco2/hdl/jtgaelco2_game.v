@@ -18,7 +18,7 @@
       byte 2: sound bank map, 2 bits per bank: plane used by bank 0..3 (MAME set_bank_offsets)
       byte 3: bit 0 DS5002FP protection CPU present; bit 1 Snow Board board (map, 15 MHz, EEPROM, protection);
               bit 2 384-pixel wide screen; bit 3 fifth graphics plane present (5 bpp); bit 4 15 MHz CPU;
-              bit 5 Bang! light gun board
+              bit 5 Bang! light gun board; bit 6 Touch and Go board (dual monitor, 480 pixels, 16 MHz, 4 players)
       byte 4: planes 0 and 1 read as zero from word (byte4 << 16) up; 0 = never
       byte 5: the fifth plane reads as zero from word (byte5 << 16) up; 0 = never */
 
@@ -30,13 +30,16 @@ wire        clkg = clk48;
 reg   [2:0] pxdiv = 0;
 reg   [2:0] psize;
 reg   [7:0] hilim, lolim, p4lim, bank_map;
-reg         mcu_en, snow, wide, bpp5, fast, bang;
+reg         mcu_en, snow, wide, bpp5, fast, bang, tg;
 reg   [1:0] mcu_cnt = 0;
+// Touch and Go: OSD "Screen" (status bits 14-13): 0 = screen 1, 1 = screen 2 (2 = side by side: not yet)
+wire        scr = status[14:13]==2'd1;
 
-// pixel clock 48/8 = 6 MHz (384-pixel lines); wide screen 48/7 = 6.86 MHz (440-pixel lines, same 15.6 kHz)
-always @(posedge clkg) pxdiv <= (wide && pxdiv==6) ? 3'd0 : pxdiv + 3'd1;
+// pixel clock 48/8 = 6 MHz (384-pixel lines); wide screen 48/7 = 6.86 MHz (440-pixel lines, same 15.6 kHz);
+// Touch and Go 48/5 = 9.6 MHz (616-pixel lines, 15.6 kHz)
+always @(posedge clkg) pxdiv <= ((wide && pxdiv==6) || (tg && pxdiv==4)) ? 3'd0 : pxdiv + 3'd1;
 wire   ce48     = pxdiv==0;                         // pixel enable of our 48 MHz video logic
-wire   ce48x2   = pxdiv==0 || pxdiv==4;
+wire   ce48x2   = pxdiv==0 || pxdiv==(tg ? 3'd2 : 3'd4);
 // JTFRAME runs on clk (96 MHz): give it one-clock pulses. A 48 MHz enable is high for two 96 MHz clocks,
 // which made the light-gun overlay count every pixel twice (two crosshairs, neither on the aim point).
 reg    ce_l = 0, ce2_l = 0;
@@ -49,7 +52,10 @@ assign debug_view = 8'd0;
 `ifdef SIMULATION
 // without -load the header is not downloaded: Maniac Square values
 initial begin psize = 0; hilim = 8'h02; lolim = 0; p4lim = 0; bank_map = 8'h04;
-    mcu_en = 0; snow = 0; wide = 0; bpp5 = 0; fast = 0; bang = 0;
+    mcu_en = 0; snow = 0; wide = 0; bpp5 = 0; fast = 0; bang = 0; tg = 0;
+`ifdef SIM_TG       // Touch and Go
+    psize = 3; hilim = 8'h20; lolim = 8'h30; p4lim = 8'h20; bank_map = 8'h04; bpp5 = 1; tg = 1;
+`endif
 `ifdef SIM_SNOW
     psize = 3; hilim = 8'h20; lolim = 8'h30; p4lim = 8'h20; bank_map = 8'h04; snow = 1; wide = 1; bpp5 = 1; fast = 1;
 `endif
@@ -72,7 +78,7 @@ always @(posedge clk) if( header && prog_we ) begin
     if( prog_addr[2:0]==0 ) psize    <= prog_data[2:0];
     if( prog_addr[2:0]==1 ) hilim    <= prog_data;
     if( prog_addr[2:0]==2 ) bank_map <= prog_data;
-    if( prog_addr[2:0]==3 ) { bang, fast, bpp5, wide, snow, mcu_en } <= prog_data[5:0];
+    if( prog_addr[2:0]==3 ) { tg, bang, fast, bpp5, wide, snow, mcu_en } <= prog_data[6:0];
     if( prog_addr[2:0]==4 ) lolim    <= prog_data;
     if( prog_addr[2:0]==5 ) p4lim    <= prog_data;
 end
@@ -124,6 +130,11 @@ jtgaelco2_main u_main(
     .snow       ( snow      ),
     .fast       ( fast      ),
     .bang       ( bang      ),
+    .tg         ( tg        ),
+    .joystick3  ( joystick3[6:0] ),
+    .joystick4  ( joystick4[6:0] ),
+    .coin4      ( coin      ),
+    .start4     ( cab_1p    ),
     .irq4       ( gun_tick  ),
     .gun_ien    (           ),
     .gun1_x     ( gun_1p_x  ),
@@ -190,8 +201,8 @@ jtframe_dual_ram16 #(.AW(14)) u_shram(
     .we1 ( mcu_sw ? (mcu_sa[0] ? 2'b01 : 2'b10) : 2'b00 ), .q1( sh_mcu_q )
 );
 
-// DS5002FP (protected sets only), 12 MHz
-always @(posedge clkg) mcu_cnt <= mcu_cnt + 2'd1;
+// DS5002FP (protected sets only), 12 MHz (Touch and Go 16 MHz)
+always @(posedge clkg) mcu_cnt <= (tg && mcu_cnt==2'd2) ? 2'd0 : mcu_cnt + 2'd1;
 
 jtgaelco2_mcu u_mcu(
     .rst        ( rst | ~mcu_en ),
@@ -202,7 +213,7 @@ jtgaelco2_mcu u_mcu(
     .sh_dout    ( mcu_sd    ),
     .sh_wr      ( mcu_sw    ),
     .sh_din     ( mcu_sa[0] ? sh_mcu_q[7:0] : sh_mcu_q[15:8] ),
-    .prog_addr  ( prog_addr[14:0] ),
+    .prog_addr  ( prog_addr[15:0] ),
     .prog_data  ( prog_data ),
     .prom_we    ( prom_we   )
 );
@@ -278,6 +289,9 @@ aligator_video_top u_video(
     .p4_1       ( p4cut(p4t1_data, p4t1_addr) ),
     .p4_s       ( p4cut(p4s_data,  p4s_addr ) ),
     .wide       ( wide      ),
+    .tgw        ( tg        ),
+    .dual       ( tg        ),
+    .scr        ( scr       ),
     .vga_r      ( r5        ),
     .vga_g      ( g5        ),
     .vga_b      ( b5        ),

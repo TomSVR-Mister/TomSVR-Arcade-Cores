@@ -10,6 +10,9 @@ module aligator_video_top #(
     input  wire        rst,
     input  wire        ce_pix,
     input  wire        wide,       // TomSVR
+    input  wire        tgw,        // TomSVR: 480-pixel lines (Touch and Go)
+    input  wire        dual,       // TomSVR: dual-monitor board
+    input  wire        scr,        // TomSVR: screen shown on a dual-monitor board
 
     input  wire [15:0] vreg0, vreg1, vreg2,
 
@@ -32,7 +35,7 @@ module aligator_video_top #(
     wire [9:0] hpos; wire [8:0] vpos; wire frame_end;
     wire hs_i, vs_i, hb_i, vb_i, de_i;
     aligator_video_timing u_timing (
-        .clk(clk), .rst(rst), .ce_pix(ce_pix), .wide(wide),
+        .clk(clk), .rst(rst), .ce_pix(ce_pix), .wide(wide), .tgw(tgw),
         .hpos(hpos), .vpos(vpos), .frame_end(frame_end),
         .hsync(hs_i), .vsync(vs_i), .hblank(hb_i), .vblank(vb_i),
         .de(de_i), .vblank_irq(vblank_irq)
@@ -45,7 +48,7 @@ module aligator_video_top #(
     wire [11:0] pal_index; wire opaque;
     aligator_gae1_video u_video (
         .clk(clk), .ce(ce_pix), .hpos(hpos), .vpos(vpos), .frame_end(frame_end),
-        .vreg0(vreg0), .vreg1(vreg1),
+        .vreg0(vreg0), .vreg1(vreg1), .tgw(tgw), .dual(dual), .scr(scr),
         .wrd_a(wrd_a), .wrd_q(wrd_q),
         .tp0_idx(tp0_idx), .tp0_q(tp0_q),
         .rom_a0(rom_a0), .d0_p0(d0_p0), .d0_p1(d0_p1), .d0_p2(d0_p2), .d0_p3(d0_p3), .d0_p4(p4_0), .gfx0_ok(gfx0_ok),
@@ -92,7 +95,7 @@ module aligator_video_top #(
     wire [9:0] hpos_lb = hd[SPR_HDLY-1];
     wire [16:0] lb_q;
     aligator_gae1_sprite u_spr (
-        .clk(clk96), .wide(wide), .ce(1'b1), .start(spr_start), .line(render_line),
+        .clk(clk96), .wide(wide), .tgw(tgw), .dual(dual), .scr(scr), .ce(1'b1), .start(spr_start), .line(render_line),
         .vreg0(vreg0), .vreg1(vreg1), .busy(),
         .spr_a(spr_a), .spr_q(spr_q),
         .rom_a(rom_as), .d_p0(ds_p0), .d_p1(ds_p1), .d_p2(ds_p2), .d_p3(ds_p3), .d_p4(p4_s), .gfx_ok(gfxs_ok),

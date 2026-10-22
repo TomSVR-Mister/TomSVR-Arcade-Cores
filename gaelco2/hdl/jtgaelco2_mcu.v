@@ -6,7 +6,10 @@
     0x1000, range 0x7fff. MOVX to 1000-7FFF reaches the SRAM itself (MAME: the games use it as scratch
     memory); 8000-FFFF is the window into the 68000 shared RAM (big endian); 0000-0FFF is open.
     The SRAM is one dual-port RAM: port 0 = download (clk96, while the game is held in reset) or the MCU's
-    data accesses, port 1 = instruction fetch. */
+    data accesses, port 1 = instruction fetch.
+    Internal RAM 00-7F starts from a 128-byte image (MAME "touchgo_scratch": Touch and Go needs it to copy its
+    high-score table), downloaded after the program (PROM offset 0x8000); the MCU stays in reset while it is
+    copied in. Without that file the image is zero, as the cleared RAM before. */
 
 module jtgaelco2_mcu(
     input             rst,
@@ -19,7 +22,7 @@ module jtgaelco2_mcu(
     output            sh_wr,
     input      [ 7:0] sh_din,
     // program download
-    input      [14:0] prog_addr,
+    input      [15:0] prog_addr,
     input      [ 7:0] prog_data,
     input             prom_we
 );
@@ -55,11 +58,34 @@ end
 
 wire [ 7:0] x_din = sram_sel ? sram_q : sh_sel ? sh_din : 8'hff;
 
+// scratch image and its copy into the internal RAM after reset
+reg  [7:0] init_cnt = 0;
+wire       init_on  = ~init_cnt[7];
+wire [7:0] scr_q;
+always @(posedge clk) begin
+    if( rst ) init_cnt <= 0;
+    else if( init_on ) init_cnt <= init_cnt + 8'd1;
+end
+jtframe_dual_ram #(.AW(7)) u_scratch(
+    .clk0   ( clk96     ),
+    .data0  ( prog_data ),
+    .addr0  ( prog_addr[6:0] ),
+    .we0    ( prom_we & prog_addr[15] ),
+    .q0     (           ),
+    .clk1   ( clk       ),
+    .data1  ( 8'd0      ),
+    .addr1  ( init_cnt[6:0] + 7'd1 ),  // one clock ahead of the write below
+    .we1    ( 1'b0      ),
+    .q1     ( scr_q     )
+);
+reg [7:0] scr_first;   // byte 0 (read before the counter starts)
+always @(posedge clk96) if( prom_we && prog_addr[15] && prog_addr[6:0]==0 ) scr_first <= prog_data;
+
 jtframe_dual_ram #(.AW(15),.SIMFILE("mcu.bin")) u_sram(
     .clk0   ( clk96     ),
     .data0  ( prom_we ? prog_data : xd ),
-    .addr0  ( prom_we ? prog_addr : xa[14:0] ),
-    .we0    ( prom_we | (xw & sram_sel) ),
+    .addr0  ( prom_we ? prog_addr[14:0] : xa[14:0] ),
+    .we0    ( (prom_we & ~prog_addr[15]) | (xw & sram_sel) ),
     .q0     ( sram_q    ),
     .clk1   ( clk       ),
     .data1  ( 8'd0      ),
@@ -68,18 +94,17 @@ jtframe_dual_ram #(.AW(15),.SIMFILE("mcu.bin")) u_sram(
     .q1     ( rom_data  )
 );
 
-jtframe_ram_rst #(.AW(7),.CEN_RD(1)) u_ramu(
-    .rst    ( rst       ),
+jtframe_ram #(.AW(7),.CEN_RD(1)) u_ramu(
     .clk    ( clk       ),
-    .cen    ( cen       ),
-    .addr   ( ram_addr  ),
-    .data   ( ram_data  ),
-    .we     ( ram_we    ),
+    .cen    ( cen | init_on ),
+    .addr   ( init_on ? init_cnt[6:0] : ram_addr ),
+    .data   ( init_on ? (init_cnt==0 ? scr_first : scr_q) : ram_data ),
+    .we     ( init_on | ram_we ),
     .q      ( ram_q     )
 );
 
 jt8051 u_mcu(
-    .rst        ( rst       ),
+    .rst        ( rst | init_on ),
     .clk        ( clk       ),
     .cen        ( cen       ),
     .int0n      ( 1'b1      ),

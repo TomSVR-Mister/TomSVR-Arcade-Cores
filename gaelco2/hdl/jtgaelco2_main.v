@@ -15,7 +15,9 @@
     COIN 300020 (bit 6 = EEPROM data out), LS259 latch on writes to 300000-30000F (D0, A3-A1 = bit:
     0-1 coin counters, 4 EEPROM DI, 5 CLK, 6 CS), protection 310000-31FFFF (MAME snowboar_protection_r/w).
     Bang! (bang=1, MAME bang_map): Snow Board board without protection; light guns at 310000 (X 1P/2P, then
-    Y 1P/2P), a write to 310000 enables the gun interrupt (level 4); the vblank interrupt is level 2. */
+    Y 1P/2P), a write to 310000 enables the gun interrupt (level 4); the vblank interrupt is level 2.
+    Touch and Go (tg=1, MAME touchgo_map): 16 MHz CPU, four players: 300000 {SW2, P1}, 300002 {SW1, P2},
+    300004 {coins 1-4, P3}, 300006 {service 1, test, service 2, P4}; SW2:8 (IN0 bit 15) is the service DIP. */
 
 module jtgaelco2_main(
     input              clk,
@@ -51,6 +53,11 @@ module jtgaelco2_main(
     input              snow,
     input              fast,       // 15 MHz CPU (Snow Board), else 12 MHz
     input              bang,       // Bang! light gun board
+    input              tg,         // Touch and Go board (16 MHz, four players)
+    input      [ 6:0]  joystick3,
+    input      [ 6:0]  joystick4,
+    input      [ 3:0]  coin4,      // all four coin inputs (Touch and Go)
+    input      [ 3:0]  start4,     // all four start buttons (Touch and Go)
     input              irq4,       // gun interrupt timing pulse (Bang!)
     output reg         gun_ien,    // gun interrupt enabled by the game (Bang!)
     input      [ 8:0]  gun1_x, gun1_y, gun2_x, gun2_y,   // screen coordinates (JTFRAME light gun)
@@ -67,7 +74,7 @@ wire        RnW, UDSn, LDSn, ASn, DTACKn, cpu_cen, cpu_cenb, BUSn, VPAn;
 wire        IPL6n, ok_dly, int_clr;
 reg  [15:0] cpu_din, vregs[2:4];
 reg         prot_l;
-reg         vregs_cs, in0_cs, in1_cs, coin_cs, latch_cs, prot_cs, p2_cs, gun_cs;
+reg         vregs_cs, in0_cs, in1_cs, in2_cs, in3_cs, coin_cs, latch_cs, prot_cs, p2_cs, gun_cs;
 reg  [31:0] latch;
 
 assign main_addr = A[19:1];
@@ -87,7 +94,9 @@ always @* begin
     vregs_cs = !BUSn && addr[23:4]  == 20'h21800 && addr[3:1] >= 3'd2 && addr[3:1] <= 3'd4;
     in0_cs   = !BUSn && addr[23:1]  == 23'h180000;              // 300000 (Snow Board: P1)
     in1_cs   = !BUSn && addr[23:1]  == (snow ? 23'h180008 : 23'h180001); // 300002 (Snow Board: P2 at 300010)
-    coin_cs  = !BUSn && addr[23:1]  == (snow ? 23'h180010 : 23'h190000); // 320000 (Snow Board: 300020)
+    in2_cs   = !BUSn && tg && addr[23:1] == 23'h180002;         // 300004 (Touch and Go)
+    in3_cs   = !BUSn && tg && addr[23:1] == 23'h180003;         // 300006 (Touch and Go)
+    coin_cs  = !BUSn && !tg && addr[23:1] == (snow ? 23'h180010 : 23'h190000); // 320000 (Snow Board: 300020)
     latch_cs = !BUSn && snow && addr[23:4] == 20'h30000;        // 300000-30000F writes
     prot_cs  = !BUSn && snow && !bang && addr[23:16] == 8'h31;  // 310000-31FFFF
     gun_cs   = !BUSn && bang && addr[23:4] == 20'h31000;        // 310000-31000F
@@ -102,6 +111,13 @@ wire [7:0] p1 = { start[0], joystick1[6:4], joystick1[1], joystick1[0], joystick
 wire [7:0] p2 = { start[1], joystick2[6:4], joystick2[1], joystick2[0], joystick2[2], joystick2[3] };
 wire [15:0] in0 = { dipsw[ 7:0], p1 };
 wire [15:0] in1 = { dipsw[15] & dip_test, dipsw[14:8], p2 };   // SW2:8 = service mode
+// Touch and Go: the service DIP is IN0 bit 15; coins and service buttons in the high bytes of IN2/IN3
+wire [7:0] p3 = { start4[2], joystick3[6:4], joystick3[1], joystick3[0], joystick3[2], joystick3[3] };
+wire [7:0] p4 = { start4[3], joystick4[6:4], joystick4[1], joystick4[0], joystick4[2], joystick4[3] };
+wire [15:0] tin0 = { dipsw[7] & dip_test, dipsw[6:0], p1 };
+wire [15:0] tin1 = { dipsw[15:8], p2 };
+wire [15:0] tin2 = { 4'hf, coin4, p3 };
+wire [15:0] tin3 = { 5'h1f, 1'b1, 1'b1, service, p4 };
 // COIN: coin 1, coin 2, -, -, service 2 (go to test), service 1
 wire [15:0] cin = snow ? { 8'hff, 1'b1, eep_do, start[1], start[0], service, dip_test, coin[1], coin[0] } :
                          { 10'h3ff, service, 1'b1, 2'b11, coin[1], coin[0] };
@@ -136,8 +152,10 @@ always @(posedge clk) begin
                xram_cs  ? xram_dout :
                prot_cs  ? { pr_o[7:0], pr_o[15:8] } :
                gun_cs   ? gun_q :
-               in0_cs   ? (bang ? bp1 : snow ? sp1 : in0) :
-               in1_cs   ? (bang ? bp2 : snow ? sp2 : in1) :
+               in0_cs   ? (bang ? bp1 : snow ? sp1 : tg ? tin0 : in0) :
+               in1_cs   ? (bang ? bp2 : snow ? sp2 : tg ? tin1 : in1) :
+               in2_cs   ? tin2 :
+               in3_cs   ? tin3 :
                coin_cs  ? cin : 16'hffff;
 end
 
@@ -213,7 +231,8 @@ jtframe_68kdtack_cen #(.W(6),.RECOVERY(1)) u_dtack(
     .ASn        ( ASn       ),
     .DSn        ( {UDSn,LDSn} ),
     .num        ( fast ? 5'd5 : 5'd1 ),
-    .den        ( fast ? 6'd16 : 6'd4 ),   // 48 MHz * 1/4 = 12 MHz; Snow Board 48 * 5/16 = 15 MHz
+    .den        ( fast ? 6'd16 : tg ? 6'd3 : 6'd4 ),   // 48 MHz * 1/4 = 12 MHz; Snow Board 48 * 5/16 = 15 MHz;
+                                                     // Touch and Go 48 / 3 = 16 MHz
     .DTACKn     ( DTACKn    ),
     .wait2      ( 1'b0      ),
     .wait3      ( 1'b0      ),

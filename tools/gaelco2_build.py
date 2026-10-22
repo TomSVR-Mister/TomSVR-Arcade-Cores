@@ -11,7 +11,8 @@
 import sys, os, re, zipfile, hashlib
 
 SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb', 'maniacsqs', 'snowboar', 'snowboara',
-        'bang', 'banga', 'bangb', 'bangj', 'bangja', 'bangjb']
+        'bang', 'banga', 'bangb', 'bangj', 'bangja', 'bangjb',
+        'touchgo', 'touchgoa', 'touchgona', 'touchgonna', 'touchgonnaa', 'touchgonnab', 'touchgonnac', 'touchgoun']
 GFXA, P4A, PROMA = 0x100000, 0x1100000, 0x1500000
 
 src = open(sys.argv[1]).read()
@@ -27,7 +28,9 @@ def rom_def(name):
     for line in m.group(1).splitlines():
         line = line.split('//')[0].strip()
         r = re.match(r'ROM_REGION\w*\(\s*(0x[0-9a-fA-F]+),\s*"([\w:]+)"', line)
-        if r: cur = r.group(2); regions[cur] = dict(size=num(r.group(1)), roms=[]); continue
+        if r: cur = r.group(2); regions[cur] = dict(size=num(r.group(1)), roms=[], fills=[]); continue
+        f = re.match(r'ROM_FILL\(\s*(0x[0-9a-fA-F]+),\s*(\w+),\s*(0x[0-9a-fA-F]+)\s*\)', line)
+        if f and cur: regions[cur]['fills'].append((num(f.group(1)), num(f.group(2)), num(f.group(3))))
         l = re.match(r'(ROM_LOAD\w*)\(\s*"([^"]+)",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)\s*,.*?CRC\((\w+)\)', line)
         if l: regions[cur]['roms'].append(dict(kind=l.group(1), name=l.group(2), off=num(l.group(3)),
                                                len=num(l.group(4)), crc=l.group(5).lower()))
@@ -58,7 +61,7 @@ def machine_cfg(machine):
     mhz = int(clk.group(1)) / int(clk.group(4)) if clk else 12
     return dict(wide=1 if vis and int(vis.group(1)) == 384 else 0,
                 snow=1 if ('snowboar_map' in body or 'bang_map' in body) else 0, fast=1 if mhz == 15 else 0,
-                bang=1 if 'bang_map' in body else 0)
+                bang=1 if 'bang_map' in body else 0, tg=1 if 'touchgo_map' in body else 0)
 
 DEF = {'Off': 'Off', 'On': 'On', 'Demo_Sounds': 'Demo Sounds', 'Difficulty': 'Difficulty', 'Easy': 'Easy',
        'Normal': 'Normal', 'Hard': 'Hard', 'Hardest': 'Hardest', 'Unknown': 'Unknown', 'Free_Play': 'Free Play',
@@ -122,17 +125,25 @@ def build(setname):
     g = game_info(setname); r = rom_def(setname)
     files = zipfiles(setname, g['parent'])
     prog, gfx = r['maincpu']['roms'], r['gfx']
+    pfills = r['maincpu']['fills']
     mcu = r.get('gaelco_ds5002fp:sram', {}).get('roms', [])
+    scratch = r.get('gaelco_ds5002fp:mcu:internal', {}).get('roms', [])   # Touch and Go: internal RAM image
     # ROMs in "gfx_temp" are split by the driver init (ROM16_split_gfx): even bytes to dest1, odd to dest2
     if 'gfx_temp' in r:
         fn = re.search(r'::%s\(\)\s*\{(.*?)^\}' % re.escape(g['init']), src_m, re.S | re.M).group(1)
         for c in re.finditer(r'ROM16_split_gfx\("gfx_temp",\s*"gfx",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)\)', fn):
             st, ln, d1, d2 = (num(c.group(i)) for i in range(1, 5))
+            l16 = [x for x in r['gfx_temp']['roms'] if x['kind'] == 'ROM_LOAD16_BYTE' and st <= x['off'] < st + ln]
+            if l16:   # byte-wide ROM pairs (touchgona): even files go whole to dest1, odd files to dest2
+                for x in l16:
+                    o = x['off'] - st
+                    gfx['roms'].append(dict(x, kind='ROM_LOAD', off=(d2 if o % 2 else d1) + o // 2))
+                continue
             x = next(x for x in r['gfx_temp']['roms'] if x['off'] <= st < x['off'] + x['len'])
             for half, d in ((0, d1), (1, d2)):
                 gfx['roms'].append(dict(x, kind='split', off=d, len=ln // 2, sofs=st - x['off'], half=half))
         gfx['roms'] = [x for x in gfx['roms'] if x['crc'] != '00000000']
-    have = all(x['crc'] in files for x in prog + gfx['roms'] + mcu)
+    have = all(x['crc'] in files for x in prog + gfx['roms'] + mcu + scratch)
     def rdp(x):   # bytes of a gfx entry (split entries: every other byte of their ROM)
         d = rd(x)
         return d[x['sofs'] + x['half']::2][:x['len']] if x['kind'] == 'split' else d
@@ -157,7 +168,7 @@ def build(setname):
     banks = bank_offsets(g['machine'])
     bmap = 0
     for i, o in enumerate(banks): bmap |= (o // plane) << (2 * i)
-    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3 | m['fast'] << 4 | m['bang'] << 5, lolim, p4lim, 0, 0])
+    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3 | m['fast'] << 4 | m['bang'] << 5 | m['tg'] << 6, lolim, p4lim, 0, 0])
 
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     ev = [x for x in prog if x['off'] % 2 == 0]; od = [x for x in prog if x['off'] % 2 == 1]
@@ -180,10 +191,19 @@ def build(setname):
     cuts = sorted(set(c for c in cuts if c <= plane) | set(range(0, plane + 1, step)))
     PAIRMAP = {(0, 1): '0012', (2, 3): '1200'}
     def src(p, a): return at(p, a) or at(p ^ 2, a) or at(0, a % plen[0])
+    def srcpair(pair, a):   # ROM bytes for both planes of a pair
+        (x0, o0), (x1, o1) = src(pair[0], a), src(pair[1], a)
+        ok = not (x0['kind'] == 'split' or x1['kind'] == 'split') or \
+             (x0['name'] == x1['name'] and x0['half'] == 0 and x1['half'] == 1 and o0 == o1)
+        if ok: return (x0, o0), (x1, o1)
+        # filler where a split pair has no ROM (Touch and Go planes 0-1 end at 3 MB): copy a whole pair
+        q = (pair[0] ^ 2, pair[1] ^ 2)
+        if at(q[0], a) and at(q[1], a): return at(q[0], a), at(q[1], a)
+        return at(0, a % plen[0]), at(1, a % plen[0])
     for a, b in zip(cuts, cuts[1:]):
         parts.append('        <interleave output="32">')
         for pair in ((0, 1), (2, 3)):
-            (x0, o0), (x1, o1) = src(pair[0], a), src(pair[1], a)
+            (x0, o0), (x1, o1) = srcpair(pair, a)
             if x0['kind'] == 'split' or x1['kind'] == 'split':
                 # both planes must be the two halves of one split ROM: one 16-bit part
                 assert x0['name'] == x1['name'] and x0['half'] == 0 and x1['half'] == 1 and o0 == o1, (setname, a)
@@ -205,27 +225,30 @@ def build(setname):
         assert len(mcu) == 1 and mcu[0]['len'] == 0x8000 and gend <= PROMA
         if gend < PROMA: parts.append(f'        <part repeat="0x{PROMA - gend:x}"> 00</part>')
         parts.append(f'        <part {P(mcu[0])}/>')
+        if scratch: parts.append(f'        <part {P(scratch[0])}/>')   # PROM offset 0x8000
     if have:
         img = bytearray(hdr) + bytearray(b'\xff' * GFXA)
         e, o = rd(ev[0]), rd(od[0])
         for k in range(len(e)): img[8 + 2 * k] = o[k]; img[8 + 2 * k + 1] = e[k]
+        for a, n, v in pfills:
+            for k in range(n): img[8 + ((a + k) ^ 1)] = v
         pdata = []
         for p in range(4):
             d = bytearray(plane)
             for x in planes[p]: d[x['off'] - p * plane:x['off'] - p * plane + x['len']] = rdp(x)
             pdata.append(d)
         # bytes of planes without ROM: the same substitute data the MRA uses
-        for p in range(4):
-            for a, b in zip(cuts, cuts[1:]):
-                if at(p, a) is None:
-                    x, off = at(p ^ 2, a) or at(0, a % plen[0]); r = rdp(x)
-                    pdata[p][a:b] = r[off:off + b - a]
+        for a, b in zip(cuts, cuts[1:]):
+            for pair in ((0, 1), (2, 3)):
+                for p, (x, off) in zip(pair, srcpair(pair, a)):
+                    if at(p, a) is None: r = rdp(x); pdata[p][a:b] = r[off:off + b - a]
         g32 = bytearray(4 * plane)
         g32[0::4] = pdata[1]; g32[1::4] = pdata[0]; g32[2::4] = pdata[3]; g32[3::4] = pdata[2]
         img += g32
         if bpp5:
             p4 = b''.join(rdp(x) for x in planes[4]); img += bytes(P4A - (GFXA + 4 * plane)) + p4 + bytes(plane - len(p4))
         if mcu: img += bytes(PROMA - gend) + rd(mcu[0]); open(f'{out}/{setname}_mcu.bin', 'wb').write(rd(mcu[0]))
+        if scratch: img += rd(scratch[0])
         md5 = hashlib.md5(img).hexdigest()
         open(f'{out}/{setname}.rom', 'wb').write(img); open(f'{out}/{setname}.md5', 'w').write(md5)
     else:
@@ -239,6 +262,9 @@ def build(setname):
     bnames = bnames.replace('Fire,-,-', 'Fire,Button 2,Button 3')
     # light gun games: core_mod bit 1 makes JTFRAME draw a crosshair (mouse, analog stick, d-pad or Sinden)
     coremod = '    <rom index="1"><part>02 00</part></rom>\n' if m['bang'] else ''
+    # program ROM_FILLs (touchgona: byte 1 of the stack pointer); program byte a sits at image offset 8 + (a ^ 1)
+    patches = ''.join(f'        <patch offset="0x{8 + ((a + k) ^ 1):x}">{v:02X}</patch>\n'
+                      for a, n, v in pfills for k in range(n))
     zips = f'{setname}.zip|{g["parent"]}.zip' if g['parent'] else f'{setname}.zip'
     nl = '\n'
     mra = f'''<!-- {title} on JTGAELCO2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "{setname}"),
@@ -251,13 +277,13 @@ def build(setname):
     <mameversion>0288</mameversion>
     <year>{g["year"]}</year>
     <manufacturer>{g["manu"].replace("&", "&amp;")}</manufacturer>
-    <players>2</players>
+    <players>{4 if m['tg'] else 2}</players>
     <rbf>jtgaelco2</rbf>
     <joystick>8</joystick>
     <region>World</region>
     <rom index="0" zip="{zips}" md5="None">
 {nl.join(parts)}
-    </rom>
+{patches}    </rom>
 {coremod}{switches}    <buttons names="{bnames},Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
 </misterromdescription>
 '''

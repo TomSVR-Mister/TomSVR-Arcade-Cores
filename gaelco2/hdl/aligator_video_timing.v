@@ -18,6 +18,7 @@ module aligator_video_timing #(
     input  wire        rst,
     input  wire        ce_pix,
     input  wire        wide,       // TomSVR: 384 visible pixels in a 440-pixel line (Snow Board)
+    input  wire        tgw,        // TomSVR: 480 visible pixels in a 616-pixel line (Touch and Go, 48/5 MHz)
 
     output wire [9:0]  hpos,
     output wire [8:0]  vpos,
@@ -31,8 +32,8 @@ module aligator_video_timing #(
 
     output reg         vblank_irq
 );
-    wire [9:0] HV = wide ? 10'd384 : HVIS;
-    wire [9:0] HTOTAL = wide ? 10'd440 : HVIS + HFP + HSW + HBP;
+    wire [9:0] HV = tgw ? 10'd480 : wide ? 10'd384 : HVIS;
+    wire [9:0] HTOTAL = tgw ? 10'd616 : wide ? 10'd440 : HVIS + HFP + HSW + HBP;
     localparam VTOTAL = VVIS + VFP + VSW + VBP;
 
     reg [9:0] hcnt;

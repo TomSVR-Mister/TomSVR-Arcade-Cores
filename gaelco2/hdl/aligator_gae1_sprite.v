@@ -3,6 +3,9 @@
 module aligator_gae1_sprite (
     input  wire        clk,
     input  wire        wide,       // TomSVR
+    input  wire        tgw,        // TomSVR: 480-pixel lines
+    input  wire        dual,       // TomSVR: dual monitor: draw only sprites whose word 0 bit 15 = scr
+    input  wire        scr,
     input  wire        ce,
     input  wire        start,
     input  wire [8:0]  line,
@@ -55,13 +58,14 @@ module aligator_gae1_sprite (
 
     reg [7:0]  gl0,gl1,gl2,gl3,gl4, gr0,gr1,gr2,gr3,gr4;
 
-    reg [16:0] lb0 [0:383];
-    reg [16:0] lb1 [0:383];
+    reg [16:0] lb0 [0:511];
+    reg [16:0] lb1 [0:511];
     assign lb_q = rbank ? lb1[lb_x] : lb0[lb_x];
 
     wire [14:0] base_word = vreg1[4] ? 15'h800 : 15'h0;
     // MAME: spr_x_adjust = (visible width - 320) - 190 - vreg0 bit 4 (TomSVR: width from 'wide')
-    wire signed [11:0] spradj = (wide ? -12'sd126 : -12'sd190) - {11'b0, vreg0[4]};
+    wire signed [11:0] spradj = (tgw ? -12'sd30 : wide ? -12'sd126 : -12'sd190) - {11'b0, vreg0[4]};
+    wire [9:0] wlast = tgw ? 10'd479 : wide ? 10'd383 : 10'd319;
 
     wire [4:0] ex      = xflip ? (xsize - 5'd1 - cx) : cx;
     wire [9:0] bx_cell = (sx0 + {1'b0, ex, 4'b0}) & 10'h3ff;
@@ -76,7 +80,7 @@ module aligator_gae1_sprite (
     wire [4:0] pen5  = {p4b[bsel], p3b[bsel], p2b[bsel], p1b[bsel], p0b[bsel]};
     wire [3:0] pen   = pen5[3:0];   // shadow/highlight level (MAME skips pens >= 16 there)
     wire signed [11:0] xpos_s = cell_x0 + $signed({8'b0, px});
-    wire       xin   = (xpos_s >= 0) && (xpos_s < (wide ? 12'sd384 : 12'sd320));
+    wire       xin   = (xpos_s >= 0) && (xpos_s <= $signed({2'b0, wlast}));
     wire [8:0] lb_wa = xpos_s[8:0];
 
     wire [16:0] lb_cur = wbank_r ? lb1[lb_wa] : lb0[lb_wa];
@@ -130,7 +134,7 @@ module aligator_gae1_sprite (
             IDLE: ;
             CLR: begin
                 clr_i <= clr_i + 1'b1;
-                if (clr_i == (wide ? 10'd383 : 10'd319)) begin spr_e <= 10'd0; state <= RDW1F; end
+                if (clr_i == wlast) begin spr_e <= 10'd0; state <= RDW1F; end
             end
 
             RDW1F: begin
@@ -141,7 +145,7 @@ module aligator_gae1_sprite (
             end
             RDW0: begin
                 bank_hi <= spr_q[8:0]; color_base <= spr_q[15:9];
-                state <= RDW2;
+                state <= (dual && spr_q[15] != scr) ? NEXT : RDW2;   // TomSVR: other monitor's sprite
             end
             RDW2: begin
                 sx0   <= spr_q[9:0];
@@ -165,7 +169,9 @@ module aligator_gae1_sprite (
             D5RD: begin
                 number      <= {bank_hi, 10'b0} + {7'b0, spr_q[11:0]};
                 cell_idx    <= {(color_base + {3'b0, spr_q[15:12]}), 5'b0};
-                cell_shadow <= ((color_base + {3'b0, spr_q[15:12]}) == 7'h7f);
+                // MAME: shadow colour 0x7f, dual-monitor boards 0x3f/0x7f (last colour of each screen)
+                cell_shadow <= dual ? ((color_base[5:0] + {2'b0, spr_q[15:12]}) == 6'h3f)
+                                    : ((color_base + {3'b0, spr_q[15:12]}) == 7'h7f);
                 state <= FSETL;
             end
             FSETL: begin rom_a <= rom_a_l; state <= FWL; end
@@ -192,7 +198,7 @@ module aligator_gae1_sprite (
     // synthesis translate_off
     integer k;
     initial begin state=IDLE; busy=0; spr_e=0; px=0; clr_i=0; wbank_r=0; cx=0; number=0; wr_q=0;
-        for (k=0;k<384;k=k+1) begin lb0[k]=0; lb1[k]=0; end end
+        for (k=0;k<512;k=k+1) begin lb0[k]=0; lb1[k]=0; end end
     // synthesis translate_on
 endmodule
 

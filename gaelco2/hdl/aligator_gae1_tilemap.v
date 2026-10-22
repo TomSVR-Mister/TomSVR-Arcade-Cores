@@ -5,6 +5,7 @@ module aligator_gae1_tilemap (
     input  wire        ce,
     input  wire        start,
     input  wire [8:0]  line,
+    input  wire [9:0]  wlast,      // TomSVR: last pixel of the line (383, Touch and Go 479)
     input  wire [9:0]  scroll_x,
     input  wire [8:0]  scroll_y,
     input  wire [2:0]  bank,
@@ -100,7 +101,7 @@ module aligator_gae1_tilemap (
             end
             PIX: begin
                 if (wbank_r) lb1[sx[8:0]] <= lb_wdata; else lb0[sx[8:0]] <= lb_wdata;
-                if (sx == 10'd383) begin
+                if (sx == wlast) begin
                     state <= DONE;
                 end else begin
                     sx    <= sx + 10'd1;

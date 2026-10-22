@@ -8,6 +8,9 @@ module aligator_gae1_video (
     input  wire        frame_end,
 
     input  wire [15:0] vreg0, vreg1,
+    input  wire        tgw,        // TomSVR: 480-pixel lines
+    input  wire        dual,       // TomSVR: dual-monitor board (Touch and Go): one tilemap per screen
+    input  wire        scr,        //   screen shown: 0 = tilemap 0, 1 = tilemap 1
 
     output wire [14:0] wrd_a,
     input  wire [15:0] wrd_q,
@@ -78,15 +81,16 @@ module aligator_gae1_video (
     wire [9:0] lb_rx = (hpos - 10'd14) & 10'h1ff;
 `endif
 
+    wire [9:0] wlast = tgw ? 10'd479 : 10'd383;
     aligator_gae1_tilemap u_l0 (
-        .clk(clk), .ce(1'b1), .start(start_r), .line(render_line),
+        .clk(clk), .ce(1'b1), .start(start_r), .line(render_line), .wlast(wlast),
         .scroll_x(sc0x), .scroll_y(scroll0y), .bank(bank0), .busy(),
         .tp_idx(tp0_idx), .tp_q(tp0_q),
         .rom_a(rom_a0), .d_p0(d0_p0), .d_p1(d0_p1), .d_p2(d0_p2), .d_p3(d0_p3), .d_p4(d0_p4), .gfx_ok(gfx0_ok),
         .lb_x(lb_rx), .lb_q(lb_q0), .wbank(wbank), .rbank(rbank)
     );
     aligator_gae1_tilemap u_l1 (
-        .clk(clk), .ce(1'b1), .start(start_r), .line(render_line),
+        .clk(clk), .ce(1'b1), .start(start_r), .line(render_line), .wlast(wlast),
         .scroll_x(sc1x), .scroll_y(scroll1y), .bank(bank1), .busy(),
         .tp_idx(tp1_idx), .tp_q(tp1_q),
         .rom_a(rom_a1), .d_p0(d1_p0), .d_p1(d1_p1), .d_p2(d1_p2), .d_p3(d1_p3), .d_p4(d1_p4), .gfx_ok(gfx1_ok),
@@ -95,15 +99,16 @@ module aligator_gae1_video (
 
     wire [4:0] pen0 = lb_q0[4:0]; wire [6:0] color0 = lb_q0[11:5];
     wire [4:0] pen1 = lb_q1[4:0]; wire [6:0] color1 = lb_q1[11:5];
-    wire op0 = (pen0 != 5'd0);
+    // TomSVR: dual-monitor boards draw only the selected screen's tilemap, colour = layer * 0x40 + 6-bit colour
+    wire op0 = (pen0 != 5'd0) && !(dual && scr);
 `ifdef ALIGATOR_L0ONLY
     wire op1 = 1'b0;
 `else
-    wire op1 = (pen1 != 5'd0);
+    wire op1 = (pen1 != 5'd0) && !(dual && !scr);
 `endif
     always @(posedge clk) if (ce) begin
-        if (op0)      begin pal_index <= {color0, pen0}; opaque <= 1'b1; end
-        else if (op1) begin pal_index <= {color1, pen1}; opaque <= 1'b1; end
+        if (op0)      begin pal_index <= {dual ? 1'b0 : color0[6], color0[5:0], pen0}; opaque <= 1'b1; end
+        else if (op1) begin pal_index <= {dual ? 1'b1 : color1[6], color1[5:0], pen1}; opaque <= 1'b1; end
         else          begin pal_index <= 12'd0;          opaque <= 1'b0; end
     end
 endmodule

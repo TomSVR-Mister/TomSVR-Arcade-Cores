@@ -1,8 +1,8 @@
 CORENAME=JTGAELCO2
 GAMETOP=jtgaelco2_game_sdram
 
-# maximum width (Snow Board 384); 320-pixel games use part of the line buffer
-JTFRAME_WIDTH=384
+# maximum width (Touch and Go 480); narrower games use part of the line buffer
+JTFRAME_WIDTH=480
 JTFRAME_HEIGHT=240
 JTFRAME_COLORW=5
 JTFRAME_BUTTONS=3
@@ -22,6 +22,10 @@ JTFRAME_SDRAM_LARGE
 JTFRAME_BA1_START=0x100000
 JTFRAME_BA2_START=0x1100000
 JTFRAME_PROM_START=0x1500000
+
+[mister]
+# Touch and Go: which monitor to show (status bits 14-13)
+CORE_OSD=ODE,Screen (Touch and Go),1,2;
 
 [mist|sidi]
 JTFRAME_SKIP
