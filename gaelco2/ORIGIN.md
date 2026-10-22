@@ -39,6 +39,7 @@ needs. The protected sets will use our own DS5002FP on jt8051 (from our JTWRALLY
 |---|---|---|---|
 | 1 | jlrh sound: `volume_table.mem` missing from the repository | 2026-10-22, reading the code | fixed (computed from MAME) |
 | 2 | jlrh tilemap: line buffers not mappable to block RAM | 2026-10-22, first Quartus build (77k logic cells, did not fit) | fixed |
-| 3 | jlrh sprites read live sprite RAM; MAME draws from a copy buffered at vblank | 2026-10-22, reading the code | open, check in sim |
+| 3 | jlrh sprites read live sprite RAM; MAME draws from a copy buffered at vblank | 2026-10-22, reading the code | not a bug here: with a vblank buffer the sim showed new sprites a frame later than MAME (tried and reverted) |
 | 4 | JTFRAME_SDRAM_LARGE (as in jlrh's config) made the sim fetch the 68000 program from twice the address | 2026-10-22, sim (line-F trap at boot) | avoided: 8 MB banks |
 | 5 | Ours: SDC file lost its closing brace when trimmed | 2026-10-22, first build | fixed |
+| 6 | Maniac Square boot: during the test-screen fade-out (MAME frames 388-450) the text sprites are one 5-bit step brighter than MAME (1355 px). The game rewrites the text palette (entries 0x400+) right after vblank on odd frames; tile colours (even frames) match MAME exactly | 2026-10-22, sim vs MAME | open, cosmetic |
