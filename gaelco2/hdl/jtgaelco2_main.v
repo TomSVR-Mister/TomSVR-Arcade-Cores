@@ -47,6 +47,7 @@ module jtgaelco2_main(
     input              dip_pause,
     // Snow Board board
     input              snow,
+    input              fast,       // 15 MHz CPU (Snow Board), else 12 MHz
     output reg         xram_cs,
     input      [15:0]  xram_dout,
     output reg         eep_di, eep_clk, eep_cs,
@@ -171,8 +172,8 @@ jtframe_68kdtack_cen #(.W(6),.RECOVERY(1)) u_dtack(
     .bus_ack    ( 1'b0      ),
     .ASn        ( ASn       ),
     .DSn        ( {UDSn,LDSn} ),
-    .num        ( snow ? 5'd5 : 5'd1 ),
-    .den        ( snow ? 6'd16 : 6'd4 ),   // 48 MHz * 1/4 = 12 MHz; Snow Board 48 * 5/16 = 15 MHz
+    .num        ( fast ? 5'd5 : 5'd1 ),
+    .den        ( fast ? 6'd16 : 6'd4 ),   // 48 MHz * 1/4 = 12 MHz; Snow Board 48 * 5/16 = 15 MHz
     .DTACKn     ( DTACKn    ),
     .wait2      ( 1'b0      ),
     .wait3      ( 1'b0      ),

@@ -10,10 +10,11 @@
 # byte 3 bit 0 = DS5002FP present, its 32 kB SRAM image at download offset 0x900000 (PROM).
 import sys, os, re, zipfile, hashlib
 
-SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb', 'snowboar']
+SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb', 'maniacsqs', 'snowboar', 'snowboara']
 GFXA, P4A, PROMA = 0x100000, 0x1100000, 0x1500000
 
 src = open(sys.argv[1]).read()
+src_m = open(os.path.join(os.path.dirname(sys.argv[1]), 'gaelco2_m.cpp')).read()
 zipdir, out = sys.argv[2], sys.argv[3]
 os.makedirs(f'{out}/mra', exist_ok=True)
 
@@ -52,8 +53,10 @@ def machine_cfg(machine):
     vis = re.search(r'set_visarea\(0,\s*(\d+)-1', body)
     base = re.match(r'\s*(\w+)\(config\);', body)
     if not vis and base: return machine_cfg(base.group(1))
+    clk = re.search(r'M68000\(config, m_maincpu, XTAL\((\d+)\'(\d+)\'(\d+)\)\s*/\s*(\d+)\)', body)
+    mhz = int(clk.group(1)) / int(clk.group(4)) if clk else 12
     return dict(wide=1 if vis and int(vis.group(1)) == 384 else 0,
-                snow=1 if 'snowboar_map' in body else 0)
+                snow=1 if 'snowboar_map' in body else 0, fast=1 if mhz == 15 else 0)
 
 DEF = {'Off': 'Off', 'On': 'On', 'Demo_Sounds': 'Demo Sounds', 'Difficulty': 'Difficulty', 'Easy': 'Easy',
        'Normal': 'Normal', 'Hard': 'Hard', 'Hardest': 'Hardest', 'Unknown': 'Unknown', 'Free_Play': 'Free Play',
@@ -118,7 +121,19 @@ def build(setname):
     files = zipfiles(setname, g['parent'])
     prog, gfx = r['maincpu']['roms'], r['gfx']
     mcu = r.get('gaelco_ds5002fp:sram', {}).get('roms', [])
+    # ROMs in "gfx_temp" are split by the driver init (ROM16_split_gfx): even bytes to dest1, odd to dest2
+    if 'gfx_temp' in r:
+        fn = re.search(r'::%s\(\)\s*\{(.*?)^\}' % re.escape(g['init']), src_m, re.S | re.M).group(1)
+        for c in re.finditer(r'ROM16_split_gfx\("gfx_temp",\s*"gfx",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)\)', fn):
+            st, ln, d1, d2 = (num(c.group(i)) for i in range(1, 5))
+            x = next(x for x in r['gfx_temp']['roms'] if x['off'] <= st < x['off'] + x['len'])
+            for half, d in ((0, d1), (1, d2)):
+                gfx['roms'].append(dict(x, kind='split', off=d, len=ln // 2, sofs=st - x['off'], half=half))
+        gfx['roms'] = [x for x in gfx['roms'] if x['crc'] != '00000000']
     have = all(x['crc'] in files for x in prog + gfx['roms'] + mcu)
+    def rdp(x):   # bytes of a gfx entry (split entries: every other byte of their ROM)
+        d = rd(x)
+        return d[x['sofs'] + x['half']::2][:x['len']] if x['kind'] == 'split' else d
     rd = lambda x: files[x['crc']][0].read(files[x['crc']][1])
     plane = gfx['size'] // 5
     psize = plane.bit_length() - 0x80000.bit_length()
@@ -140,7 +155,7 @@ def build(setname):
     banks = bank_offsets(g['machine'])
     bmap = 0
     for i, o in enumerate(banks): bmap |= (o // plane) << (2 * i)
-    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3, lolim, p4lim, 0, 0])
+    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3 | m['fast'] << 4, lolim, p4lim, 0, 0])
 
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     ev = [x for x in prog if x['off'] % 2 == 0]; od = [x for x in prog if x['off'] % 2 == 1]
@@ -161,13 +176,22 @@ def build(setname):
                   {x['off'] - p * plane + x['len'] for p in range(4) for x in planes[p]})
     step = min(x['len'] for p in range(4) for x in planes[p])
     cuts = sorted(set(c for c in cuts if c <= plane) | set(range(0, plane + 1, step)))
+    PAIRMAP = {(0, 1): '0012', (2, 3): '1200'}
+    def src(p, a): return at(p, a) or at(p ^ 2, a) or at(0, a % plen[0])
     for a, b in zip(cuts, cuts[1:]):
         parts.append('        <interleave output="32">')
-        for p in range(4):
-            src = at(p, a) or at(p ^ 2, a) or at(0, a % plen[0])
-            x, off = src
-            ex = (f' offset="0x{off:x}"' if off else '') + (f' length="0x{b - a:x}"' if b - a != x['len'] else '')
-            parts.append(f'            <part {P(x, ex)} map="{MAP[p]}"/>')
+        for pair in ((0, 1), (2, 3)):
+            (x0, o0), (x1, o1) = src(pair[0], a), src(pair[1], a)
+            if x0['kind'] == 'split' or x1['kind'] == 'split':
+                # both planes must be the two halves of one split ROM: one 16-bit part
+                assert x0['name'] == x1['name'] and x0['half'] == 0 and x1['half'] == 1 and o0 == o1, (setname, a)
+                so = x0['sofs'] + 2 * o0
+                ex = (f' offset="0x{so:x}"' if so else '') + f' length="0x{2 * (b - a):x}"'
+                parts.append(f'            <part {P(x0, ex)} map="{PAIRMAP[pair]}"/>')
+                continue
+            for p, (x, off) in zip(pair, ((x0, o0), (x1, o1))):
+                ex = (f' offset="0x{off:x}"' if off else '') + (f' length="0x{b - a:x}"' if b - a != x['len'] else '')
+                parts.append(f'            <part {P(x, ex)} map="{MAP[p]}"/>')
         parts.append('        </interleave>')
     gend = GFXA + 4 * plane
     if bpp5:
@@ -185,19 +209,19 @@ def build(setname):
         pdata = []
         for p in range(4):
             d = bytearray(plane)
-            for x in planes[p]: d[x['off'] - p * plane:x['off'] - p * plane + x['len']] = rd(x)
+            for x in planes[p]: d[x['off'] - p * plane:x['off'] - p * plane + x['len']] = rdp(x)
             pdata.append(d)
         # bytes of planes without ROM: the same substitute data the MRA uses
         for p in range(4):
             for a, b in zip(cuts, cuts[1:]):
                 if at(p, a) is None:
-                    x, off = at(p ^ 2, a) or at(0, a % plen[0]); r = rd(x)
+                    x, off = at(p ^ 2, a) or at(0, a % plen[0]); r = rdp(x)
                     pdata[p][a:b] = r[off:off + b - a]
         g32 = bytearray(4 * plane)
         g32[0::4] = pdata[1]; g32[1::4] = pdata[0]; g32[2::4] = pdata[3]; g32[3::4] = pdata[2]
         img += g32
         if bpp5:
-            p4 = b''.join(rd(x) for x in planes[4]); img += p4 + bytes(plane - len(p4))
+            p4 = b''.join(rdp(x) for x in planes[4]); img += p4 + bytes(plane - len(p4))
         if mcu: img += bytes(PROMA - gend) + rd(mcu[0]); open(f'{out}/{setname}_mcu.bin', 'wb').write(rd(mcu[0]))
         md5 = hashlib.md5(img).hexdigest()
         open(f'{out}/{setname}.rom', 'wb').write(img); open(f'{out}/{setname}.md5', 'w').write(md5)
