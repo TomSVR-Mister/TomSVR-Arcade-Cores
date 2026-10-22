@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-25 MiSTer arcade cores and 174 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+25 MiSTer arcade cores and 177 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** They are built on jotego's JTFRAME framework, but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
@@ -52,7 +52,7 @@ why); the patch is applied in memory by the MRA.
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
-| gaelco2 | Maniac Square (Gaelco, 1996; two unprotected versions) | gaelco2.cpp |
+| gaelco2 | Maniac Square (Gaelco, 1996; protected and unprotected versions), Snow Board Championship (Gaelco / OMK, 1997) | gaelco2.cpp |
 | galpin | Gals Pinball, Hot Pinball | galspnbl.cpp |
 | gumbo | Gumbo, Miss Puzzle, Miss Bingo, Double Point | gumbo.cpp |
 | hdoll | Honey Doll | snowbros.cpp |
