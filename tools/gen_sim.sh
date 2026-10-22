@@ -1,6 +1,6 @@
 #!/bin/bash
 # gen_sim.sh <core> <set> <hdrlen> <cut1> [cut2] [cut3] : sim dir from $J/rom/<set>.rom
-S=/tmp/claude-0/-home-claude/e1042311-2b93-5281-bddb-91ed22183aec/scratchpad; J=$S/comad/jtcores
+J=${J:-/home/claude/jtcores}   # jtcores checkout, with rom/<set>.rom
 C=$1; SET=$2; H=$3; shift 3
 D=$J/cores/$C/ver/$SET; mkdir -p $D; cd $D
 ln -sf ../../../../rom/$SET.rom rom.bin

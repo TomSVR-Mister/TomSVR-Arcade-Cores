@@ -21,14 +21,19 @@ module jtgaelco2_game(
 
 wire        clkg = clk48;
 reg   [2:0] pxdiv = 0;
-reg   [2:0] psize = 0;
-reg   [7:0] hilim = 0, bank_map = 8'he4;
+reg   [2:0] psize;
+reg   [7:0] hilim, bank_map;
 
 always @(posedge clkg) pxdiv <= pxdiv + 3'd1;
 assign pxl_cen  = pxdiv==0;
 assign pxl2_cen = pxdiv==0 || pxdiv==4;
 assign dip_flip   = 1'b0;
 assign debug_view = 8'd0;
+
+`ifdef SIMULATION
+// without -load the header is not downloaded: Maniac Square values
+initial begin psize = 0; hilim = 8'h02; bank_map = 8'h04; end
+`endif
 
 always @(posedge clk) if( header && prog_we ) begin
     if( prog_addr[2:0]==0 ) psize    <= prog_data[2:0];
@@ -199,4 +204,24 @@ assign snd_addr  = rom_asnd & amask;
 assign snd_left  = snd_l;
 assign snd_right = snd_r;
 
+`ifdef SIMULATION
+integer nv=0, np=0, nf=0, nfe=0; reg lvbl_l=0, mok_l=0;
+always @(posedge clkg) begin
+    mok_l <= main_ok & main_cs;
+    if( main_cs & main_ok & ~mok_l && nfe<120 ) begin
+        nfe <= nfe+1;
+        $display("FETCH %h -> %h", {main_addr,1'b0}, main_data);
+    end
+end
+always @(posedge clkg) begin
+    lvbl_l <= LVBL;
+    if( vram_cs & cpu_we ) nv <= nv+1;
+    if( pal_cs  & cpu_we ) np <= np+1;
+    if( lvbl_l & ~LVBL ) begin
+        nf <= nf+1;
+        if( nf<40 || nf%50==0 ) $display("G2 frame %0d pc~%h vram_wr=%0d pal_wr=%0d vregs=%h %h %h", nf,
+            {main_addr,1'b0}, nv, np, vreg0, vreg1, vreg2);
+    end
+end
+`endif
 endmodule

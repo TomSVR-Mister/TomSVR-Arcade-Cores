@@ -11,7 +11,6 @@ JTFRAME_CREDITS
 # 48 MHz game clock, 96 MHz SDRAM (the sprite engine runs at 96 MHz)
 JTFRAME_CLK48
 JTFRAME_SDRAM96
-JTFRAME_SDRAM_LARGE
 JTFRAME_STEREO
 
 # SDRAM layout (download offsets, after the 8-byte header): 68000 program 0, graphics + sound 0x100000
