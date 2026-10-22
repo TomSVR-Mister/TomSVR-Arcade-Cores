@@ -43,3 +43,4 @@ needs. The protected sets will use our own DS5002FP on jt8051 (from our JTWRALLY
 | 4 | JTFRAME_SDRAM_LARGE (as in jlrh's config) made the sim fetch the 68000 program from twice the address | 2026-10-22, sim (line-F trap at boot) | avoided: 8 MB banks |
 | 5 | Ours: SDC file lost its closing brace when trimmed | 2026-10-22, first build | fixed |
 | 6 | Fades looked one step off vs MAME | 2026-10-22, sim vs MAME | not a bug: my comparison was one frame misaligned; sim frames 180-470 are pixel-identical to MAME frame for frame |
+| 7 | Ours: MRA button list had "-" for unused buttons; MiSTer shifted the default mapping (coin and start on face buttons) | 2026-10-22, Tom's hardware test | fixed in the MRAs |
