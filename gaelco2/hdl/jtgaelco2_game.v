@@ -155,7 +155,6 @@ always @(posedge clkg) begin
         end else gsub <= gsub + 6'd1;
     end
 end
-end
 
 // Snow Board: extra RAM at 212000-213FFF and the 93C66 EEPROM (256 x 16 bits) on the LS259 latch
 wire        xram_cs, eep_di, eep_clk, eep_cs, eep_do;
