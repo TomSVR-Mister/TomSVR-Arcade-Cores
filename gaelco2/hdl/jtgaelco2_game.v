@@ -17,7 +17,8 @@
       byte 1: planes 2 and 3 read as zero from word (byte1 << 16) up; 0 = never
       byte 2: sound bank map, 2 bits per bank: plane used by bank 0..3 (MAME set_bank_offsets)
       byte 3: bit 0 DS5002FP protection CPU present; bit 1 Snow Board board (map, 15 MHz, EEPROM, protection);
-              bit 2 384-pixel wide screen; bit 3 fifth graphics plane present (5 bpp); bit 4 15 MHz CPU
+              bit 2 384-pixel wide screen; bit 3 fifth graphics plane present (5 bpp); bit 4 15 MHz CPU;
+              bit 5 Bang! light gun board
       byte 4: planes 0 and 1 read as zero from word (byte4 << 16) up; 0 = never
       byte 5: the fifth plane reads as zero from word (byte5 << 16) up; 0 = never */
 
@@ -29,7 +30,7 @@ wire        clkg = clk48;
 reg   [2:0] pxdiv = 0;
 reg   [2:0] psize;
 reg   [7:0] hilim, lolim, p4lim, bank_map;
-reg         mcu_en, snow, wide, bpp5, fast;
+reg         mcu_en, snow, wide, bpp5, fast, bang;
 reg   [1:0] mcu_cnt = 0;
 
 // pixel clock 48/8 = 6 MHz (384-pixel lines); wide screen 48/7 = 6.86 MHz (440-pixel lines, same 15.6 kHz)
@@ -42,7 +43,7 @@ assign debug_view = 8'd0;
 `ifdef SIMULATION
 // without -load the header is not downloaded: Maniac Square values
 initial begin psize = 0; hilim = 8'h02; lolim = 0; p4lim = 0; bank_map = 8'h04;
-    mcu_en = 0; snow = 0; wide = 0; bpp5 = 0; fast = 0;
+    mcu_en = 0; snow = 0; wide = 0; bpp5 = 0; fast = 0; bang = 0;
 `ifdef SIM_SNOW
     psize = 3; hilim = 8'h20; lolim = 8'h30; p4lim = 8'h20; bank_map = 8'h04; snow = 1; wide = 1; bpp5 = 1; fast = 1;
 `endif
@@ -51,6 +52,9 @@ initial begin psize = 0; hilim = 8'h02; lolim = 0; p4lim = 0; bank_map = 8'h04;
 `endif
 `ifdef SIM_MSQS     // Maniac Square on the Snow Board PCB
     snow = 1;
+`endif
+`ifdef SIM_BANG
+    psize = 2; hilim = 0; lolim = 0; p4lim = 0; bank_map = 8'he4; snow = 1; bpp5 = 1; fast = 1; bang = 1;
 `endif
 `ifdef SIM_MCU
     mcu_en = 1;     // protected sets: jtsim -d SIM_MCU, mcu.bin in the sim folder
@@ -62,7 +66,7 @@ always @(posedge clk) if( header && prog_we ) begin
     if( prog_addr[2:0]==0 ) psize    <= prog_data[2:0];
     if( prog_addr[2:0]==1 ) hilim    <= prog_data;
     if( prog_addr[2:0]==2 ) bank_map <= prog_data;
-    if( prog_addr[2:0]==3 ) { fast, bpp5, wide, snow, mcu_en } <= prog_data[4:0];
+    if( prog_addr[2:0]==3 ) { bang, fast, bpp5, wide, snow, mcu_en } <= prog_data[5:0];
     if( prog_addr[2:0]==4 ) lolim    <= prog_data;
     if( prog_addr[2:0]==5 ) p4lim    <= prog_data;
 end
@@ -113,6 +117,13 @@ jtgaelco2_main u_main(
     .dip_pause  ( dip_pause ),
     .snow       ( snow      ),
     .fast       ( fast      ),
+    .bang       ( bang      ),
+    .irq4       ( gun_tick  ),
+    .gun_ien    (           ),
+    .gun1_x     ( gun_1p_x  ),
+    .gun1_y     ( gun_1p_y  ),
+    .gun2_x     ( gun_2p_x  ),
+    .gun2_y     ( gun_2p_y  ),
     .xram_cs    ( xram_cs   ),
     .xram_dout  ( xram_dout ),
     .eep_di     ( eep_di    ),
@@ -120,6 +131,18 @@ jtgaelco2_main u_main(
     .eep_cs     ( eep_cs    ),
     .eep_do     ( eep_do    )
 );
+
+// Bang! gun interrupt timing: MAME runs a 512-line scanline timer and fires every 64 lines, i.e. eight evenly
+// spaced pulses per frame; here every 33 of the 264 lines, starting at vblank
+reg  [5:0] gsub;
+reg        lhbl_l, lvbl_l2, gun_tick;
+always @(posedge clkg) begin
+    lhbl_l  <= LHBL; lvbl_l2 <= LVBL; gun_tick <= 0;
+    if( lvbl_l2 & ~LVBL ) begin gsub <= 0; gun_tick <= 1; end
+    else if( lhbl_l & ~LHBL ) begin
+        if( gsub==6'd32 ) begin gsub <= 0; gun_tick <= 1; end else gsub <= gsub + 6'd1;
+    end
+end
 
 // Snow Board: extra RAM at 212000-213FFF and the 93C66 EEPROM (256 x 16 bits) on the LS259 latch
 wire        xram_cs, eep_di, eep_clk, eep_cs, eep_do;

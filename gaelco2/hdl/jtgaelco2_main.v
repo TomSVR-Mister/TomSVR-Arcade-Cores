@@ -13,7 +13,9 @@
     FE0000-FE7FFF  work RAM, FE8000-FEFFFF shared RAM (the DS5002FP window on protected sets)
     Snow Board board (snow=1, MAME snowboar_map): 15 MHz CPU, 212000-213FFF extra RAM, P1 300000, P2 300010,
     COIN 300020 (bit 6 = EEPROM data out), LS259 latch on writes to 300000-30000F (D0, A3-A1 = bit:
-    0-1 coin counters, 4 EEPROM DI, 5 CLK, 6 CS), protection 310000-31FFFF (MAME snowboar_protection_r/w). */
+    0-1 coin counters, 4 EEPROM DI, 5 CLK, 6 CS), protection 310000-31FFFF (MAME snowboar_protection_r/w).
+    Bang! (bang=1, MAME bang_map): Snow Board board without protection; light guns at 310000 (X 1P/2P, then
+    Y 1P/2P), a write to 310000 enables the gun interrupt (level 4); the vblank interrupt is level 2. */
 
 module jtgaelco2_main(
     input              clk,
@@ -48,6 +50,10 @@ module jtgaelco2_main(
     // Snow Board board
     input              snow,
     input              fast,       // 15 MHz CPU (Snow Board), else 12 MHz
+    input              bang,       // Bang! light gun board
+    input              irq4,       // gun interrupt timing pulse (Bang!)
+    output reg         gun_ien,    // gun interrupt enabled by the game (Bang!)
+    input      [ 8:0]  gun1_x, gun1_y, gun2_x, gun2_y,   // screen coordinates (JTFRAME light gun)
     output reg         xram_cs,
     input      [15:0]  xram_dout,
     output reg         eep_di, eep_clk, eep_cs,
@@ -61,7 +67,7 @@ wire        RnW, UDSn, LDSn, ASn, DTACKn, cpu_cen, cpu_cenb, BUSn, VPAn;
 wire        IPL6n, ok_dly, int_clr;
 reg  [15:0] cpu_din, vregs[2:4];
 reg         prot_l;
-reg         vregs_cs, in0_cs, in1_cs, coin_cs, latch_cs, prot_cs, p2_cs;
+reg         vregs_cs, in0_cs, in1_cs, coin_cs, latch_cs, prot_cs, p2_cs, gun_cs;
 reg  [31:0] latch;
 
 assign main_addr = A[19:1];
@@ -83,7 +89,8 @@ always @* begin
     in1_cs   = !BUSn && addr[23:1]  == (snow ? 23'h180008 : 23'h180001); // 300002 (Snow Board: P2 at 300010)
     coin_cs  = !BUSn && addr[23:1]  == (snow ? 23'h180010 : 23'h190000); // 320000 (Snow Board: 300020)
     latch_cs = !BUSn && snow && addr[23:4] == 20'h30000;        // 300000-30000F writes
-    prot_cs  = !BUSn && snow && addr[23:16] == 8'h31;           // 310000-31FFFF
+    prot_cs  = !BUSn && snow && !bang && addr[23:16] == 8'h31;  // 310000-31FFFF
+    gun_cs   = !BUSn && bang && addr[23:4] == 20'h31000;        // 310000-31000F
     xram_cs  = !BUSn && snow && addr[23:13] == 11'h109;         // 212000-213FFF
     wram_cs  = !BUSn && addr[23:15] == 9'h1fc;                  // FE0000-FE7FFF
     shram_cs = !BUSn && addr[23:15] == 9'h1fd;                  // FE8000-FEFFFF
@@ -101,6 +108,16 @@ wire [15:0] cin = snow ? { 8'hff, 1'b1, eep_do, start[1], start[0], service, dip
 // Snow Board players: no DIPs (EEPROM), start buttons in COIN
 wire [15:0] sp1 = { 9'h1ff, joystick1[6:4], joystick1[1], joystick1[0], joystick1[2], joystick1[3] };
 wire [15:0] sp2 = { 9'h1ff, joystick2[6:4], joystick2[1], joystick2[0], joystick2[2], joystick2[3] };
+// Bang!: trigger = button 1 on bit 7; guns as MAME bang_state::gun_x/gun_y (screen x + 1, screen y - 4)
+wire [15:0] bp1 = { 8'h00, joystick1[4], 7'h00 };
+wire [15:0] bp2 = { 8'h00, joystick2[4], 7'h00 };
+reg  [15:0] gun_q;
+always @* case( addr[2:1] )
+    2'd0: gun_q = { 7'd0, gun1_x + 9'd1 };
+    2'd1: gun_q = { 7'd0, gun2_x + 9'd1 };
+    2'd2: gun_q = { {7{gun1_y < 9'd4}}, gun1_y - 9'd4 };
+    2'd3: gun_q = { {7{gun2_y < 9'd4}}, gun2_y - 9'd4 };
+endcase
 // pr_o = MAME mangle(latch) (gaelco2_m.cpp get_lo/get_hi/get_out), generated from MAME's code and checked
 // against it on 200 random values
 wire [15:0] pr_lo = { latch[6], latch[11], latch[18], latch[20], latch[3], latch[26], latch[14], latch[2], latch[17], latch[0], latch[4], latch[5], latch[30], latch[13], latch[15], latch[23] };
@@ -118,15 +135,16 @@ always @(posedge clk) begin
                vregs_cs ? vregs[addr[3:1]] :
                xram_cs  ? xram_dout :
                prot_cs  ? { pr_o[7:0], pr_o[15:8] } :
-               in0_cs   ? (snow ? sp1 : in0) :
-               in1_cs   ? (snow ? sp2 : in1) :
+               gun_cs   ? gun_q :
+               in0_cs   ? (bang ? bp1 : snow ? sp1 : in0) :
+               in1_cs   ? (bang ? bp2 : snow ? sp2 : in1) :
                coin_cs  ? cin : 16'hffff;
 end
 
 always @(posedge clk) begin
     if( rst ) begin
         vregs[2] <= 0; vregs[3] <= 0; vregs[4] <= 0;
-        eep_di <= 0; eep_clk <= 0; eep_cs <= 0; latch <= 0; prot_l <= 0;
+        eep_di <= 0; eep_clk <= 0; eep_cs <= 0; latch <= 0; prot_l <= 0; gun_ien <= 0;
     end else begin
         prot_l <= prot_cs & ~RnW;
         if( vregs_cs && !RnW ) begin
@@ -141,17 +159,39 @@ always @(posedge clk) begin
         endcase
         // MAME: m_snowboard_latch = (latch << 16) | data, once per write
         if( prot_cs && !RnW && !prot_l ) latch <= { latch[15:0], cpu_dout };
+        // MAME: a write to 310000 sets m_clr_gun_int, cleared at the vblank interrupt
+        if( gun_cs && !RnW && addr[3:1]==0 ) gun_ien <= 1;
+        if( vbl_pulse ) gun_ien <= 0;
     end
 end
 
-// IRQ 6 on vblank, held until acknowledged (MAME irq6_line_hold)
+// IRQ 6 on vblank, held until acknowledged (MAME irq6_line_hold). Bang!: vblank on level 2 and the gun
+// interrupt on level 4 (MAME bang_irq, HOLD_LINE), each cleared by its own acknowledge cycle.
+reg  lvbl_l;
+wire vbl_pulse = lvbl_l & ~lvbl;
+wire IPL4n;
+always @(posedge clk) lvbl_l <= lvbl;
+
 jtframe_edge #(.QSET(0)) u_irq(
     .rst    ( rst      ),
     .clk    ( clk      ),
     .edgeof ( ~lvbl    ),
-    .clr    ( int_clr  ),
+    .clr    ( int_clr && (bang ? A[3:1]==3'd2 : 1'b1) ),
     .q      ( IPL6n    )
 );
+
+jtframe_edge #(.QSET(0)) u_irq4(
+    .rst    ( rst      ),
+    .clk    ( clk      ),
+    .edgeof ( irq4 & gun_ien & bang ),
+    .clr    ( int_clr && A[3:1]==3'd4 ),
+    .q      ( IPL4n    )
+);
+
+// 68000 IPL (active low): level 6 = 001; Bang! level 4 = 011 has priority over level 2 = 101
+wire [2:0] ipln = !bang      ? { IPL6n, IPL6n, 1'b1 } :
+                  !IPL4n     ? 3'b011 :
+                  !IPL6n     ? 3'b101 : 3'b111;
 
 jtframe_okdly #(.W(1)) u_okdly(
     .rst    ( rst      ),
@@ -202,7 +242,7 @@ jtframe_m68k u_cpu(
     .BGACKn     ( 1'b1        ),
     .BGn        (             ),
     .DTACKn     ( DTACKn      ),
-    .IPLn       ( { IPL6n, IPL6n, 1'b1 } )   // level 6 = 001
+    .IPLn       ( ipln        )
 );
 
 endmodule

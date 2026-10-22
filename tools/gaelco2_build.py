@@ -10,7 +10,8 @@
 # byte 3 bit 0 = DS5002FP present, its 32 kB SRAM image at download offset 0x900000 (PROM).
 import sys, os, re, zipfile, hashlib
 
-SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb', 'maniacsqs', 'snowboar', 'snowboara']
+SETS = ['maniacsq', 'maniacsqc', 'maniacsqa', 'maniacsqb', 'maniacsqs', 'snowboar', 'snowboara',
+        'bang', 'banga', 'bangb', 'bangj', 'bangja', 'bangjb']
 GFXA, P4A, PROMA = 0x100000, 0x1100000, 0x1500000
 
 src = open(sys.argv[1]).read()
@@ -56,7 +57,8 @@ def machine_cfg(machine):
     clk = re.search(r'M68000\(config, m_maincpu, XTAL\((\d+)\'(\d+)\'(\d+)\)\s*/\s*(\d+)\)', body)
     mhz = int(clk.group(1)) / int(clk.group(4)) if clk else 12
     return dict(wide=1 if vis and int(vis.group(1)) == 384 else 0,
-                snow=1 if 'snowboar_map' in body else 0, fast=1 if mhz == 15 else 0)
+                snow=1 if ('snowboar_map' in body or 'bang_map' in body) else 0, fast=1 if mhz == 15 else 0,
+                bang=1 if 'bang_map' in body else 0)
 
 DEF = {'Off': 'Off', 'On': 'On', 'Demo_Sounds': 'Demo Sounds', 'Difficulty': 'Difficulty', 'Easy': 'Easy',
        'Normal': 'Normal', 'Hard': 'Hard', 'Hardest': 'Hardest', 'Unknown': 'Unknown', 'Free_Play': 'Free Play',
@@ -155,7 +157,7 @@ def build(setname):
     banks = bank_offsets(g['machine'])
     bmap = 0
     for i, o in enumerate(banks): bmap |= (o // plane) << (2 * i)
-    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3 | m['fast'] << 4, lolim, p4lim, 0, 0])
+    hdr = bytes([psize, hilim, bmap, (1 if mcu else 0) | snow << 1 | wide << 2 | bpp5 << 3 | m['fast'] << 4 | m['bang'] << 5, lolim, p4lim, 0, 0])
 
     P = lambda x, extra='': f'name="{x["name"]}" crc="{x["crc"]}"{extra}'
     ev = [x for x in prog if x['off'] % 2 == 0]; od = [x for x in prog if x['off'] % 2 == 1]
@@ -232,7 +234,10 @@ def build(setname):
     # boards with an EEPROM (Snow Board) have no DIP switches: settings are in the game's service menu
     switches = (f'    <switches page_id="1" page_name="Switches" base="16" default="{default & 0xff:02x},{default >> 8:02x}">\n'
                 + ''.join('        ' + d + '\n' for d in dips) + '    </switches>\n') if dips else ''
-    bnames = 'Rotate,Button 2,Button 3' if setname.startswith('maniacsq') else 'Button 1,Button 2,Button 3'
+    bnames = 'Rotate,Button 2,Button 3' if setname.startswith('maniacsq') else 'Fire,-,-' if m['bang'] else 'Button 1,Button 2,Button 3'
+    bnames = bnames.replace('Fire,-,-', 'Fire,Button 2,Button 3')
+    # light gun games: core_mod bit 1 makes JTFRAME draw a crosshair (mouse, analog stick, d-pad or Sinden)
+    coremod = '    <rom index="1"><part>02 00</part></rom>\n' if m['bang'] else ''
     zips = f'{setname}.zip|{g["parent"]}.zip' if g['parent'] else f'{setname}.zip'
     nl = '\n'
     mra = f'''<!-- {title} on JTGAELCO2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "{setname}"),
@@ -252,7 +257,7 @@ def build(setname):
     <rom index="0" zip="{zips}" md5="None">
 {nl.join(parts)}
     </rom>
-{switches}    <buttons names="{bnames},Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+{coremod}{switches}    <buttons names="{bnames},Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
 </misterromdescription>
 '''
     fn = re.sub(r'[/:]', '-', g['title'])

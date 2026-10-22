@@ -13,6 +13,8 @@ JTFRAME_CREDITS
 JTFRAME_CLK48
 JTFRAME_SDRAM96
 JTFRAME_STEREO
+# Bang!: guns (the MRA's core_mod light gun flag makes JTFRAME draw the crosshair)
+JTFRAME_LIGHTGUN
 JTFRAME_SDRAM_LARGE
 
 # SDRAM layout (download offsets, after the 8-byte header): 68000 program 0 (bank 0), graphics + sound 0x100000
