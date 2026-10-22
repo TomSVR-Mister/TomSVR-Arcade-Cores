@@ -33,6 +33,8 @@ needs. The protected sets will use our own DS5002FP on jt8051 (from our JTWRALLY
 | `aligator_gae1_tilemap.v` | Line buffer reads registered | combinational reads made Quartus build the buffers from ~24k registers; the design did not fit |
 | `syn/timing.sdc` | Only the 48/96 MHz clock-crossing lines kept | the rest constrained the 8051 we do not use |
 
+Not jlrh's, but noted here: `hdl/jt8051_regs.v` is jotego's jt8051 file with one fix (bug 10).
+
 ## Bugs and differences found
 
 | # | Where | Found | Status |
@@ -46,3 +48,4 @@ needs. The protected sets will use our own DS5002FP on jt8051 (from our JTWRALLY
 | 7 | Ours: MRA button list had "-" for unused buttons; MiSTer shifted the default mapping (coin and start on face buttons) | 2026-10-22, Tom's hardware test | fixed in the MRAs |
 | 8 | jlrh video: line-scroll table indexed by screen line; MAME indexes it by tilemap row (screen line + vertical scroll) | 2026-10-22, reading MAME while chasing a Snow Board difference | fixed (that difference turned out to be #3) |
 | 9 | Snow Board globe: on one frame in three the sim shows the next animation step one frame before MAME | 2026-10-22, every-frame comparison | open, cosmetic: the CPU's sprite write lands just before vblank in the sim and just after it in MAME (MAME's vblank timing is marked not accurate) |
+| 10 | **jotego's jt8051** (jtcores bfced64): bit instructions on ACC, B, PSW (and SP/DPTR writes via the same path) load the bit value instead of the modified byte (`src` instead of `sfr_din`), so SETB ACC.7 gives 01, not 80 | 2026-10-22, protected Maniac Square: matched blocks never cleared (Tom's HW test); found by diffing the DS5002FP's shared-RAM accesses against MAME | fixed in our copy `hdl/jt8051_regs.v`; checking in sim. Also affects our wrally, sqix, semicom cores if their MCU code uses such bit ops |
