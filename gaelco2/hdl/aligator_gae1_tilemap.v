@@ -40,7 +40,11 @@ module aligator_gae1_tilemap (
 
     reg [11:0] lb0 [0:511];
     reg [11:0] lb1 [0:511];
-    assign lb_q = rbank ? lb1[lb_x] : lb0[lb_x];
+    // TomSVR: registered reads so Quartus maps the line buffers to block RAM (the combinational read
+    // built them from ~24k registers). lb_x only changes once per 8-clock pixel, so one clock is harmless.
+    reg [11:0] lbq0, lbq1; reg rbank_q;
+    always @(posedge clk) begin lbq0 <= lb0[lb_x]; lbq1 <= lb1[lb_x]; rbank_q <= rbank; end
+    assign lb_q = rbank_q ? lbq1 : lbq0;
 
     wire [9:0] tmx_next = (sx + 10'd1 + scroll_x) & 10'h3ff;
     wire       half_end = (tmx_next[3] != tmx_r[3]);

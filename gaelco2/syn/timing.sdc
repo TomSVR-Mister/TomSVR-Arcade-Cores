@@ -7,3 +7,4 @@ foreach C96 [list $CLK96A $CLK96B] {
     set_multicycle_path -from [get_clocks $CLK48] -to [get_clocks $C96] -hold  -end 1
     set_multicycle_path -from [get_clocks $C96] -to [get_clocks $CLK48] -setup -end 2
     set_multicycle_path -from [get_clocks $C96] -to [get_clocks $CLK48] -hold  -end 1
+}
