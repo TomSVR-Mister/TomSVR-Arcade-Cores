@@ -38,8 +38,10 @@ module aligator_gae1_video (
     reg [8:0] scroll0y, scroll1y;
     reg [9:0] scroll0x, scroll1x;
     reg [9:0] ls0, ls1;
-    assign wrd_a = (scnt==3'd4) ? (15'h1000 + {6'd0, render_line}) :
-                   (scnt==3'd5) ? (15'h1200 + {6'd0, render_line}) :
+    // TomSVR: MAME's rowscroll table is indexed by tilemap row (screen line + vertical scroll), not screen line
+    wire [8:0] ls_row0 = render_line + scroll0y, ls_row1 = render_line + scroll1y;
+    assign wrd_a = (scnt==3'd4) ? (15'h1000 + {6'd0, ls_row0}) :
+                   (scnt==3'd5) ? (15'h1200 + {6'd0, ls_row1}) :
 
                                   (15'h1400 + {12'd0, scnt});
     always @(posedge clk) if (ce) begin

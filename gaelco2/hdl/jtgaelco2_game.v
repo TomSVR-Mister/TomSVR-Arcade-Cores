@@ -321,7 +321,7 @@ always @(posedge clkg) begin
     if( pal_cs  & cpu_we ) np <= np+1;
     if( lvbl_l & ~LVBL ) begin
         nf <= nf+1;
-        if( nf<40 || nf%50==0 ) $display("G2 frame %0d pc~%h vram_wr=%0d pal_wr=%0d vregs=%h %h %h mcu_shwr=%0d", nf,
+        if( nf<40 || nf%50==0 || (nf>=1100 && nf%20==0) ) $display("G2 frame %0d pc~%h vram_wr=%0d pal_wr=%0d vregs=%h %h %h mcu_shwr=%0d", nf,
             {main_addr,1'b0}, nv, np, vreg0, vreg1, vreg2, nmw);
     end
 end
