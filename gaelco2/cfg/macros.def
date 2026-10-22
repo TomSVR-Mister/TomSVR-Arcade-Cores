@@ -1,7 +1,8 @@
 CORENAME=JTGAELCO2
 GAMETOP=jtgaelco2_game_sdram
 
-JTFRAME_WIDTH=320
+# maximum width (Snow Board 384); 320-pixel games use part of the line buffer
+JTFRAME_WIDTH=384
 JTFRAME_HEIGHT=240
 JTFRAME_COLORW=5
 JTFRAME_BUTTONS=3
