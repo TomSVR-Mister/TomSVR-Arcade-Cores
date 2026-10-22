@@ -30,7 +30,7 @@ wire [ 6:0] ram_addr;
 wire        ram_we, pre_wr, pre_acc;
 reg  [15:0] rom_addr, xa;
 reg  [ 7:0] xd;
-reg         xw;
+reg         xw, xrd;
 reg  [ 1:0] cen_dly;
 
 wire        sram_sel = xa[15:12] != 0 && !xa[15];   // 1000-7FFF
@@ -48,6 +48,7 @@ always @(posedge clk) begin
         xa       <= pre_addr;
         xd       <= pre_dout;
         xw       <= pre_wr & pre_acc;
+        xrd      <= ~pre_wr & pre_acc;
         rom_addr <= pre_rom;
     end
 end
@@ -104,4 +105,13 @@ jt8051 u_mcu(
     .x_acc      ( pre_acc   )
 );
 
+`ifdef SIMULATION
+// access log for comparing with MAME (hostmem space = 8000-FFFF window): enabled by the game's frame counter
+reg log_en = 0, xw_l = 0;
+always @(posedge clk) begin
+    xw_l <= xw;
+    if( log_en && cen && xrd && xa[15] ) $display("R %04x %02x", xa, x_din);
+    if( log_en && xw && !xw_l && xa[15] ) $display("W %04x %02x", xa, xd);
+end
+`endif
 endmodule

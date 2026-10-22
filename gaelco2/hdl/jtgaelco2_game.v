@@ -320,6 +320,7 @@ always @(posedge clkg) begin
     lvbl_l <= LVBL;
     if( vram_cs & cpu_we ) nv <= nv+1;
     if( mcu_sw ) nmw <= nmw+1;
+    u_mcu.log_en <= nf>=1596 && nf<=1625;
     if( pal_cs  & cpu_we ) np <= np+1;
     if( lvbl_l & ~LVBL ) begin
         nf <= nf+1;
