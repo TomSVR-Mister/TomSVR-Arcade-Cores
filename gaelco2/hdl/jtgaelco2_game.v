@@ -107,6 +107,7 @@ wire [11:0] pal_a;
 jtgaelco2_vmem u_vmem(
     .clk        ( clkg      ),
     .clk96      ( clk96     ),
+    .vb_start   ( vblank_irq),
     .cpu_addr   ( cpu_addr  ),
     .cpu_dsn    ( cpu_dsn   ),
     .cpu_we     ( cpu_we    ),
