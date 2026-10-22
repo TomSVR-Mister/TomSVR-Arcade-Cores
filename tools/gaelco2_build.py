@@ -196,7 +196,8 @@ def build(setname):
                 parts.append(f'            <part {P(x, ex)} map="{MAP[p]}"/>')
         parts.append('        </interleave>')
     gend = GFXA + 4 * plane
-    if bpp5:
+    if bpp5:   # plane 5 starts at P4A (BA2_START); pad the gap after planes 1-4 (none when the plane is 4 MB)
+        if gend < P4A: parts.append(f'        <part repeat="0x{P4A - gend:x}"> 00</part>')
         for x in planes[4]: parts.append(f'        <part {P(x)}/>')
         if plen[4] < plane: parts.append(f'        <part repeat="0x{plane - plen[4]:x}"> 00</part>')
         gend = P4A + plane
@@ -223,7 +224,7 @@ def build(setname):
         g32[0::4] = pdata[1]; g32[1::4] = pdata[0]; g32[2::4] = pdata[3]; g32[3::4] = pdata[2]
         img += g32
         if bpp5:
-            p4 = b''.join(rdp(x) for x in planes[4]); img += p4 + bytes(plane - len(p4))
+            p4 = b''.join(rdp(x) for x in planes[4]); img += bytes(P4A - (GFXA + 4 * plane)) + p4 + bytes(plane - len(p4))
         if mcu: img += bytes(PROMA - gend) + rd(mcu[0]); open(f'{out}/{setname}_mcu.bin', 'wb').write(rd(mcu[0]))
         md5 = hashlib.md5(img).hexdigest()
         open(f'{out}/{setname}.rom', 'wb').write(img); open(f'{out}/{setname}.md5', 'w').write(md5)

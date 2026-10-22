@@ -54,7 +54,7 @@ initial begin psize = 0; hilim = 8'h02; lolim = 0; p4lim = 0; bank_map = 8'h04;
     snow = 1;
 `endif
 `ifdef SIM_BANG
-    psize = 2; hilim = 0; lolim = 0; p4lim = 0; bank_map = 8'he4; snow = 1; bpp5 = 1; fast = 1; bang = 1;
+    psize = 2; hilim = 8'h18; lolim = 8'h18; p4lim = 8'h10; bank_map = 8'he4; snow = 1; bpp5 = 1; fast = 1; bang = 1;
 `endif
 `ifdef SIM_MCU
     mcu_en = 1;     // protected sets: jtsim -d SIM_MCU, mcu.bin in the sim folder
