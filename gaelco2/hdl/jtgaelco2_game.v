@@ -163,11 +163,20 @@ wire [ 1:0] xwe = (xram_cs & cpu_we) ? cpu_dsn : 2'b0;
 jtframe_ram16 #(.AW(12)) u_xram(
     .clk( clkg ), .data( cpu_dout ), .addr( cpu_addr[12:1] ), .we( xwe ), .q( xram_dout )
 );
+// jt9346 only takes a start bit when DI rises between clocks, so a command that follows a word ending in 1 is missed
+// (as in our Hot Mind core): Bang! read its Y gun calibration (word DA, FFFF) as C000, put every shot off screen and
+// never hit. One extra clock with DI low when CS rises (ignored while the chip waits for the start bit) clears it.
+reg  [2:0] eep_inj;
+reg        eep_csl;
+always @(posedge clkg) begin
+    eep_csl <= eep_cs;
+    eep_inj <= eep_cs && !eep_csl ? 3'b111 : eep_inj >> 1;
+end
 jt9346 #(.AW(8),.DW(16)) u_eeprom(
     .rst        ( rst       ),
     .clk        ( clkg      ),
-    .sclk       ( eep_clk   ),
-    .sdi        ( eep_di    ),
+    .sclk       ( eep_clk | eep_inj[1] ),
+    .sdi        ( eep_di & ~|eep_inj ),
     .sdo        ( eep_do    ),
     .scs        ( eep_cs    ),
     .dump_clk   ( clkg      ),
