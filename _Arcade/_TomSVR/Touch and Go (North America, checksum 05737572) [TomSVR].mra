@@ -1,0 +1,89 @@
+<!-- Touch and Go (North America, checksum 05737572) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "touchgona"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Touch and Go (North America, checksum 05737572) [TomSVR]</name>
+    <setname>touchgona</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1995</year>
+    <manufacturer>Gaelco</manufacturer>
+    <players>4</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="touchgona.zip|touchgo.zip" md5="None">
+        <part>03 20 04 49 30 20 00 00</part>
+        <interleave output="16">
+            <part name="v_us_56_f546_14-11.ic56" crc="3bfe2010" map="10"/>
+            <part name="v_us_57_d888_14-11.ic57" crc="c8a9e7bd" map="01"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a0_193f_27c040.bin" crc="41c90162" map="0010"/>
+            <part name="tg_b0_fb48_27c040.bin" crc="fe8eb187" map="0001"/>
+            <part name="tg_c0_a325_27c040.bin" crc="fafcb7f8" map="1000"/>
+            <part name="tg_d0_3d37_27c4001.bin" crc="1e1fc30a" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a1_5dce_27c4001.bin" crc="491238f9" map="0010"/>
+            <part name="tg_b1_ac00_27c4001.bin" crc="8860b58d" map="0001"/>
+            <part name="tg_c1_afd5_27c040.bin" crc="458167dc" map="1000"/>
+            <part name="tg_d1_b966_27c040.bin" crc="e9b9ba8a" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a2_d081_27c040.bin" crc="1586253d" map="0010"/>
+            <part name="tg_b2_1b47_27c4001.bin" crc="2f03c5f5" map="0001"/>
+            <part name="tg_c2_0610_27c040.bin" crc="85c2c678" map="1000"/>
+            <part name="tg_d2_5aca_27c4001.bin" crc="a0d0f560" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a3_044b_27c040.bin" crc="ed8a7fb9" map="0010"/>
+            <part name="tg_b3_4da7_27c040.bin" crc="eacc3fb2" map="0001"/>
+            <part name="tg_c3_8d08_27c040.bin" crc="8364f252" map="1000"/>
+            <part name="tg_d3_e7dd_27c040.bin" crc="da2800c0" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a4_8a5c_27c040.bin" crc="7fb87c24" map="0010"/>
+            <part name="tg_b4_15b6_27c040.bin" crc="22cb5327" map="0001"/>
+            <part name="tg_a4_8a5c_27c040.bin" crc="7fb87c24" map="1000"/>
+            <part name="tg_b4_15b6_27c040.bin" crc="22cb5327" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a5_aab8_27c040.bin" crc="74857bb1" map="0010"/>
+            <part name="tg_b5_5da0_27c040.bin" crc="b6ad12bc" map="0001"/>
+            <part name="tg_a5_aab8_27c040.bin" crc="74857bb1" map="1000"/>
+            <part name="tg_b5_5da0_27c040.bin" crc="b6ad12bc" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a0_193f_27c040.bin" crc="41c90162" map="0010"/>
+            <part name="tg_a0_193f_27c040.bin" crc="41c90162" map="0001"/>
+            <part name="tg_a0_193f_27c040.bin" crc="41c90162" map="1000"/>
+            <part name="tg_a0_193f_27c040.bin" crc="41c90162" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="tg_a1_5dce_27c4001.bin" crc="491238f9" map="0010"/>
+            <part name="tg_a1_5dce_27c4001.bin" crc="491238f9" map="0001"/>
+            <part name="tg_a1_5dce_27c4001.bin" crc="491238f9" map="1000"/>
+            <part name="tg_a1_5dce_27c4001.bin" crc="491238f9" map="0100"/>
+        </interleave>
+        <part name="tg_e0_36e8_27c040.bin" crc="5b17a97a"/>
+        <part name="tg_e1_f282_27c4001.bin" crc="4471097f"/>
+        <part name="tg_e2_4b24_27c4001.bin" crc="73a3fe2f"/>
+        <part name="tg_e3_aed9_27c4001.bin" crc="d0b1422e"/>
+        <part repeat="0x200000"> 00</part>
+        <part name="touchgo_ds5002fp_sram.bin" crc="6a238adb"/>
+        <part name="touchgo_scratch" crc="f9ca54ff"/>
+        <patch offset="0x8">FE</patch>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="cf,ff">
+        <dip name="Difficulty" bits="0,1" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Credit configuration" bits="2" ids="2 Credits Start/1 Credit Continue,1 Credit Start/1 Credit Continue"/>
+        <dip name="Coin Slot" bits="3" ids="Common,Independent"/>
+        <dip name="Monitor Type" bits="4,5" ids="Double monitor  4 players,-,Single monitor  4 players,Single monitor  2 players"/>
+        <dip name="Demo Sounds" bits="6" ids="Off,On"/>
+        <dip name="Service Mode" bits="7" ids="On,Off"/>
+        <dip name="Coin A" bits="8,9,10,11" ids="Disabled or Free Play (if Coin B too),4C/5C,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="12,13,14,15" ids="Disabled or Free Play (if Coin A too),4C/5C,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
