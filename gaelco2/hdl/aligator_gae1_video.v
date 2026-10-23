@@ -38,17 +38,50 @@ module aligator_gae1_video (
     always @(posedge clk) start_r <= line_change;
 
     reg [2:0] scnt = 3'd0;
+    // TomSVR: dual-monitor boards (MAME gaelco2_dual_state::get_rowscrollmode_yscroll): in line-scroll mode the
+    // vertical scroll of each screen's tilemap gets 0-31 extra lines, worked out from bit 12 of 32 VRAM words at
+    // 0x1040 + offset*3 + 1 (screen 2: 0x1240 ...): 31 - (first index, in this table's order, whose bit is set).
+    // Touch and Go's court sat 31 lines too high without it. One word is read per 7 pixel clocks.
+    reg  [5:0] chk_k = 6'd0;
+    reg  [4:0] chk_min;
+    reg        chk_found;
+    reg  [4:0] yadd0 = 5'd0, yadd1 = 5'd0;
+    reg  [4:0] chk_off;
+    always @(*) case (chk_k[4:0])
+        5'd0: chk_off=5'h02; 5'd1: chk_off=5'h0e; 5'd2: chk_off=5'h0a; 5'd3: chk_off=5'h1b;
+        5'd4: chk_off=5'h15; 5'd5: chk_off=5'h13; 5'd6: chk_off=5'h04; 5'd7: chk_off=5'h19;
+        5'd8: chk_off=5'h0c; 5'd9: chk_off=5'h1f; 5'd10: chk_off=5'h08; 5'd11: chk_off=5'h1d;
+        5'd12: chk_off=5'h11; 5'd13: chk_off=5'h06; 5'd14: chk_off=5'h17; 5'd15: chk_off=5'h10;
+        5'd16: chk_off=5'h01; 5'd17: chk_off=5'h0d; 5'd18: chk_off=5'h16; 5'd19: chk_off=5'h09;
+        5'd20: chk_off=5'h1a; 5'd21: chk_off=5'h05; 5'd22: chk_off=5'h1e; 5'd23: chk_off=5'h00;
+        5'd24: chk_off=5'h12; 5'd25: chk_off=5'h0b; 5'd26: chk_off=5'h14; 5'd27: chk_off=5'h03;
+        5'd28: chk_off=5'h1c; 5'd29: chk_off=5'h18; 5'd30: chk_off=5'h07; default: chk_off=5'h0f;
+    endcase
+    wire [14:0] chk_addr = (chk_k[5] ? 15'h1240 : 15'h1040) + {8'd0, chk_off, 1'b0} + {9'd0, chk_off} + 15'd1;
+    wire [8:0] yadd0_eff = (dual && vreg0[15]) ? {4'd0, yadd0} : 9'd0;
+    wire [8:0] yadd1_eff = (dual && vreg1[15]) ? {4'd0, yadd1} : 9'd0;
     reg [8:0] scroll0y, scroll1y;
     reg [9:0] scroll0x, scroll1x;
     reg [9:0] ls0, ls1;
     // TomSVR: MAME's rowscroll table is indexed by tilemap row (screen line + vertical scroll), not screen line
-    wire [8:0] ls_row0 = render_line + scroll0y, ls_row1 = render_line + scroll1y;
+    wire [8:0] scroll0y_eff = scroll0y + yadd0_eff, scroll1y_eff = scroll1y + yadd1_eff;
+    wire [8:0] ls_row0 = render_line + scroll0y_eff, ls_row1 = render_line + scroll1y_eff;
     assign wrd_a = (scnt==3'd4) ? (15'h1000 + {6'd0, ls_row0}) :
                    (scnt==3'd5) ? (15'h1200 + {6'd0, ls_row1}) :
+                   (scnt==3'd6) ? chk_addr :
 
                                   (15'h1400 + {12'd0, scnt});
     always @(posedge clk) if (ce) begin
-        scnt <= (scnt==3'd5) ? 3'd0 : scnt + 3'd1;
+        scnt <= (scnt==3'd6) ? 3'd0 : scnt + 3'd1;
+        if (scnt==3'd6) begin
+            chk_k <= chk_k + 6'd1;
+            if (wrd_q[12] && !chk_found) begin chk_found <= 1'b1; chk_min <= chk_k[4:0]; end
+            if (chk_k[4:0]==5'd31) begin
+                if (chk_k[5]) yadd1 <= (wrd_q[12] && !chk_found) ? 5'd0 : chk_found ? 5'd31 - chk_min : 5'd0;
+                else          yadd0 <= (wrd_q[12] && !chk_found) ? 5'd0 : chk_found ? 5'd31 - chk_min : 5'd0;
+                chk_found <= 1'b0;
+            end
+        end
         case (scnt)
             3'd0: scroll0y <= wrd_q[8:0] + 9'd1;
             3'd1: scroll0x <= wrd_q[9:0] + 10'h14;
@@ -84,14 +117,14 @@ module aligator_gae1_video (
     wire [9:0] wlast = tgw ? 10'd479 : 10'd383;
     aligator_gae1_tilemap u_l0 (
         .clk(clk), .ce(1'b1), .start(start_r), .line(render_line), .wlast(wlast),
-        .scroll_x(sc0x), .scroll_y(scroll0y), .bank(bank0), .busy(),
+        .scroll_x(sc0x), .scroll_y(scroll0y_eff), .bank(bank0), .busy(),
         .tp_idx(tp0_idx), .tp_q(tp0_q),
         .rom_a(rom_a0), .d_p0(d0_p0), .d_p1(d0_p1), .d_p2(d0_p2), .d_p3(d0_p3), .d_p4(d0_p4), .gfx_ok(gfx0_ok),
         .lb_x(lb_rx), .lb_q(lb_q0), .wbank(wbank), .rbank(rbank)
     );
     aligator_gae1_tilemap u_l1 (
         .clk(clk), .ce(1'b1), .start(start_r), .line(render_line), .wlast(wlast),
-        .scroll_x(sc1x), .scroll_y(scroll1y), .bank(bank1), .busy(),
+        .scroll_x(sc1x), .scroll_y(scroll1y_eff), .bank(bank1), .busy(),
         .tp_idx(tp1_idx), .tp_q(tp1_q),
         .rom_a(rom_a1), .d_p0(d1_p0), .d_p1(d1_p1), .d_p2(d1_p2), .d_p3(d1_p3), .d_p4(d1_p4), .gfx_ok(gfx1_ok),
         .lb_x(lb_rx), .lb_q(lb_q1), .wbank(wbank), .rbank(rbank)
