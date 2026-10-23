@@ -27,10 +27,17 @@ module aligator_gae1_sprite (
     input  wire        rbank
 );
 
-    localparam [3:0] IDLE=0, CLR=1, RDW1F=2, RDW0=3, RDW2=4, RDW3=5, SETUP=6,
-                     D5ADR=7, D5RD=8, FSETL=9, FWL=10, FSETR=11, FWR=12, PWR=13, NEXT=14, DON=15;
+    localparam [4:0] IDLE=0, CLR=1, RDW1F=2, RDW0=3, RDW2=4, RDW3=5, SETUP=6,
+                     D5ADR=7, D5RD=8, FSETL=9, FWL=10, FSETR=11, FWR=12, HAND=13, NEXT=14, DON=15;
 
-    reg [3:0]  state;
+    reg [4:0]  state;
+    // TomSVR: separate draw unit. The fetch FSM hands a cell (both 8-pixel halves) to it and goes on fetching the
+    // next cell while the 16 pixels are written, so a cell costs max(16, fetch) clocks instead of 16 + fetch.
+    reg        d_act, d_xflip, d_shadow;
+    reg [3:0]  dpx;
+    reg [11:0] d_idx;
+    reg signed [11:0] d_x0;
+    reg [7:0]  dl0,dl1,dl2,dl3,dl4, dr0,dr1,dr2,dr3,dr4;
     reg [9:0]  spr_e;
     reg [9:0]  clr_i;
     reg [8:0]  line_r;
@@ -70,24 +77,24 @@ module aligator_gae1_sprite (
     wire [4:0] ex      = xflip ? (xsize - 5'd1 - cx) : cx;
     wire [9:0] bx_cell = (sx0 + {1'b0, ex, 4'b0}) & 10'h3ff;
 
-    wire [3:0] gpx   = xflip ? (4'd15 - px) : px;
+    wire [3:0] gpx   = d_xflip ? (4'd15 - dpx) : dpx;
     wire [2:0] bsel  = 3'd7 - gpx[2:0];
-    wire [7:0] p0b   = gpx[3] ? gr0 : gl0;
-    wire [7:0] p1b   = gpx[3] ? gr1 : gl1;
-    wire [7:0] p2b   = gpx[3] ? gr2 : gl2;
-    wire [7:0] p3b   = gpx[3] ? gr3 : gl3;
-    wire [7:0] p4b   = gpx[3] ? gr4 : gl4;
+    wire [7:0] p0b   = gpx[3] ? dr0 : dl0;
+    wire [7:0] p1b   = gpx[3] ? dr1 : dl1;
+    wire [7:0] p2b   = gpx[3] ? dr2 : dl2;
+    wire [7:0] p3b   = gpx[3] ? dr3 : dl3;
+    wire [7:0] p4b   = gpx[3] ? dr4 : dl4;
     wire [4:0] pen5  = {p4b[bsel], p3b[bsel], p2b[bsel], p1b[bsel], p0b[bsel]};
     wire [3:0] pen   = pen5[3:0];   // shadow/highlight level (MAME skips pens >= 16 there)
-    wire signed [11:0] xpos_s = cell_x0 + $signed({8'b0, px});
+    wire signed [11:0] xpos_s = d_x0 + $signed({8'b0, dpx});
     wire       xin   = (xpos_s >= 0) && (xpos_s <= $signed({2'b0, wlast}));
     wire [8:0] lb_wa = xpos_s[8:0];
 
     wire [16:0] lb_cur = wbank_r ? lb1[lb_wa] : lb0[lb_wa];
-    wire [16:0] lb_new = cell_shadow
+    wire [16:0] lb_new = d_shadow
         ? {1'b1, pen, (lb_cur[16] ? lb_cur[11:0] : 12'd0)}
-        : {1'b1, 4'd0, (cell_idx | {7'b0, pen5})};
-    wire       do_write = (state==PWR) && (pen5 != 5'd0) && xin && !(cell_shadow && pen5[4]);
+        : {1'b1, 4'd0, (d_idx | {7'b0, pen5})};
+    wire       do_write = d_act && (pen5 != 5'd0) && xin && !(d_shadow && pen5[4]);
 
     wire [21:0] rom_a_l = {number, 1'b0, gpy};
     wire [21:0] rom_a_r = {number, 1'b1, gpy};
@@ -100,6 +107,9 @@ module aligator_gae1_sprite (
     wire [8:0]  rely_w    = (line_r - sy0_w) & 9'h1ff;
     wire        proceed_w = spr_q[9] & (rely_w < {ysize_w, 4'b0});
 
+    // TomSVR: a cell entirely left or right of the visible line is skipped before its graphics are fetched
+    wire signed [11:0] cx0_now = $signed({2'b0, bx_cell}) + spradj;
+    wire       cell_off = (cx0_now < -12'sd15) || (cx0_now > $signed({2'b0, wlast}));
     wire [14:0] d5_addr = (ptr_w + {6'b0, row_off} + {10'b0, cx}) & 15'h7fff;
     always @(*) begin
         case (state)
@@ -128,7 +138,9 @@ module aligator_gae1_sprite (
     end
 
     always @(posedge clk) if (ce) begin
+        if (d_act) begin dpx <= dpx + 4'd1; if (dpx == 4'd15) d_act <= 1'b0; end
         if (start) begin
+            d_act <= 1'b0;
             line_r <= line; clr_i <= 10'd0; busy <= 1'b1; wbank_r <= wbank; state <= CLR;
         end else case (state)
             IDLE: ;
@@ -165,7 +177,9 @@ module aligator_gae1_sprite (
                 state   <= D5ADR;
             end
 
-            D5ADR: state <= D5RD;
+            D5ADR: if (cell_off) begin
+                       if (cx + 5'd1 < xsize) cx <= cx + 5'd1; else state <= NEXT;
+                   end else state <= D5RD;
             D5RD: begin
                 number      <= {bank_hi, 10'b0} + {7'b0, spr_q[11:0]};
                 cell_idx    <= {(color_base + {3'b0, spr_q[15:12]}), 5'b0};
@@ -177,27 +191,29 @@ module aligator_gae1_sprite (
             FSETL: begin rom_a <= rom_a_l; state <= FWL; end
             FWL:   if (gfx_ok) begin gl0<=d_p0; gl1<=d_p1; gl2<=d_p2; gl3<=d_p3; gl4<=d_p4; rom_a<=rom_a_r; state<=FSETR; end
             FSETR: state <= FWR;
-            FWR:   if (gfx_ok) begin gr0<=d_p0; gr1<=d_p1; gr2<=d_p2; gr3<=d_p3; gr4<=d_p4; px<=4'd0; bx<=bx_cell;
+            FWR:   if (gfx_ok) begin gr0<=d_p0; gr1<=d_p1; gr2<=d_p2; gr3<=d_p3; gr4<=d_p4; bx<=bx_cell;
                        cell_x0 <= $signed({2'b0, bx_cell}) + spradj;
-                       state<=PWR; end
-            PWR: begin
-                if (px == 4'd15) begin
-                    if (cx + 5'd1 < xsize) begin cx <= cx + 5'd1; state <= D5ADR; end
-                    else state <= NEXT;
-                end else px <= px + 4'd1;
+                       state<=HAND; end
+            HAND: if (!d_act || dpx == 4'd15) begin    // hand the cell to the draw unit
+                dl0<=gl0; dl1<=gl1; dl2<=gl2; dl3<=gl3; dl4<=gl4;
+                dr0<=gr0; dr1<=gr1; dr2<=gr2; dr3<=gr3; dr4<=gr4;
+                d_idx <= cell_idx; d_shadow <= cell_shadow; d_x0 <= cell_x0; d_xflip <= xflip;
+                dpx <= 4'd0; d_act <= 1'b1;
+                if (cx + 5'd1 < xsize) begin cx <= cx + 5'd1; state <= D5ADR; end
+                else state <= NEXT;
             end
             NEXT: if (spr_e < 10'd511) begin
                       spr_e <= spr_e + 10'd1;
                       state <= RDW1F;
                   end else state <= DON;
-            DON:  begin busy <= 1'b0; state <= IDLE; end
+            DON:  if (!d_act) begin busy <= 1'b0; state <= IDLE; end
             default: state <= IDLE;
         endcase
     end
 
     // synthesis translate_off
     integer k;
-    initial begin state=IDLE; busy=0; spr_e=0; px=0; clr_i=0; wbank_r=0; cx=0; number=0; wr_q=0;
+    initial begin state=IDLE; busy=0; d_act=0; dpx=0; spr_e=0; px=0; clr_i=0; wbank_r=0; cx=0; number=0; wr_q=0;
         for (k=0;k<512;k=k+1) begin lb0[k]=0; lb1[k]=0; end end
     // synthesis translate_on
 endmodule
