@@ -113,7 +113,7 @@ wire [15:0] bp1 = { 8'h00, joystick1[4], 7'h00 };
 wire [15:0] bp2 = { 8'h00, joystick2[4], 7'h00 };
 reg  [15:0] gun_q;
 always @* case( addr[2:1] )
-`ifdef SIM_BANG     // sim: gun 1 where MAME's port value 0x80,0x80 puts it
+`ifndef BANGDIAG_NEVER     // DIAGNOSTIC BUILD: guns fixed at the screen centre (as the sim)
     2'd0: gun_q = 16'd161;
     2'd1: gun_q = 16'd161;
     2'd2: gun_q = 16'd116;
