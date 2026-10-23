@@ -1,6 +1,6 @@
 # How the 22 released cores are put together
 
-This covers the 25 released cores and their 185 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 25 released cores and their 193 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
