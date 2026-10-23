@@ -91,7 +91,7 @@ def ports(name):
             mask = f(num(d.group(1)))
             cur = dict(name=label(d.group(3)), mask=mask, default=f(num(d.group(2))), settings={})
             dips[mask] = cur; continue
-        s = re.match(r'PORT_DIPSETTING\(\s*(0x[0-9a-fA-F]+),\s*(.+?)\s*\)\s*$', line)
+        s = re.match(r'PORT_DIPSETTING\(\s*(0x[0-9a-fA-F]+),\s*("[^"]*"|DEF_STR\(\s*\w+\s*\))', line)
         if s and cur is not None: cur['settings'].setdefault(f(num(s.group(1))), label(s.group(2))); continue
         sv = re.match(r'PORT_SERVICE(?:_DIPLOC)?\(\s*(0x[0-9a-fA-F]+),\s*IP_ACTIVE_LOW', line)
         if sv:
