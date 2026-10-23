@@ -1,6 +1,6 @@
 # How the 22 released cores are put together
 
-This covers the 25 released cores and their 177 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 25 released cores and their 185 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
@@ -149,7 +149,7 @@ One core can run several board variants because the header tells it which one it
 | jtys8 | byte 0 bit 0: 2 MB background; bit 1: Cannon Ball vertical |
 | jthotblk | header present, all zero |
 | jtdynduke | byte 0 bit 0: The Double Dynamites I/O map |
-| jtgaelco2 | byte 0: graphics plane size (0x80000 << n); byte 1/4/5: planes 2-3 / 0-1 / 4 read as zero from word byte << 16; byte 2: sound bank to plane map; byte 3: bit 0 DS5002FP, bit 1 Snow Board board, bit 2 384-pixel screen, bit 3 fifth plane |
+| jtgaelco2 | byte 0: graphics plane size (0x80000 << n); byte 1/4/5: planes 2-3 / 0-1 / 4 read as zero from word byte << 16; byte 2: sound bank to plane map; byte 3: bit 0 DS5002FP, bit 1 Snow Board board, bit 2 384-pixel screen, bit 3 fifth plane, bit 4 15 MHz CPU, bit 5 Bang! light-gun board, bit 6 Touch and Go board (480-pixel dual monitor, 16 MHz, 4 players) |
 | jtsqix | byte 0 bit 0: Perestroika Girls ROM byte shuffle; bit 1: MCU fitted; bit 2: the bootleg's 8031 MCU in place of the i8751 |
 | jtfunybubl, jtgalpin, jthdoll, jtothunder, jtwrally, jtxexex, jtzero | no header (one board layout) |
 
