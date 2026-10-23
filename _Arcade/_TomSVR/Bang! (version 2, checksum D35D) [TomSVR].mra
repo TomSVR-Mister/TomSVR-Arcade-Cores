@@ -1,0 +1,52 @@
+<!-- Bang! (version 2, checksum D35D) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "banga"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Bang! (version 2, checksum D35D) [TomSVR]</name>
+    <setname>banga</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1998</year>
+    <manufacturer>Gaelco / Bit Managers</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="banga.zip|bang.zip" md5="None">
+        <part>02 18 E4 3A 18 10 00 00</part>
+        <interleave output="16">
+            <part name="so_demo_bang_ic53_altera_6a11_15-2-99.ic53" crc="09954233" map="10"/>
+            <part name="so_demo_bang_ic55_altera_1de5_15-2-99.ic55" crc="68f8f769" map="01"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ba_16_468a_27c040.ic16" crc="c926486c" map="0010"/>
+            <part name="ba_9_1bc7_27c040.ic9" crc="078195dc" map="0001"/>
+            <part name="ba_1_1223_27c040.ic1" crc="e7b97b0f" map="1000"/>
+            <part name="ba_20_b854_27c040.ic20" crc="a1145df8" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ba_17_08d4_27c040.ic17" crc="0c35aa6f" map="0010"/>
+            <part name="ba_10_7a6b_27c040.ic10" crc="06711eeb" map="0001"/>
+            <part name="ba_2_a40f_27c040.ic2" crc="ff297a8f" map="1000"/>
+            <part name="ba_13_754e_27c040.ic13" crc="fe3e8d07" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ba_18_0a6a_27c040.ic18" crc="2056b1ad" map="0010"/>
+            <part name="ba_11_e242_27c040.ic11" crc="2088d15c" map="0001"/>
+            <part name="ba_3_f69f_27c040.ic3" crc="d3da5d4f" map="1000"/>
+            <part name="ba_5_a760_27c040.ic5" crc="9bee444c" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="ba_16_468a_27c040.ic16" crc="c926486c" map="0010"/>
+            <part name="ba_16_468a_27c040.ic16" crc="c926486c" map="0001"/>
+            <part name="ba_16_468a_27c040.ic16" crc="c926486c" map="1000"/>
+            <part name="ba_16_468a_27c040.ic16" crc="c926486c" map="0100"/>
+        </interleave>
+        <part repeat="0x800000"> 00</part>
+        <part name="ba_21_2e9c_27c040.ic21" crc="fd93d7f2"/>
+        <part name="ba_14_6978_27c040.ic14" crc="858fcbf9"/>
+        <part repeat="0x100000"> 00</part>
+    </rom>
+    <rom index="1"><part>02 00</part></rom>
+    <buttons names="Fire,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

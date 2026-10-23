@@ -1,0 +1,33 @@
+<!-- Snow Board Championship (version 2.0) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "snowboara"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Snow Board Championship (version 2.0) [TomSVR]</name>
+    <setname>snowboara</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>Gaelco / OMK</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="snowboara.zip|snowboar.zip" md5="None">
+        <part>03 20 04 1E 00 20 00 00</part>
+        <interleave output="16">
+            <part name="sb_53.ic53" crc="e4eaefd4" map="10"/>
+            <part name="sb_55.ic55" crc="e2476994" map="01"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb_ic44.ic44" crc="1bbe88bc" length="0x400000" map="0012"/>
+            <part name="sb_ic46.ic46" crc="22e7c648" length="0x400000" map="1200"/>
+        </interleave>
+        <interleave output="32">
+            <part name="sb_ic45.ic45" crc="373983d9" length="0x400000" map="0012"/>
+            <part name="sb_ic45.ic45" crc="373983d9" length="0x400000" map="1200"/>
+        </interleave>
+        <part name="sb_ic43.ic43" crc="afce54ed"/>
+        <part repeat="0x200000"> 00</part>
+    </rom>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

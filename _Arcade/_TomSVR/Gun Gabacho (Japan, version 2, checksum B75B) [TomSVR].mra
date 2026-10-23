@@ -1,0 +1,52 @@
+<!-- Gun Gabacho (Japan, version 2, checksum B75B) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "bangjb"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Gun Gabacho (Japan, version 2, checksum B75B) [TomSVR]</name>
+    <setname>bangjb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1999</year>
+    <manufacturer>Gaelco / Bit Managers (GM Shoji license)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="bangjb.zip|bang.zip" md5="None">
+        <part>02 18 E4 3A 18 10 00 00</part>
+        <interleave output="16">
+            <part name="bang_53_4f19_23-4_japo_27c040.ic53" crc="b8a67a57" map="10"/>
+            <part name="bang_55_6b05_23-4_japo_27c040.ic55" crc="0211d5cb" map="01"/>
+        </interleave>
+        <interleave output="32">
+            <part name="bang-a.ic16" crc="3b63acfc" map="0010"/>
+            <part name="bang-a.ic9" crc="3cb86360" map="0001"/>
+            <part name="bang-a.ic1" crc="965d0ad9" map="1000"/>
+            <part name="bang-a.ic20" crc="4b828f3c" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="bang-a.ic17" crc="72865b80" map="0010"/>
+            <part name="bang-a.ic10" crc="03fdd777" map="0001"/>
+            <part name="bang-a.ic2" crc="8ea261a7" map="1000"/>
+            <part name="bang-a.ic13" crc="d1146b92" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="bang18.ic18" crc="2056b1ad" map="0010"/>
+            <part name="bang11.ic11" crc="2088d15c" map="0001"/>
+            <part name="bang3.ic3" crc="d3da5d4f" map="1000"/>
+            <part name="bang5.ic5" crc="9bee444c" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="bang-a.ic16" crc="3b63acfc" map="0010"/>
+            <part name="bang-a.ic16" crc="3b63acfc" map="0001"/>
+            <part name="bang-a.ic16" crc="3b63acfc" map="1000"/>
+            <part name="bang-a.ic16" crc="3b63acfc" map="0100"/>
+        </interleave>
+        <part repeat="0x800000"> 00</part>
+        <part name="bang-a.ic21" crc="531ce3b6"/>
+        <part name="bang-a.ic14" crc="f8e1cf84"/>
+        <part repeat="0x100000"> 00</part>
+    </rom>
+    <rom index="1"><part>02 00</part></rom>
+    <buttons names="Fire,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

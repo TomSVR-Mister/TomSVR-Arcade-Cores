@@ -1,0 +1,48 @@
+<!-- Maniac Square (unprotected, version 1.0, checksum 66B1, 960419/1 PCB) on TomSVR_gaelco2, a personal MiSTer core for Gaelco 2 boards (MAME gaelco2.cpp "maniacsqs"),
+     built on JTFRAME by Jose Tejada (jotego), with the Gaelco 2 video and GAE1 sound from jlrh's gaelco-fpga.
+     The ROM is assembled from your own MAME zip, unmodified. Requires TomSVR_gaelco2.rbf. -->
+<misterromdescription>
+    <name>Maniac Square (unprotected, version 1.0, checksum 66B1, 960419/1 PCB) [TomSVR]</name>
+    <setname>maniacsqs</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>Gaelco</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_gaelco2</rbf>
+    <joystick>8</joystick>
+    <region>World</region>
+    <rom index="0" zip="maniacsqs.zip|maniacsq.zip" md5="None">
+        <part>00 02 04 02 00 00 00 00</part>
+        <interleave output="16">
+            <part name="ms1.ic53" crc="911fb089" map="10"/>
+            <part name="ms2.ic55" crc="e77a5537" map="01"/>
+        </interleave>
+        <part repeat="0xc0000"> FF</part>
+        <interleave output="32">
+            <part name="f0.bin" crc="d8551b2f" length="0x20000" map="0010"/>
+            <part name="f1.bin" crc="b269c427" length="0x20000" map="0001"/>
+            <part name="f2.bin" crc="af4ea5e7" map="1000"/>
+            <part name="f3.bin" crc="578c3588" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="f0.bin" crc="d8551b2f" offset="0x20000" length="0x20000" map="0010"/>
+            <part name="f1.bin" crc="b269c427" offset="0x20000" length="0x20000" map="0001"/>
+            <part name="f0.bin" crc="d8551b2f" offset="0x20000" length="0x20000" map="1000"/>
+            <part name="f1.bin" crc="b269c427" offset="0x20000" length="0x20000" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="f0.bin" crc="d8551b2f" offset="0x40000" length="0x20000" map="0010"/>
+            <part name="f1.bin" crc="b269c427" offset="0x40000" length="0x20000" map="0001"/>
+            <part name="f0.bin" crc="d8551b2f" offset="0x40000" length="0x20000" map="1000"/>
+            <part name="f1.bin" crc="b269c427" offset="0x40000" length="0x20000" map="0100"/>
+        </interleave>
+        <interleave output="32">
+            <part name="f0.bin" crc="d8551b2f" offset="0x60000" length="0x20000" map="0010"/>
+            <part name="f1.bin" crc="b269c427" offset="0x60000" length="0x20000" map="0001"/>
+            <part name="f0.bin" crc="d8551b2f" offset="0x60000" length="0x20000" map="1000"/>
+            <part name="f1.bin" crc="b269c427" offset="0x60000" length="0x20000" map="0100"/>
+        </interleave>
+    </rom>
+    <buttons names="Rotate,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

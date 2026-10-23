@@ -13,7 +13,7 @@
     <joystick>8</joystick>
     <region>World</region>
     <rom index="0" zip="snowboar.zip" md5="None">
-        <part>03 20 04 0E 30 20 00 00</part>
+        <part>03 20 04 1E 30 20 00 00</part>
         <interleave output="16">
             <part name="sb.53" crc="4742749e" map="10"/>
             <part name="sb.55" crc="6ddc431f" map="01"/>
