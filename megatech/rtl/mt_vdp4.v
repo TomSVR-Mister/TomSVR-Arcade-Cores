@@ -14,7 +14,7 @@
  *  during the current line by a state machine running on every clk, so clk must be at least ~6x ce_pix.
  *  Line counter vcnt: 0..223 active (224-line mode), 0..191 in 192-line mode, total 262 lines.
  */
-module mt_vdp4 #(parameter SMALL = 0, parameter [8:0] VINIT = 9'd0) (   // SMALL = 1: 12 kB VRAM for the BIOS TEST MODE screens (see vmap)
+module mt_vdp4 #(parameter SMALL = 0) (   // SMALL = 1: 12 kB VRAM for the BIOS TEST MODE screens (see vmap)
     input             clk,
     input             rst,
     input             ce_pix,
@@ -52,6 +52,7 @@ reg  [7:0] latch_lo;
 reg  [7:0] rbuf;
 (* ramstyle = "logic" *) reg  [5:0] cram[0:31];
 reg        vint_flag, line_flag, spr_ovr;
+reg  [7:0] stat_q = 8'h1f;
 
 wire       m224   = R[0][1] & R[1][4];               // 224-line mode (M2 + M1 with M4)
 wire       disp   = R[1][6];
@@ -133,7 +134,7 @@ end
 // CPU read data (combinational on the access; the CPU samples it during its read cycle)
 always @(*) begin
     if (sel_cnt) dout = a0 ? hc_latch : vc;
-    else if (a0) dout = {vint_flag, spr_ovr, 1'b0, 5'h1f};
+    else if (a0) dout = stat_q;
     else dout = rbuf;
 end
 
@@ -145,7 +146,7 @@ end
 // ---------------------------------------------------------------- timing
 reg sync_p;
 always @(posedge clk) begin
-    if (rst) begin h <= 0; v <= VINIT; sync_p <= 0; end
+    if (rst) begin h <= 0; v <= 0; sync_p <= 0; end
     else if (sync) sync_p <= 1;
     if (!rst && ce_pix) begin
         if (sync_p || sync) begin
@@ -178,7 +179,13 @@ always @(posedge clk) begin
             end else lcnt <= R[10];
         end
         if (ovr_set) spr_ovr <= 1;
-        if (cs & rd & a0 & ~sel_cnt) begin vint_flag <= 0; line_flag <= 0; spr_ovr <= 0; end
+        // status read: rd is one clk at the start of the CPU's read cycle and the flags clear on it, so the CPU
+        // (sampling later in the cycle) gets the value captured here. Reading the live flags returned 0 nearly
+        // always: the BIOS TEST MODE loop (polls bit 7 at 1d4c) then missed most joystick and Test presses.
+        if (cs & rd & a0 & ~sel_cnt) begin
+            stat_q <= {vint_flag, spr_ovr, 1'b0, 5'h1f};
+            vint_flag <= 0; line_flag <= 0; spr_ovr <= 0;
+        end
     end
 end
 assign irq_n = ~((vint_flag & R[1][5]) | (line_flag & R[0][4]));

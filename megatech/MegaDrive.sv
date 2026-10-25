@@ -79,7 +79,9 @@ localparam CONF_STR = {
 	"Mega-Tech;;",
 	"-;",
 	"O[64],Screen,Game,Menu;",
+`ifdef MT_SBS
 	"O[68],Side by Side,Off,On;",
+`endif
 	"O[65],Coin Sound,Off,On;",
 	"O[66],Time Up Background,Black,Blue;",
 	"O[67],Flash Warning,Dim,Shadow;",
@@ -1004,6 +1006,7 @@ wire [7:0] mt_gb = mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c
 
 // Side by side (OSD): game screen left, menu screen right, as the cabinet's two monitors (TEST MODE keeps the
 // full screen)
+`ifdef MT_SBS   // side by side: does not fit next to the TEST MODE VDP yet (M10K blocks), see HANDOVER
 assign     sbs_vid = status[68] & ~bios_vid;
 wire       sbs_sync, sbs_ce, sbs_hbl, sbs_vbl, sbs_hs, sbs_vs;
 wire [7:0] sbs_r, sbs_g, sbs_b;
@@ -1016,9 +1019,18 @@ mt_sbs mt_sbs
 	.clk_m(clk_sys), .m_ce(mt_ce_pix), .m_r(mt_r), .m_g(mt_g), .m_b(mt_b), .m_hbl(mt_hbl), .m_vbl(mt_vbl),
 	.ce(sbs_ce), .r(sbs_r), .g(sbs_g), .b(sbs_b), .hbl(sbs_hbl), .vbl(sbs_vbl), .hs(sbs_hs), .vs(sbs_vs)
 );
+`else
+assign     sbs_vid = 0;
+wire       sbs_sync = 0, sbs_ce = 0, sbs_hbl = 0, sbs_vbl = 0, sbs_hs = 0, sbs_vs = 0;
+wire [7:0] sbs_r = 0, sbs_g = 0, sbs_b = 0;
+`endif
 
 wire mt_menu_vid = menu_on & ~sbs_vid;
+`ifdef MT_SBS
 video_mixer #(.LINE_LENGTH(640), .GAMMA(1)) video_mixer
+`else
+video_mixer #(.LINE_LENGTH(400), .GAMMA(1)) video_mixer
+`endif
 (
 	.*,
 	.ce_pix(sbs_vid ? sbs_ce : (mt_menu_vid | bios_vid) ? mt_ce_pix : ce_pix),
