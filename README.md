@@ -1,16 +1,18 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-25 MiSTer arcade cores and 193 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+26 MiSTer arcade cores and 245 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
-**These are not jotego cores.** They are built on jotego's JTFRAME framework, but they are not part of jtcores and
+**These are not jotego cores.** All but one are built on jotego's JTFRAME framework (megatech is built on
+MegaDrive_MiSTer, see below), but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
 naming. If an official or board-verified core for any of these games comes along, use that one instead; this
 project will drop its version.
 
 ## How accurate they are
 
-- Each core is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295, jtopl, jt12, jt51,
-  jt5205, jteeprom, jt5911, jt8051), all unchanged.
+- Each core except megatech is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295,
+  jtopl, jt12, jt51, jt5205, jteeprom, jt5911, jt8051), all unchanged. megatech runs the cartridges on
+  **MegaDrive_MiSTer** (Nuked-MD) and adds the Mega-Tech arcade board around it.
 - The board logic on top of that (memory maps, video, sprites, how the chips are wired) was written from the
   **MAME drivers**. No PCBs or schematics were used.
 - They were checked by comparing simulation frames against MAME and by playing them on MiSTer hardware. So they
@@ -59,6 +61,7 @@ why); the patch is applied in memory by the MRA.
 | hotblk | Hot Blocks - Tetrix II | hotblock.cpp |
 | jpop | Jumping Pop (Nics) | tnzs.cpp |
 | madd | Mad Donna, Komo Como | oneshot.cpp |
+| megatech | Sega Mega-Tech: 47 games on 48 MRAs (38 Mega Drive and 9 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen and coin timer | megatech.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
@@ -75,12 +78,15 @@ why); the patch is applied in memory by the MRA.
 
 `afega/` (Afega boards, already covered by kuzecores) and `pkladies/` (unfinished) are in the source but not released.
 
-Known issue: Miss Puzzle (more explicit) shows some picture corruption. Reports are welcome as GitHub issues
+Known issues: Miss Puzzle (more explicit) shows some picture corruption. Mega-Tech: Out Run and Parlour Games show
+missing sprites, Great Soccer is a bad dump in MAME and stays on a blank screen, and the test-menu settings are not
+saved. Reports are welcome as GitHub issues
 (game, MRA name and what you see).
 
 ## Building from source
 
-Each folder (`esd/`, `para/` ...) is a JTFRAME core. Copy it into `cores/` of
+`megatech/` is a standalone Quartus project (`MegaDrive.qpf`, based on MegaDrive_MiSTer); its MRAs come from
+`tools/megatech_build.py`. Every other folder (`esd/`, `para/` ...) is a JTFRAME core. Copy it into `cores/` of
 [jotego/jtcores](https://github.com/jotego/jtcores) at commit `bfced64` and build with jotego's normal flow, or run
 the `build.yaml` GitHub Actions workflow in this repo. `tools/` holds the MRA generators and the simulation helpers
 used to compare against MAME.
@@ -99,7 +105,11 @@ used to compare against MAME.
 - **jlrh**: the Gaelco 2 video pipeline (tilemaps, sprites, palette) and GAE1 sound in gaelco2, from his
   [gaelco-fpga](https://github.com/jlrh/gaelco-fpga) Alligator Hunt core (GPLv3). The CPU, memory and inputs are
   JTFRAME; `gaelco2/ORIGIN.md` lists exactly what comes from where and what was changed.
+- **nukeykt**: Nuked-MD, the die-level Mega Drive netlists, and **Alexey Melnikov (Sorgelig)**: the MiSTer port
+  ([MegaDrive_MiSTer](https://github.com/MiSTer-devel/MegaDrive_MiSTer)), GPL-2.0-or-later, the base of megatech.
+  jt89 (jotego) is used for the Mega-Tech menu PSG and T80 for its BIOS Z80.
 - **The MAME team**, whose drivers document these boards.
 
 GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,
-and the V30 files in `dynduke/hdl/v30` keep their GPL-2 licence.
+the V30 files in `dynduke/hdl/v30` keep their GPL-2 licence, and the MegaDrive_MiSTer / Nuked-MD files in
+`megatech/` keep their GPL-2.0-or-later licence.

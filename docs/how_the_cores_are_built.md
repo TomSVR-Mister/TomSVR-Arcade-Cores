@@ -1,11 +1,11 @@
-# How the 22 released cores are put together
+# How the released cores are put together
 
-This covers the 25 released cores and their 193 MRAs. File names in releases carry a `TomSVR` tag; the core
+This covers the 26 released cores and their 245 MRAs. File names in releases carry a `TomSVR` tag; the core
 folders and module names below keep their JTFRAME `jt` names because the framework needs them.
 
 ## The common base
 
-All 25 cores are JTFRAME cores. Each repo folder (`esd/`, `para/` ...) is copied into
+25 of the 26 cores are JTFRAME cores (megatech is the exception, see its section below). Each repo folder (`esd/`, `para/` ...) is copied into
 `jotego/jtcores/cores/` at commit `bfced64` and built there with jotego's normal build flow. So every core
 depends on jtcores at that commit. Nothing in jotego's tree is changed; the cores only add new folders.
 
@@ -82,7 +82,7 @@ Each of these is a new driver written from the MAME source named, using only JTF
 | **jthotblk** | 3 | Hot Blocks (hotblock.cpp) | 8088 | AY-3-8910 | jt49 only (no JTFRAME CPU). See below. |
 | **jtmadd** | 2 | Promat VISYS (oneshot.cpp) | 68000, Z80 | YM3812 | m68k, z80, jtopl2 |
 | **jtnmg5** | 12 | Yun Sung YS-1300 (nmg5.cpp) | 68000, Z80 | YM3812, OKI | m68k, z80, jtopl2, jt6295 |
-| **jtgaelco2** | 5 | Gaelco 2 boards (gaelco2.cpp): Maniac Square, Snow Board Championship | 68000, DS5002FP on the protected sets | GAE1 / CG1V (on the video chip) | m68k (jtframe_m68k), jt8051 (with a fix to its bit instructions, see `gaelco2/ORIGIN.md`), jt9346 EEPROM, JTFRAME RAMs. Video and GAE1 sound from jlrh's gaelco-fpga, extended with the fifth graphics plane, the 384-pixel screen and MAME's vblank sprite buffer. |
+| **jtgaelco2** | 21 | Gaelco 2 boards (gaelco2.cpp): Maniac Square, Snow Board Championship, Bang! / Gun Gabacho, Touch and Go | 68000, DS5002FP on the protected sets | GAE1 / CG1V (on the video chip) | m68k (jtframe_m68k), jt8051 (with a fix to its bit instructions, see `gaelco2/ORIGIN.md`), jt9346 EEPROM, JTFRAME RAMs. Video and GAE1 sound from jlrh's gaelco-fpga, extended with the fifth graphics plane, the 384-pixel screen and MAME's vblank sprite buffer. |
 | **jtpara** | 13 | Yun Sung Paradise (paradise.cpp) | Z80 | 2 x OKI | z80, jt6295, jtframe_edge |
 | **jtplaymark** | 9 | Playmark (playmark.cpp) | 68000, PIC16C57 | OKI | m68k, jt6295, jteeprom (Hot Mind). The PIC16C57 is new code (`jtplaymark_pic.v`, from the Microchip data sheet and MAME). |
 | **jtothunder** | 6 | Taito Operation Thunderbolt (othunder.cpp) | 68000, Z80 | YM2610 | m68k, z80, jt10, jteeprom (93C46 NVRAM). Light gun game; the MRA sets the JTFRAME light gun flag so a crosshair is drawn for mouse, stick or Sinden aiming. |
@@ -94,6 +94,15 @@ Each of these is a new driver written from the MAME source named, using only JTF
 | **jtys16** | 10 | Yun Sung 16-bit (yunsun16.cpp) | 68000 (+ Z80 on Magic Bubble) | OKI, YM3812 | m68k, z80, jt6295, jtopl2, jtframe obj draw |
 | **jtys8** | 5 | Yun Sung 8-bit (yunsung8.cpp) | Z80, Z80 | YM3812, MSM5205 | z80, jtopl2, jt5205 |
 | **jtzero** | 2 | Comad 1993 (zerozone.cpp) | 68000, Z80 | OKI | m68k, z80, jt6295 |
+
+## megatech: the one core not on JTFRAME
+
+**TomSVR_megatech** (48 MRAs, MAME `sega/megatech.cpp`) runs the Sega Mega-Tech cartridges on
+[MegaDrive_MiSTer](https://github.com/MiSTer-devel/MegaDrive_MiSTer) (Nuked-MD die-level netlists by nukeykt, MiSTer
+port by Alexey Melnikov, GPL-2.0-or-later) and adds the arcade board around it: the BIOS Z80 (T80), the menu screen with
+its own VDP and PSG (jt89), coin timer, TIME UP and flash warning, all driven by the real Mega-Tech BIOS. One cartridge
+per MRA. It is a standalone Quartus project in `megatech/` (`MegaDrive.qpf`); `megatech/README_TomSVR.md` and
+`megatech/DESIGN.md` describe it, and `tools/megatech_build.py` writes the MRAs.
 
 ### Code not from jotego
 
