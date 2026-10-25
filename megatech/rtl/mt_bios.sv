@@ -25,6 +25,14 @@ module mt_bios (
     input      [15:0] dl_data,    // WIDE ioctl: [7:0] = byte at dl_addr, [15:8] = byte at dl_addr+1
     input             dl_wr,
 
+    // NVRAM (RAM 4000-5fff: operator settings, bookkeeping): load from / save to the SD card through the MRA's
+    // <nvram> (ioctl download / upload, WIDE: [7:0] = byte at the even address)
+    input             nv_dl,
+    input             nv_wr,
+    input      [12:0] nv_addr,
+    input      [15:0] nv_din,
+    output     [15:0] nv_dout,    // bytes at {nv_addr[12:1], 1} / {nv_addr[12:1], 0}
+
     // cabinet inputs, active high
     input             coin1, coin2, service_coin, start1, start2,
     input       [8:0] tu_x, tu_y,          // pixel position relative to the TIME UP text (game screen timing)
@@ -132,11 +140,38 @@ wire        win_ins = (win_a[23:16] == 8'h30);          // 0x300000-0x30ffff: in
 always @(posedge clk) begin
     bios_q  <= bios_rom[A[14:0]];
     instr_q <= instr_rom[win_a[15:1]];
-    ram_q   <= ram[A[12:0]];
     bram_q  <= bram[{cart_sel != 3'd0, A[11:0]}];
-    if (mem_we && A[15:13] == 3'b010) ram[A[12:0]] <= zdo;            // 4000-5fff
     if (mem_we && A[15:12] == 4'h3) bram[{cart_sel != 3'd0, A[11:0]}] <= zdo;
 end
+
+// RAM 4000-5fff = NVRAM, one port (a second read port made Quartus duplicate the RAM: +8 blocks at 98%).
+// The Z80, or the NVRAM load (the Z80 is held in reset meanwhile, two bytes per WIDE word on two clocks as the
+// ROM download), or the NVRAM save: it borrows the port at zdiv 5 and 6, between the Z80's write (zdiv 1) and
+// the next read the Z80 samples (zdiv 0), and reads the even and odd byte (hps_io samples ioctl_din long after
+// it moves ioctl_addr).
+reg        nv_ph1, nv_ph2;
+reg [15:0] nv_w;
+reg [12:0] nv_a;
+always @(posedge clk) begin
+    nv_ph1 <= 0;
+    nv_ph2 <= nv_ph1;
+    if (nv_dl & nv_wr) begin nv_ph1 <= 1; nv_w <= nv_din; nv_a <= {nv_addr[12:1], 1'b0}; end
+end
+wire        nv_we  = nv_ph1 | nv_ph2;
+wire        nv_rs  = ~nv_we & (zdiv == 4'd5 || zdiv == 4'd6);
+wire [12:0] ram_a  = nv_we ? (nv_ph1 ? nv_a : (nv_a | 13'd1)) : nv_rs ? {nv_addr[12:1], zdiv == 4'd6} : A[12:0];
+wire  [7:0] ram_d  = nv_we ? (nv_ph1 ? nv_w[7:0] : nv_w[15:8]) : zdo;
+wire        ram_we = nv_we | (mem_we && A[15:13] == 3'b010);           // 4000-5fff
+always @(posedge clk) begin
+    ram_q <= ram[ram_a];
+    if (ram_we) ram[ram_a] <= ram_d;
+end
+reg [7:0] nv_lo, nv_hi;
+always @(posedge clk) begin
+    if (zdiv == 4'd6) nv_lo <= ram_q;   // read at zdiv 5
+    if (zdiv == 4'd7) nv_hi <= ram_q;   // read at zdiv 6
+end
+assign nv_dout = {nv_hi, nv_lo};
 
 always @(posedge clk) begin
     if (reset) bank_addr <= 0;

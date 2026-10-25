@@ -228,6 +228,8 @@ wire [24:0] ioctl_addr;
 wire [15:0] ioctl_data;
 wire  [7:0] ioctl_index;
 wire        ioctl_wait;
+wire        ioctl_upload;
+wire [15:0] mt_nv_dout;                  // Mega-Tech BIOS NVRAM save (MRA <nvram index="4">)
 
 reg  [31:0] sd_lba;
 reg         sd_rd = 0;
@@ -280,6 +282,9 @@ hps_io #(.CONF_STR(CONF_STR), .WIDE(1)) hps_io
 	.ioctl_addr(ioctl_addr),
 	.ioctl_dout(ioctl_data),
 	.ioctl_wait(ioctl_wait),
+	.ioctl_upload(ioctl_upload),
+	.ioctl_din(mt_nv_dout),
+	.ioctl_rd(),
 
 	.sd_lba('{sd_lba}),
 	.sd_rd(sd_rd),
@@ -352,6 +357,7 @@ wire reset   = status[0] | buttons[1] | region_set_rst;
 wire mt_hold_68k, mt_hold_z80;         // Mega-Tech: game CPUs held in reset by the BIOS (the VDP keeps running)
 wire mt_game_black;                      // Mega-Tech: game screen black + game sound muted (TIME UP restart)
 wire mt_sel_rst;                         // Mega-Tech: cart select restarting the game CPUs
+reg  [7:0] mt_kb = 0;                    // Mega-Tech: cabinet keys on the keyboard (ps2_key decoder)
 wire [3:0] mt_porte;                     // io2 port E outputs (mt_bios)
 wire [7:0] mt_portd;                     // io2 port D outputs (mt_bios)
 wire [1:0] mt_r, mt_g, mt_b;           // Mega-Tech menu screen (mt_bios)
@@ -1074,7 +1080,10 @@ wire       mt_game_reset;
 // The BIOS side has its own reset: sys_reset also follows the game reset that the BIOS itself triggers
 // (then: cart select -> game reset -> loading -> sys_reset), which made the BIOS reset itself in a loop (test 2: black).
 reg mt_bios_rst = 1;
-always @(posedge clk_sys) mt_bios_rst <= RESET | status[0] | buttons[1] | mt_download;
+// NVRAM (MRA <nvram index="4" size="8192">): MiSTer loads it from the SD card after the ROMs (the BIOS is held in
+// reset meanwhile and then boots with the saved settings) and saves it whenever the OSD is opened.
+wire mt_nv_dl = ioctl_download & (ioctl_index == 8'd4);
+always @(posedge clk_sys) mt_bios_rst <= RESET | status[0] | buttons[1] | mt_download | mt_nv_dl;
 
 // Select (= next cart, restarts the game side on the real board) only after a ~1 s hold, so an accidental
 // press on a pad shoulder doesn't restart the game. Then a 0.2 s press is passed to the BIOS.
@@ -1098,15 +1107,20 @@ mt_bios mt_bios
 	.dl_addr(ioctl_addr),
 	.dl_data(ioctl_data),
 	.dl_wr(ioctl_wr),
+	.nv_dl(mt_nv_dl),
+	.nv_wr(ioctl_wr),
+	.nv_addr(ioctl_addr[12:0]),
+	.nv_din(ioctl_data),
+	.nv_dout(mt_nv_dout),
 
-	.coin1(joystick_0[12]),
-	.coin2(joystick_1[12]),
-	.service_coin(1'b0),
-	.start1(joystick_0[7]),
-	.start2(joystick_1[7]),
-	.sel_btn(mt_sel_pulse),
-	.enter_btn(joystick_0[14] | joystick_1[14]),
-	.service(joystick_0[15]),
+	.coin1(joystick_0[12] | mt_kb[0]),
+	.coin2(joystick_1[12] | mt_kb[1]),
+	.service_coin(mt_kb[4]),
+	.start1(joystick_0[7] | mt_kb[2]),
+	.start2(joystick_1[7] | mt_kb[3]),
+	.sel_btn(mt_sel_pulse | mt_kb[5]),
+	.enter_btn(joystick_0[14] | joystick_1[14] | mt_kb[6]),
+	.service(joystick_0[15] | mt_kb[7]),
 	.door1(1'b0),
 	.door2(1'b0),
 	.dsw0(mt_dsw0),
@@ -1167,10 +1181,18 @@ always @(posedge clk_sys) begin
 	old_state <= ps2_key[10];
 
 	if(old_state != ps2_key[10]) begin
-		casex(code)
-			'h005: begin region_req <= 0; region_set_rst <= pressed; region_set <= pressed; end // F1
-			'h006: begin region_req <= 1; region_set_rst <= pressed; region_set <= pressed; end // F2
-			'h004: begin region_req <= 2; region_set_rst <= pressed; region_set <= pressed; end // F3
+		// Mega-Tech: the console's F1-F3 region keys (they also reset the core) are replaced by MAME's cabinet
+		// keys: 5/6 coin, 1/2 start, 9 service coin, 0 select, - enter, F2 test (held, as MAME's service switch)
+		case(code)
+			'h02E: mt_kb[0] <= pressed; // 5 coin 1
+			'h036: mt_kb[1] <= pressed; // 6 coin 2
+			'h016: mt_kb[2] <= pressed; // 1 start 1
+			'h01E: mt_kb[3] <= pressed; // 2 start 2
+			'h046: mt_kb[4] <= pressed; // 9 service coin
+			'h045: mt_kb[5] <= pressed; // 0 select
+			'h04E: mt_kb[6] <= pressed; // - enter
+			'h006: mt_kb[7] <= pressed; // F2 test
+			default: ;
 		endcase
 	end
 

@@ -1,0 +1,93 @@
+name: Build Mega-Tech (TomSVR_megatech)
+
+# Dispatch only: pushing never builds.
+#   gh workflow run megatech.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f project=megatech/MegaDrive [-f seeds=1,2,3]
+# seeds: one parallel fit per Quartus fitter seed; each lands on builds-megatech-<sha7>-s<seed> (seed 1 also on
+# builds-megatech-<sha7>), with the 40 worst setup paths in logs/worst_paths.txt.
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "Quartus project path without .qpf (e.g. megatech/MegaDrive)"
+        default: megatech/MegaDrive
+        required: true
+      seeds:
+        description: "Comma-separated fitter seeds, one parallel build each (e.g. 1,2,3)"
+        default: "1"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  mister:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: ${{ fromJSON(format('[{0}]', inputs.seeds)) }}
+    steps:
+      - name: Free disk space for the Quartus image
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: Compile for MiSTer (Quartus Lite in jotego/jtcore20)
+        shell: bash
+        run: |
+          set -o pipefail
+          cat > src/build.sh <<'EOS'
+          #!/bin/bash
+          set -e
+          # the wrapper in quartus/bin sets the library paths; linux64/quartus_sh alone fails to start
+          Q=$(dirname $(ls -d /opt/intelFPGA*/*/quartus/bin/quartus_sh 2>/dev/null | head -1))
+          echo "quartus at $Q"
+          export PATH=$Q:$PATH
+          cd /src/$(dirname ${{ inputs.project }})
+          P=$(basename ${{ inputs.project }})
+          sed -i 's/^set_global_assignment -name SEED .*/set_global_assignment -name SEED ${{ matrix.seed }}/' $P.qsf
+          grep -n "name SEED" $P.qsf
+          quartus_sh --flow compile $P
+          printf 'project_open %s\ncreate_timing_netlist\nread_sdc\nupdate_timing_netlist\nreport_timing -setup -npaths 40 -detail summary -file worst_paths.txt\nproject_close\n' $P > wp.tcl
+          quartus_sta -t wp.tcl || true
+          EOS
+          sed -i 's/^          //' src/build.sh
+          chmod +x src/build.sh
+          docker run --network host -v "$PWD/src":/src jotego/jtcore20 /src/build.sh 2>&1 | tee build.log
+
+      - name: Report resources, timing and errors as annotations
+        if: always()
+        shell: bash
+        run: |
+          d=src/$(dirname ${{ inputs.project }})
+          {
+            echo "== errors"; grep -aiE "^error|critical warning" build.log | head -20
+            for f in $(find $d -name '*.fit.summary' | head -1); do echo "== $f"; cat "$f"; done
+            for f in $(find $d -name '*.sta.summary' | head -1); do echo "== $f"; grep -B1 -A2 "Slack" "$f" | head -60; done
+            echo "== end of build.log"; tail -n 40 build.log
+          } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
+          split -l 25 tail.txt part_ || true
+          for f in part_*; do
+            msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' "$f")
+            echo "::notice title=log $f::$msg"
+          done
+
+      - name: Keep the .rbf and reports on branch builds-megatech
+        if: success()
+        shell: bash
+        run: |
+          d=src/$(dirname ${{ inputs.project }})
+          rbf=$(find $d -name '*.rbf' | head -1)
+          [ -n "$rbf" ] || exit 0
+          mkdir pub && cd pub
+          git init -q
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          cp "../$rbf" .
+          mkdir -p logs
+          find ../$d -name '*.fit.summary' -o -name '*.sta.summary' -o -name 'worst_paths.txt' | while read f; do cp "$f" logs/; done
+          git add -A && git commit -q -m "build ${GITHUB_SHA::7} seed ${{ matrix.seed }} (${{ inputs.project }})"
+          url="https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -q -f "$url" HEAD:builds-megatech-${GITHUB_SHA::7}-s${{ matrix.seed }}
+          if [ "${{ matrix.seed }}" = "1" ]; then git push -q -f "$url" HEAD:builds-megatech-${GITHUB_SHA::7}; fi

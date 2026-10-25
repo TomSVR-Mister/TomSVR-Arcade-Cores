@@ -150,6 +150,7 @@ def mra(name, st, bios):
         '        <part repeat="0xFFF0">00</part>',
         *glines,
         '    </rom>',
+        '    <nvram index="4" size="8192"/>',  # BIOS RAM 4000-5fff (operator settings, bookkeeping)
         '    <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>',
         '</misterromdescription>', '']
     return '\n'.join(out), size
