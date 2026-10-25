@@ -1218,6 +1218,7 @@ mt_bios mt_bios
 	.pad2_a(~joystick_1[4]),
 
 	.cart_sel(mt_cart_sel),
+	.ins_a(mt_ins_a), .ins_req(mt_ins_req), .ins_ack(mt_ins_ack), .ins_data(mt_ins_data),   // instruction ROMs in SDRAM
 	.game_reset(mt_game_reset),
 	.portd(mt_portd),
 	.porte(mt_porte),
