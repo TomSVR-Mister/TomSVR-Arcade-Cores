@@ -84,6 +84,7 @@ localparam CONF_STR = {
 `ifdef MT_SBS
 	"O[68],Side by Side,Off,On;",
 `endif
+	"O[69],Menu on VGA (15kHz),Off,On;",
 	"O[65],Coin Sound,Off,On;",
 	"O[66],Time Up Background,Black,Blue;",
 	"O[67],Flash Warning,Dim,Shadow;",
@@ -389,6 +390,21 @@ wire [3:0] mt_porte;                     // io2 port E outputs (mt_bios)
 wire [7:0] mt_portd;                     // io2 port D outputs (mt_bios)
 wire [1:0] mt_r, mt_g, mt_b;           // Mega-Tech menu screen (mt_bios)
 wire       mt_hs, mt_vs, mt_hbl, mt_vbl, mt_ce_pix;
+
+// Menu monitor on the analog port (OSD "Menu on VGA"): game on HDMI, menu screen as 15 kHz RGB on VGA.
+// Untested on hardware: needs a 15 kHz-capable monitor; not with the HDMI direct-video adapter.
+reg [23:0] vga2_rgb;
+reg        vga2_hs, vga2_vs;
+always @(posedge clk_sys) begin
+	vga2_rgb <= (mt_hbl | mt_vbl) ? 24'd0 : {{4{mt_r}}, {4{mt_g}}, {4{mt_b}}};
+	vga2_hs  <= mt_hs;
+	vga2_vs  <= mt_vs;
+end
+assign VGA2_EN  = status[69];
+assign VGA2_RGB = vga2_rgb;
+assign VGA2_HS  = vga2_hs;
+assign VGA2_VS  = vga2_vs;
+assign VGA2_CS  = vga2_hs ^ vga2_vs;
 wire signed [10:0] mt_snd;                // menu PSG
 wire       mt_timeup;                     // TIME UP screen on the main monitor
 wire       mt_test_on;                    // TEST MODE screens on the main monitor (mt_bios second Mode 4 VDP)

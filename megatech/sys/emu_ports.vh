@@ -30,6 +30,11 @@ output        VGA_F1,
 output [1:0]  VGA_SL,
 output        VGA_SCALER, // Force VGA scaler
 output        VGA_DISABLE, // analog out is off
+output        VGA2_EN,     // TomSVR Mega-Tech: analog out shows a second picture (VGA2_*, on CLK_VIDEO) instead of VGA_*
+output [23:0] VGA2_RGB,    // blanked RGB
+output        VGA2_HS,     // active high
+output        VGA2_VS,     // active high
+output        VGA2_CS,     // composite sync, active high
 
 input  [11:0] HDMI_WIDTH,
 input  [11:0] HDMI_HEIGHT,

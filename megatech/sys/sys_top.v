@@ -1518,15 +1518,27 @@ reg  [39:0] PhaseInc;
 	wire cs1 = vgas_en ? vgas_cs : vga_cs;
 	wire de1 = vgas_en ? vgas_de : vga_de;
 
-	assign VGA_VS = av_dis ? 1'bZ      :(((vgas_en ? (~vgas_vs ^ VS[12])                         : VGA_DISABLE ? 1'd1 : ~vga_vs) | csync_en) & subcarrier_out);
-	assign VGA_HS = av_dis ? 1'bZ      :  (vgas_en ? ((csync_en ? ~vgas_cs : ~vgas_hs) ^ HS[12]) : VGA_DISABLE ? 1'd1 : (csync_en ? ~vga_cs : ~vga_hs));
-	assign VGA_R  = av_dis ? 6'bZZZZZZ :   vgas_en ? vgas_o[23:18]                               : VGA_DISABLE ? 6'd0 : vga_o[23:18];
-	assign VGA_G  = av_dis ? 6'bZZZZZZ :   vgas_en ? vgas_o[15:10]                               : VGA_DISABLE ? 6'd0 : vga_o[15:10];
-	assign VGA_B  = av_dis ? 6'bZZZZZZ :   vgas_en ? vgas_o[7:2]                                 : VGA_DISABLE ? 6'd0 : vga_o[7:2]  ;
+	// TomSVR Mega-Tech: second picture (menu monitor) on the analog port, RGB only (no YPbPr, no scaler)
+	reg        vga2_en;
+	reg [23:0] vga2_o;
+	reg        vga2_hs, vga2_vs, vga2_cs;
+	always @(posedge clk_vid) begin
+		vga2_en <= vga2_en_e;
+		vga2_o  <= vga2_rgb_e;
+		vga2_hs <= vga2_hs_e;
+		vga2_vs <= vga2_vs_e;
+		vga2_cs <= vga2_cs_e;
+	end
 
-	wire [1:0] vga_r  = vgas_en ? vgas_o[17:16] : VGA_DISABLE ? 2'd0 : vga_o[17:16];
-	wire [1:0] vga_g  = vgas_en ? vgas_o[9:8]   : VGA_DISABLE ? 2'd0 : vga_o[9:8];
-	wire [1:0] vga_b  = vgas_en ? vgas_o[1:0]   : VGA_DISABLE ? 2'd0 : vga_o[1:0];
+	assign VGA_VS = av_dis ? 1'bZ      : vga2_en ? (~vga2_vs | csync_en) :(((vgas_en ? (~vgas_vs ^ VS[12])                         : VGA_DISABLE ? 1'd1 : ~vga_vs) | csync_en) & subcarrier_out);
+	assign VGA_HS = av_dis ? 1'bZ      : vga2_en ? (csync_en ? ~vga2_cs : ~vga2_hs) :  (vgas_en ? ((csync_en ? ~vgas_cs : ~vgas_hs) ^ HS[12]) : VGA_DISABLE ? 1'd1 : (csync_en ? ~vga_cs : ~vga_hs));
+	assign VGA_R  = av_dis ? 6'bZZZZZZ : vga2_en ? vga2_o[23:18] :   vgas_en ? vgas_o[23:18]                               : VGA_DISABLE ? 6'd0 : vga_o[23:18];
+	assign VGA_G  = av_dis ? 6'bZZZZZZ : vga2_en ? vga2_o[15:10] :   vgas_en ? vgas_o[15:10]                               : VGA_DISABLE ? 6'd0 : vga_o[15:10];
+	assign VGA_B  = av_dis ? 6'bZZZZZZ : vga2_en ? vga2_o[7:2] :   vgas_en ? vgas_o[7:2]                                 : VGA_DISABLE ? 6'd0 : vga_o[7:2]  ;
+
+	wire [1:0] vga_r  = vga2_en ? vga2_o[17:16] : vgas_en ? vgas_o[17:16] : VGA_DISABLE ? 2'd0 : vga_o[17:16];
+	wire [1:0] vga_g  = vga2_en ? vga2_o[9:8] : vgas_en ? vgas_o[9:8]   : VGA_DISABLE ? 2'd0 : vga_o[9:8];
+	wire [1:0] vga_b  = vga2_en ? vga2_o[1:0] : vgas_en ? vgas_o[1:0]   : VGA_DISABLE ? 2'd0 : vga_o[1:0];
 `endif
 
 reg video_sync = 0;
@@ -1753,6 +1765,9 @@ wire [13:0] fb_stride;
 	assign fb_stride = 0;
 `endif
 
+wire        vga2_en_e, vga2_hs_e, vga2_vs_e, vga2_cs_e;
+wire [23:0] vga2_rgb_e;
+
 emu emu
 (
 	.CLK_50M(FPGA_CLK2_50),
@@ -1774,6 +1789,11 @@ emu emu
 `ifndef MISTER_DUAL_SDRAM
 	.VGA_DISABLE(VGA_DISABLE),
 `endif
+	.VGA2_EN(vga2_en_e),
+	.VGA2_RGB(vga2_rgb_e),
+	.VGA2_HS(vga2_hs_e),
+	.VGA2_VS(vga2_vs_e),
+	.VGA2_CS(vga2_cs_e),
 
 	.HDMI_WIDTH(direct_video ? 12'd0 : hdmi_width),
 	.HDMI_HEIGHT(direct_video ? 12'd0 : hdmi_height),
