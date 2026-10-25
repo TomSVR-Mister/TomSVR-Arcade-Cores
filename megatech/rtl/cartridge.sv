@@ -86,6 +86,9 @@ module cartridge
 	output     [23:0] md_addr
 );
 
+wire [15:0] ins_dout;
+wire        ins_ack_raw;
+
 sdram sdram
 (
 	.*,
@@ -110,12 +113,24 @@ sdram sdram
 
 	.addr2({1'b1, 6'd0, ins_slot, ins_a}),
 	.din2(0),
-	.dout2(ins_data),
+	.dout2(ins_dout),
 	.wrl2(0),
 	.wrh2(0),
 	.req2(ins_req),
-	.ack2(ins_ack)
+	.ack2(ins_ack_raw)
 );
+
+// Mega-Tech instruction ROM reads: dout is shared by all ports and is overwritten by the next 68k/Z80 read, so take
+// the word on the cycle after ack2 moves and only then pass the ack on (the BIOS side reads it two clk_sys later).
+reg  [15:0] ins_lat;
+reg         ins_ack_p, ins_ack_r;
+always @(posedge clk_ram) begin
+	ins_ack_p <= ins_ack_raw;
+	if (ins_ack_p != ins_ack_raw) ins_lat <= ins_dout;
+	ins_ack_r <= ins_ack_p;
+end
+assign ins_ack  = ins_ack_r;
+assign ins_data = ins_lat;
 
 // Mega-Tech (TomSVR): 8 cartridge slots in SDRAM. Slot n game ROM at byte n * 2 MB (word {0, n, 20 bits}), its
 // instruction ROM at 16 MB + n * 32 kB (word {1, 000000, n, 14 bits}). ROM size/mask are kept per slot.
