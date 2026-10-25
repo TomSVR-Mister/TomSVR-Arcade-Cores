@@ -122,6 +122,7 @@ module md_board
 	output vdp_de_h,
 	output vdp_de_v,
 	output vdp_m5, // md mode
+	output vdp_disp, // TomSVR Mega-Tech
 	output vdp_rs1, // h32/h40
 	output vdp_m2, // v28/v30
 	output vdp_lcb,
@@ -483,6 +484,7 @@ module md_board
 		.vdp_de_h(vdp_de_h),
 		.vdp_de_v(vdp_de_v),
 		.vdp_m5(vdp_m5),
+		.vdp_disp(vdp_disp),
 		.vdp_rs1(vdp_rs1),
 		.vdp_m2(vdp_m2),
 		.vdp_lcb(vdp_lcb),

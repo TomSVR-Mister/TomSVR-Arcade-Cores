@@ -12,8 +12,9 @@ RetroSix repair notes. AI-assisted; not verified on an original board.
 OSD extras: Screen (Game/Menu monitor), Coin Sound, Time Up Background, Flash Warning (Dim/Shadow).
 Inputs: A, B, C, Start, plus Coin, Select (hold ~1 s = next/restart, as the cabinet's Select), Enter, Test.
 
-Known issues (2026-10-24): Out Run and Parlour Games (SMS based) show missing sprites; Great Soccer is a
-MAME BAD_DUMP and stays on a blank screen (as in MAME); the end of TIME UP can still glitch briefly;
-NVRAM (test-menu settings, bookkeeping) is not saved.
+Known issues (2026-10-25): Out Run and Parlour Games (SMS based) show missing sprites; Great Soccer is a
+MAME BAD_DUMP and stays on a blank screen (as in MAME); NVRAM (test-menu settings, bookkeeping) is not saved.
+2026-10-25: TIME UP is clean (the BIOS now resets only the game CPUs, as on the board, so the video never
+loses sync; the screen stays black until the restarted game turns its display on).
 
 Source: megatech/ (Quartus project MegaDrive.qpf); MRAs from tools/megatech_build.py.

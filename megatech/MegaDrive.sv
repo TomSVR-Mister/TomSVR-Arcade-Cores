@@ -349,13 +349,16 @@ end
 ///////////////////////////////////////////////////
 
 wire reset   = status[0] | buttons[1] | region_set_rst;
-wire mt_hold_md;
+wire mt_hold_68k, mt_hold_z80;         // Mega-Tech: game CPUs held in reset by the BIOS (the VDP keeps running)
+wire mt_game_black;                      // Mega-Tech: game screen black + game sound muted (TIME UP restart)
+wire mt_sel_rst;                         // Mega-Tech: cart select restarting the game CPUs
 wire [3:0] mt_porte;                     // io2 port E outputs (mt_bios)
+wire [7:0] mt_portd;                     // io2 port D outputs (mt_bios)
 wire [1:0] mt_r, mt_g, mt_b;           // Mega-Tech menu screen (mt_bios)
 wire       mt_hs, mt_vs, mt_hbl, mt_vbl, mt_ce_pix;
 wire signed [10:0] mt_snd;                // menu PSG
 wire       mt_timeup;                     // TIME UP screen on the main monitor
-wire loading = cart_download | bk_loading | RESET | mt_hold_md;
+wire loading = cart_download | bk_loading | RESET;
 
 reg        btn_reset;
 reg        md_reset;
@@ -456,6 +459,7 @@ wire        vdp_de_h;
 wire        vdp_de_v;
 wire        vdp_intfield;
 wire        vdp_m2, vdp_m5, vdp_rs1;
+wire        vdp_disp;
 wire  [7:0] r,g,b;
 wire        hs, vs;
 
@@ -503,6 +507,8 @@ md_board md_board
 	.MCLK2(clk_md),
 
 	.ext_reset(md_reset),
+	.ext_vres(mt_hold_68k), // Mega-Tech: 68k reset from the BIOS (PAL 315-5347), VDP/RAM untouched
+	.ext_zres(mt_hold_z80), // Mega-Tech: Z80 reset from the BIOS (io2 port D5)
 	.ext_ste(mt_ste_md), // Mega-Tech FLASH = forced shadow (HUD stays bright, as on the cabinet)
 	.reset_button(btn_reset), // edge triggered, requires some activity time to get detected.
 
@@ -590,6 +596,7 @@ md_board md_board
 	.vdp_de_v(vdp_de_v),
 	.vdp_m2(vdp_m2),
 	.vdp_m5(vdp_m5),
+	.vdp_disp(vdp_disp),
 	.vdp_rs1(vdp_rs1),
 	.vdp_cramdot_dis(~status[10]),
 	.ym2612_status_enable(ym2612_quirk),
@@ -902,12 +909,38 @@ assign VGA_F1 = f1;
 // TIME UP: the BIOS draws it into the game's VDP (main monitor); we draw the same text on the game screen's own
 // timing, so the output video mode never changes (no scaler re-sync). FLASH (io2 port E bit 1, last seconds):
 // whole picture at half brightness (OSD "Dim", default) or the VDP's shadow mode ("Shadow", see md_board ext_ste).
+// TIME UP end (Tom, 2026-10-25: "game, TIME UP 3.8 s, black, title"): when TIME UP ends, or a cart select
+// restarts the game, the game screen stays black (and the game sound muted) until the restarted game has turned
+// its display off and on again (VDP register 1 bit 6), at least 16 frames after the last CPU reset (the BIOS
+// releases the 68k ~9 frames before its cart select restarts it again), at most 4 s.
 wire menu_on = status[64];
-reg  mt_tu_on, mt_tu_vb;
+reg  mt_tu_on, mt_tu_vb, mt_blk, mt_blk_on, mt_seen0;
+reg  [1:0] mt_tu_s, mt_disp_s, mt_hold_s, mt_sel_s;
+reg  [4:0] mt_rel_cnt;
+reg  [7:0] mt_blk_cnt;
 always @(posedge CLK_VIDEO) begin
-	mt_tu_vb <= vblank_c;
-	if (vblank_c & ~mt_tu_vb) mt_tu_on <= ~menu_on & mt_timeup;
+	mt_tu_s   <= {mt_tu_s[0], mt_timeup};
+	mt_disp_s <= {mt_disp_s[0], vdp_disp};
+	mt_hold_s <= {mt_hold_s[0], mt_hold_68k | mt_hold_z80};
+	mt_sel_s  <= {mt_sel_s[0], mt_sel_rst};
+	mt_tu_vb  <= vblank_c;
+	if (mt_tu_s[1] | mt_sel_s[1]) begin
+		mt_blk <= 1; mt_seen0 <= 0; mt_blk_cnt <= 0; mt_rel_cnt <= 0;
+	end else if (mt_blk) begin
+		if (mt_hold_s[1]) begin mt_seen0 <= 0; mt_rel_cnt <= 0; end
+		else if (!mt_disp_s[1]) mt_seen0 <= 1;
+		if (vblank_c & ~mt_tu_vb) begin
+			if (!mt_hold_s[1] && mt_rel_cnt != 5'd31) mt_rel_cnt <= mt_rel_cnt + 1'd1;
+			mt_blk_cnt <= mt_blk_cnt + 1'd1;
+			if ((mt_seen0 && mt_disp_s[1] && mt_rel_cnt >= 5'd16) || mt_blk_cnt == 8'd240) mt_blk <= 0;
+		end
+	end
+	if (vblank_c & ~mt_tu_vb) begin
+		mt_tu_on  <= ~menu_on & mt_timeup;
+		mt_blk_on <= ~menu_on & mt_blk;
+	end
 end
+assign mt_game_black = mt_tu_s[1] | mt_blk | mt_hold_s[1];
 // the BIOS toggles FLASH on the menu VDP's frame, not the game's: take it only at the start of the game's vblank,
 // so a game frame is never part dim / part bright (Tom, test e: a darker band at a random height)
 wire mt_flash_raw = ~menu_on & ~mt_timeup & mt_porte[1] & (cart_ms | ~status[67]);
@@ -957,9 +990,9 @@ video_mixer #(.LINE_LENGTH(400), .GAMMA(1)) video_mixer
 	.freeze_sync(),
 
 	.VGA_DE(vga_de),
-	.R(menu_on ? {4{mt_r}} : mt_tu_on ? mt_tu_r : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c),
-	.G(menu_on ? {4{mt_g}} : mt_tu_on ? mt_tu_g : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c),
-	.B(menu_on ? {4{mt_b}} : mt_tu_on ? mt_tu_b : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c),
+	.R(menu_on ? {4{mt_r}} : mt_tu_on ? mt_tu_r : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c),
+	.G(menu_on ? {4{mt_g}} : mt_tu_on ? mt_tu_g : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c),
+	.B(menu_on ? {4{mt_b}} : mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c),
 
 	// Positive pulses.
 	.HSync(menu_on ? mt_hs : hs_c),
@@ -978,7 +1011,7 @@ audio_cond audio_cond
 (
 	.clk(clk_sys),
 	.reset(sys_reset),
-	.mute(~clk_en | dma_z80_req),
+	.mute(~clk_en | dma_z80_req | mt_game_black),
 
 	.lpf_mode(status[15:14]),
 	.fm_mode(status[11]),
@@ -1038,9 +1071,8 @@ always @(posedge clk_sys) if (ioctl_wr && ioctl_index == 8'd254 && !ioctl_addr[2
 
 wire [2:0] mt_cart_sel;
 wire       mt_game_reset;
-wire [7:0] mt_portd;
 // The BIOS side has its own reset: sys_reset also follows the game reset that the BIOS itself triggers
-// (cart select -> mt_hold_md -> loading -> sys_reset), which made the BIOS reset itself in a loop (test 2: black).
+// (then: cart select -> game reset -> loading -> sys_reset), which made the BIOS reset itself in a loop (test 2: black).
 reg mt_bios_rst = 1;
 always @(posedge clk_sys) mt_bios_rst <= RESET | status[0] | buttons[1] | mt_download;
 
@@ -1101,17 +1133,26 @@ mt_bios mt_bios
 // RetroSix "Coin Meter": io2 port D2 (no credits) or D3 high disables the Mega Drive controller buffers
 wire mt_pad_en = ~(mt_portd[2] | mt_portd[3]);
 
-// cart select restarts the game side (MAME switch_cart); hold the reset for a while, then cross to clk_md
-reg [7:0] mt_hold_cnt = 0;
+// Game CPU resets from the BIOS, as on the board: only the CPUs, never the VDP. A full reset (as before
+// 2026-10-25) restarted the VDP, so the video lost sync for a moment when TIME UP began and again when the game
+// restarted (Tom: a brief glitch at both). The 68k is held while
+//  - a cart select restarts the game side (MAME switch_cart), ~1.2 ms,
+//  - io2 port E bit 3 is low (X3 -> PAL 315-5347 -> 68k reset),
+//  - io2 port D bit 4 is low (the BIOS takes the 68k's bus for the header read and for TIME UP; BIOS 0x20b2).
+// The game's Z80 also while port D bit 5 is low (inverter -> OR -> Z80 reset, RetroSix), so SMS carts stop too.
+reg [15:0] mt_hold_cnt = 0;
 always @(posedge clk_sys) begin
-	if (mt_game_reset) mt_hold_cnt <= 8'hff;
+	if (mt_game_reset) mt_hold_cnt <= 16'hffff;
 	else if (mt_hold_cnt) mt_hold_cnt <= mt_hold_cnt - 1'd1;
 end
-reg [1:0] mt_hold_sync;
-// also held while the BIOS keeps io2 port E bit 3 low (X3 -> PAL 315-5347 -> 68k reset): before the first cart
-// scan and during TIME UP, so the game stops as on the board
-always @(posedge clk_md) mt_hold_sync <= {mt_hold_sync[0], |mt_hold_cnt | ~mt_porte[3]};
-assign mt_hold_md = mt_hold_sync[1];
+assign mt_sel_rst = |mt_hold_cnt;
+reg [1:0] mt_h68_s, mt_hz_s;
+always @(posedge clk_md) begin
+	mt_h68_s <= {mt_h68_s[0], mt_sel_rst | ~mt_porte[3] | ~mt_portd[4]};
+	mt_hz_s  <= {mt_hz_s[0],  mt_sel_rst | ~mt_porte[3] | ~mt_portd[4] | ~mt_portd[5]};
+end
+assign mt_hold_68k = mt_h68_s[1];
+assign mt_hold_z80 = mt_hz_s[1];
 
 ///////////////////////////////////////////////////
 
