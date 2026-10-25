@@ -142,6 +142,7 @@ reg [21:1] dl_sz;
 reg [24:1] cart_wr_addr;
 reg [20:1] mask_s[0:7];
 reg [21:1] sz_s[0:7];
+reg  [2:0] dl_slot;
 wire [24:1] rom_mask = {4'd0, mask_s[cart_slot]};
 wire [25:1] rom_sz   = {4'd0, sz_s[cart_slot]};
 
@@ -156,9 +157,10 @@ always @(posedge clk) begin
 		dl_mask <= 0;
 		dl_sz <= 0;
 	end
+	if(cart_dl) dl_slot <= cart_dl_slot;     // cart_dl_slot is 0 again once the download has ended
 	if(old_dl & ~cart_dl) begin
-		mask_s[cart_dl_slot] <= dl_mask;
-		sz_s[cart_dl_slot]   <= dl_sz;
+		mask_s[dl_slot] <= dl_mask;
+		sz_s[dl_slot]   <= dl_sz;
 	end
 
 	if (cart_dl & cart_dl_wr & cart_dl_ins) begin
@@ -179,7 +181,7 @@ always @(posedge clk) begin
 		if(cart_wr_addr0) begin
 			cart_wr_addr0 <= 0;
 			rom_wr <= ~rom_wr;
-			cart_wr_addr <= {1'b0, cart_dl_slot, dl_sz[20:1]};
+			cart_wr_addr <= {1'b0, dl_slot, dl_sz[20:1]};
 			dl_mask <= dl_mask | dl_sz[20:1];
 			dl_sz <= dl_sz + 1'd1;
 		end
