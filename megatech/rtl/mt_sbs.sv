@@ -52,7 +52,7 @@ always @(posedge clk) begin
 end
 
 // ---------------------------------------------------------------- menu line buffer (2 x 256 x 6), clk_m
-reg  [5:0] mbuf[0:511];
+(* ramstyle = "MLAB" *) reg  [5:0] mbuf[0:511];
 reg  [7:0] mx;
 reg        mline, mhbl_d, mact;
 always @(posedge clk_m) begin

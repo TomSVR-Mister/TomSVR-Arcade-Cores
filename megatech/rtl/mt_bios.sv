@@ -337,9 +337,15 @@ reg [2:0] sync_s;
 always @(posedge clk) sync_s <= {sync_s[1:0], sync_tgl};
 wire vdp_sync = sync_en & (sync_s[2] ^ sync_s[1]);
 
+// TEST MODE: the BIOS leaves the menu VDP's frame interrupt on and its handler (0038) reads port BF, which now
+// reaches the game VDP. Let that read also acknowledge the menu VDP, or the interrupt never clears and the
+// handler keeps taking the game VDP's frame flag from the test menu's own wait loop (1d4c), so joystick and Test
+// presses were mostly missed in sim.
+wire       vdp_ack_io = ~iorq_n & m1_n & (A[7:6] == 2'b10) & A[0] & ~pd7 & wr_n;
+
 mt_vdp4 vdp (
     .clk(clk), .rst(reset), .ce_pix(ce_pix), .sync(vdp_sync),
-    .cs(vdp_cs_io | cnt_cs_io), .sel_cnt(cnt_cs_io),
+    .cs(vdp_cs_io | cnt_cs_io | vdp_ack_io), .sel_cnt(cnt_cs_io),
     .rd(rd_edge & ~iorq_n), .wr(io_we & vdp_cs_io), .a0(A[0]),
     .din(zdo), .dout(vdp_dout), .irq_n(vdp_irq_n),
     .r(r), .g(g), .b(b), .hs(hs), .vs(vs), .hblank(hblank), .vblank(vblank),
@@ -350,7 +356,9 @@ mt_vdp4 vdp (
 // 12 kB VRAM (SMALL, see mt_vdp4 vmap): the BIOS uses 0000-13ff, 2a00-36ff (font) and 3800-3fff (names, sprites).
 // TIME UP also writes here, but keeps its own overlay (pads off = port D bit 2 set, so test_on stays low).
 wire mdv_disp;
-mt_vdp4 #(.SMALL(1)) vdp_md (
+// VINIT: half a frame away from the menu VDP. With both frame flags rising together, the menu VDP's interrupt
+// handler (status read at 003f) always took the game VDP flag before the test menu loop (1d4c) could see it
+mt_vdp4 #(.SMALL(1), .VINIT(9'd131)) vdp_md (
     .clk(clk), .rst(reset), .ce_pix(ce_pix), .sync(1'b0),
     .cs(mdv_cs_io | mdc_cs_io), .sel_cnt(mdc_cs_io),
     .rd(rd_edge & ~iorq_n), .wr(io_we & mdv_cs_io), .a0(A[0]),

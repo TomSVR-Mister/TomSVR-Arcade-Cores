@@ -14,7 +14,7 @@
  *  during the current line by a state machine running on every clk, so clk must be at least ~6x ce_pix.
  *  Line counter vcnt: 0..223 active (224-line mode), 0..191 in 192-line mode, total 262 lines.
  */
-module mt_vdp4 #(parameter SMALL = 0) (   // SMALL = 1: 12 kB VRAM for the BIOS TEST MODE screens (see vmap)
+module mt_vdp4 #(parameter SMALL = 0, parameter [8:0] VINIT = 9'd0) (   // SMALL = 1: 12 kB VRAM for the BIOS TEST MODE screens (see vmap)
     input             clk,
     input             rst,
     input             ce_pix,
@@ -50,7 +50,7 @@ reg  [1:0] code;
 reg        latch_first;   // 1: next control write is the second byte
 reg  [7:0] latch_lo;
 reg  [7:0] rbuf;
-reg  [5:0] cram[0:31];
+(* ramstyle = "logic" *) reg  [5:0] cram[0:31];
 reg        vint_flag, line_flag, spr_ovr;
 
 wire       m224   = R[0][1] & R[1][4];               // 224-line mode (M2 + M1 with M4)
@@ -145,7 +145,7 @@ end
 // ---------------------------------------------------------------- timing
 reg sync_p;
 always @(posedge clk) begin
-    if (rst) begin h <= 0; v <= 0; sync_p <= 0; end
+    if (rst) begin h <= 0; v <= VINIT; sync_p <= 0; end
     else if (sync) sync_p <= 1;
     if (!rst && ce_pix) begin
         if (sync_p || sync) begin
@@ -185,7 +185,8 @@ assign irq_n = ~((vint_flag & R[1][5]) | (line_flag & R[0][4]));
 
 // ---------------------------------------------------------------- line renderer
 // line buffers: {bg priority over sprites, 5-bit colour}; buffer (line & 1)
-reg  [5:0] lb0[0:255], lb1[0:255];
+(* ramstyle = "MLAB" *) reg  [5:0] lb0[0:255];
+(* ramstyle = "MLAB" *) reg  [5:0] lb1[0:255];   // small RAMs in logic: the M10K blocks are all used
 reg  [7:0] lb_wa;
 reg  [5:0] lb_wd;
 reg        lb_we, lb_sel;
