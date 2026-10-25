@@ -42,6 +42,39 @@ still marked "not working" (MAME never stops the game when the time runs out).
 - **MRAs:** generated from `megatech.cpp` by tools/megatech_build.py. Each image is rebuilt the way MiSTer assembles
   it and compared with MAME's ROM layout; all 48 match.
 
+## Up to 8 games at once (cartridge slots)
+
+The real Mega-Tech board holds up to 8 cartridges, and players pick between them on the menu screen. The core does
+the same. This feature is in testing and arrives with the next core update.
+
+- **Slot 1** is always the game of the MRA you start.
+- **Slots 2-8** are filled from the core's OSD menu with cartridge files (`.mtc`). MiSTer remembers your choice for
+  each MRA and loads the same cartridges at every start.
+
+**Why .mtc files?** An MRA builds a cartridge from your MAME zips when the core starts, but only for its own game.
+The OSD file loader can't open zips. A `.mtc` file is a cartridge assembled ahead of time: exactly the image the
+MRA would build, in one file. It contains ROM data, so it is not distributed; you make them from your own zips.
+
+**Making the .mtc files (once):**
+1. Copy `tools/megatech_mtc.py` and `tools/megatech_make_mtc.sh` from this repository to `/media/fat/Scripts/` on
+   your MiSTer SD card.
+2. On the MiSTer, open the Scripts menu and run **megatech_make_mtc**. It reads the Mega-Tech MRAs in
+   `_Arcade` and `_Arcade/_TomSVR` and your zips in `games/mame` (megatech.zip is not needed), and writes one file
+   per game to `games/Mega-Tech/` (48 files, about 29 MB in total). Games whose zips are missing are skipped.
+3. Run it again only if you add more Mega-Tech zips later.
+
+On a PC: `python3 megatech_mtc.py <MRA folder> <zip folder> <output folder>`, then copy the output folder to
+`games/Mega-Tech/` on the SD card.
+
+**Loading cartridges:**
+1. Start any Mega-Tech MRA. Its game is slot 1.
+2. Open the OSD (F12), go to **Cartridge Slots 2-8** and pick a `.mtc` file for each slot you want. Leave the
+   others empty.
+3. The menu screen now lists all loaded games. Insert coins, choose a game with **Select** (keyboard 0) and start
+   it with Start, as on the cabinet.
+4. Next time you start the same MRA, the same cartridges are loaded again. To change a slot, pick another file.
+   Each MRA keeps its own slot list, so you can set up different line-ups under different games.
+
 ## Controls
 
 | Cabinet | Pad (default) | Keyboard |
@@ -75,6 +108,5 @@ cartridge save RAM is 32 kB (no Mega-Tech cart has saves).
 ## Known issues
 
 - Great Soccer is a MAME BAD_DUMP and stays on a blank screen (as in MAME).
-- One cartridge per MRA for now; up to 8 cartridges at once, as in the 8-slot cabinet, is being worked on.
 
 Source: megatech/ (Quartus project MegaDrive.qpf); MRAs from tools/megatech_build.py.
