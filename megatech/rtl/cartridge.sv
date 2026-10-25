@@ -767,6 +767,8 @@ always @(posedge clk) begin
 	end
 end
 
+// Mega-Tech (TomSVR): the Mega-Tech board has no YM2413 (SMS FM unit), removed to save FPGA space.
+`ifdef MT_FM
 opll fm
 (
 	.xin(clk),
@@ -778,8 +780,11 @@ opll fm
 	.ic_n(~fm_reset),
 	.mixout(fm_audio)
 );
+`else
+assign fm_audio = 0;
+`endif
 
-wire fm_det_cs = cart_ms && fm_en && ~iorq_n && ms_addr[7:0] == 8'hF2;
+wire fm_det_cs = 1'b0 && cart_ms && fm_en && ~iorq_n && ms_addr[7:0] == 8'hF2;
 
 reg [7:0] fm_det_data;
 always @(posedge clk) begin
