@@ -16,3 +16,7 @@ reference scans) and MAME for `analyze.py`.
 - `leftover.py` - check a built image for unrelocated references; `lzenc.py`, `lzemu.py` - picture LZ codec;
   `facefind.py` - portrait tables
 - `asm/` - 68000 patches (sprite converters, picture decompressor, monster-picture DIP, small-face scaler)
+
+Distributed (TomSVR) builds: `COMAD=1 MONSTER=0 python3 g_<...>.py`, then rename "(Comad core)" to "[TomSVR]" and
+`jtcomad` to `TomSVR_comad` in the MRA. Super Model I/II: `COMAD=1 MONSTER=0 python3 g_supmodel.py`.
+Titles follow MAME: `wownfant` is "WOW New Fantasia (Explicit)", `wownfanta` is "WOW New Fantasia".
