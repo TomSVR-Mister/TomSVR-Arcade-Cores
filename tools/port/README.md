@@ -5,8 +5,8 @@ Fantasia II, WOW New Fantasia, Miss World 2002, Super Model I/II, Zip & Zap) to 
 (or the jtcomad fork with `COMAD=1`) and write the MRAs. No ROM data is kept here.
 
 Setup: unpack your MAME zips into `roms/<set>/` here (or set `COMAD_ROMS`); output goes to `out/` (`out_comad/`
-with `COMAD=1`, or `COMAD_OUT`). Needs `m68k-linux-gnu-as`/`objcopy` for `asm/*.s`, and capstone / machine68k for the
-reference scans.
+with `COMAD=1`, or `COMAD_OUT`). Needs binutils for m68k (`m68k-linux-gnu-as` for `asm/*.s`, `m68k-linux-gnu-objdump` for the
+reference scans) and MAME for `analyze.py`.
 
 - `port.py` - shared library (layout, patching, reference relocation, MRA writer)
 - `games_fantasia.py`, `games_c0.py`, `games_lz.py`, `games_lzfull.py`, `games_lzfull_mon.py`, `games_zz.py` - per-family build()
