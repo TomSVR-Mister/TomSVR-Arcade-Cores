@@ -61,7 +61,7 @@ why); the patch is applied in memory by the MRA.
 | hotblk | Hot Blocks - Tetrix II | hotblock.cpp |
 | jpop | Jumping Pop (Nics) | tnzs.cpp |
 | madd | Mad Donna, Komo Como | oneshot.cpp |
-| megatech | Sega Mega-Tech: 47 games on 48 MRAs (38 Mega Drive and 9 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen and coin timer | megatech.cpp |
+| megatech | Sega Mega-Tech: 47 games on 48 MRAs (38 Mega Drive and 9 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen, coin timer, TIME UP and test menu; both monitors side by side; settings saved (see [megatech/README_TomSVR.md](megatech/README_TomSVR.md)) | megatech.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
@@ -78,9 +78,8 @@ why); the patch is applied in memory by the MRA.
 
 `afega/` (Afega boards, already covered by kuzecores) and `pkladies/` (unfinished) are in the source but not released.
 
-Known issues: Miss Puzzle (more explicit) shows some picture corruption. Mega-Tech: Out Run and Parlour Games show
-missing sprites, Great Soccer is a bad dump in MAME and stays on a blank screen, and the test-menu settings are not
-saved. Reports are welcome as GitHub issues
+Known issues: Miss Puzzle (more explicit) shows some picture corruption. Mega-Tech: Great Soccer is a bad dump in
+MAME and stays on a blank screen. Reports are welcome as GitHub issues
 (game, MRA name and what you see).
 
 ## Building from source
