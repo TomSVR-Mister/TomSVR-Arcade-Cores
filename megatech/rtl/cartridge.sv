@@ -261,15 +261,17 @@ always_comb begin
 	end
 end
 
-dpram_dif #(17,8,16,16) ram
+// Mega-Tech (TomSVR): 32 kB instead of 128 kB (the 128 kB was for the SVP's DRAM, removed). No Mega-Tech cart has
+// save RAM; 32 kB still covers SMS cart RAM (2 x 16 kB pages). Frees ~78 M10K blocks.
+dpram_dif #(15,8,14,16) ram
 (
 	.clock(clk),
-	.address_a(sram_addr),
+	.address_a(sram_addr[14:0]),
 	.data_a(sram_di),
 	.wren_a(sram_wren),
 	.q_a(sram_q),
 
-	.address_b(sram2_addr),
+	.address_b(sram2_addr[13:0]),
 	.data_b(sram2_di),
 	.wren_b(sram2_wren),
 	.q_b(sram2_q)

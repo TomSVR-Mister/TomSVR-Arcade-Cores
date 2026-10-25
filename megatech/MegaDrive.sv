@@ -17,6 +17,8 @@
 //  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //============================================================================
 
+`define MT_SBS   // Mega-Tech side by side output (OSD), see rtl/mt_sbs.sv
+
 module emu
 (
 	`include "sys/emu_ports.vh"
@@ -1006,7 +1008,7 @@ wire [7:0] mt_gb = mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c
 
 // Side by side (OSD): game screen left, menu screen right, as the cabinet's two monitors (TEST MODE keeps the
 // full screen)
-`ifdef MT_SBS   // side by side: does not fit next to the TEST MODE VDP yet (M10K blocks), see HANDOVER
+`ifdef MT_SBS
 assign     sbs_vid = status[68] & ~bios_vid;
 wire       sbs_sync, sbs_ce, sbs_hbl, sbs_vbl, sbs_hs, sbs_vs;
 wire [7:0] sbs_r, sbs_g, sbs_b;
