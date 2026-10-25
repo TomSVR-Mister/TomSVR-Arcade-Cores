@@ -40,7 +40,7 @@ To install only some cores, use update_all's download filter with the per-core t
 2. Copy the `.mra` files to `/media/fat/_Arcade/` (or a subfolder).
 3. Put your own MAME (0.264 or later) zips in `/media/fat/games/mame/`. Merged or split sets both work.
 
-Your zips are never modified. Eleven of the Comad MRAs patch the game program as it loads (see the build document for
+Your zips are never modified. Fifteen of the Comad MRAs patch the game program as it loads (see the build document for
 why); the patch is applied in memory by the MRA.
 
 ## Cores
@@ -48,7 +48,7 @@ why); the patch is applied in memory by the MRA.
 | Core | Games | MAME driver |
 |---|---|---|
 | chqflag | Chequered Flag (Konami, 1988; steering by joystick or analog stick) | chqflag.cpp |
-| comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
+| comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Super Miss World, Super Model I/II, WOW New Fantasia, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |

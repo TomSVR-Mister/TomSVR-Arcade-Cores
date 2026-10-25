@@ -57,7 +57,7 @@ These began as a copy of one of jotego's game cores, renamed and changed. The or
 
 | Core | Started from | Main changes |
 |---|---|---|
-| **jtcomad** (14 MRAs) | **JTGALS** (Kaneko Gals Panic) | 5 MB program ROM plus a 1 MB patch ROM at B00000. Work RAM at C80000. OKI moved to A80000. MAME's palette-based fg transparency. Header bit 1 selects the Afega Gals Hustler board (Pocket Gals V.I.P., Gals Hustler), which reads VU-002 sprites natively. Uses jtframe_m68k, jtframe_obj, jt6295. |
+| **jtcomad** (18 MRAs) | **JTGALS** (Kaneko Gals Panic) | 5 MB program ROM plus a 1 MB patch ROM at B00000. Work RAM at C80000. OKI moved to A80000. MAME's palette-based fg transparency. Header bit 1 selects the Afega Gals Hustler board (Pocket Gals V.I.P., Gals Hustler), which reads VU-002 sprites natively. Uses jtframe_m68k, jtframe_obj, jt6295. |
 | **jtjpop** (1) | **JTKIWI** (Taito TNZS / Seta X1) | Jumping Pop (Nics): JT51 YM2151 on the second CPU in place of the YM2203, inputs and DIP switches on the second CPU, a 1024-entry palette, dial support from JTKIWI. Keeps JTKIWI's Z80s and i8742 MCU module (upi41), jt03 and jt51. |
 | **jtmissb** (2) | **JTBUBL** (Bubble Bobble) | Miss Bubble II and Bubble Pong Pong. No MCU, a rewritten sub CPU for the picture background, 8 bpp tiles and sprites, and YM3526 + OKI in place of the YM2203. Z80s, jt26, jt6295. |
 
@@ -126,7 +126,7 @@ All the MRAs follow the same scheme, with a few exceptions listed at the end.
 
 - **`<buttons>`:** named buttons. The count must match `JTFRAME_BUTTONS`, or a button lands on Select. (This caused a coin bug on Big Twin / Hot Mind, now fixed.)
 
-- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 131 MRAs, 0282 on 38 (the Comad ones), 0288 on 5 (Gaelco 2) and 0270 on 3.
+- **Zip names:** current MAME names and merged sets. Clones look in the parent zip. `mameversion` is 0264 on 131 MRAs, 0282 on 42 (the Comad ones), 0288 on 5 (Gaelco 2) and 0270 on 3.
 
 ### What the header bytes select, per core
 
