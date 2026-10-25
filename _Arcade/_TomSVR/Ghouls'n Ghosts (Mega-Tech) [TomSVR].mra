@@ -34,5 +34,6 @@
             <part name="mpr12606.ic2" crc="d0be7777" offset="0x0" length="0x20000" map="12"/>
         </interleave>
     </rom>
+    <nvram index="4" size="8192"/>
     <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>
 </misterromdescription>

@@ -28,5 +28,6 @@
             <part name="mpr-12640.ic1" crc="2fe2cf62" map="12"/>
         </interleave>
     </rom>
+    <nvram index="4" size="8192"/>
     <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>
 </misterromdescription>

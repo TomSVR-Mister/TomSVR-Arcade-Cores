@@ -29,5 +29,6 @@
             <part name="epr-14494.ic1" crc="cbe58b1b" map="10"/>
         </interleave>
     </rom>
+    <nvram index="4" size="8192"/>
     <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>
 </misterromdescription>

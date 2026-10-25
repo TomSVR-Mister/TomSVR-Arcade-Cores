@@ -26,5 +26,6 @@
         <part repeat="0xFFF0">00</part>
         <part name="mpr-11078.ic1" crc="5589d8d2"/>
     </rom>
+    <nvram index="4" size="8192"/>
     <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>
 </misterromdescription>
