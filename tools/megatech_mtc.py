@@ -7,7 +7,7 @@ as MiSTer Main does for the MRA (same parts, same order), from the zips named in
   0x00000 32 kB zero, 0x08000 instruction ROM 32 kB, 0x10000 header 64 kB, 0x20000 game ROM.
 
 usage: megatech_mtc.py [mra_dir] [zip_dir] [out_dir]
-defaults (MiSTer): /media/fat/_Arcade/_TomSVR  /media/fat/games/mame  /media/fat/games/Mega-Tech
+defaults (MiSTer): /media/fat/_Arcade (searched with its subfolders)  /media/fat/games/mame  /media/fat/games/Mega-Tech
 """
 import sys, os, re, zipfile
 import xml.etree.ElementTree as ET
@@ -78,27 +78,41 @@ def assemble(rom, zipdir):
             unit[0] = 1
     return bytes(data[:romlen[0]])
 
+def find_mras(top):
+    for d, dirs, files in os.walk(top):
+        dirs[:] = [x for x in dirs if x.lower() not in ('cores', 'mame', 'hbmame')]
+        for fn in sorted(files):
+            if fn.lower().endswith('.mra'): yield os.path.join(d, fn)
+
 def main():
     a = sys.argv[1:]
-    mradir = a[0] if len(a) > 0 else '/media/fat/_Arcade/_TomSVR'
+    mradir = a[0] if len(a) > 0 else '/media/fat/_Arcade'
     zipdir = a[1] if len(a) > 1 else '/media/fat/games/mame'
     outdir = a[2] if len(a) > 2 else '/media/fat/games/Mega-Tech'
+    print('MRAs: %s (and subfolders)\nzips: %s\nout:  %s' % (mradir, zipdir, outdir))
+    if not os.path.isdir(zipdir): print('zip folder not found: %s' % zipdir)
     os.makedirs(outdir, exist_ok=True)
-    ok = bad = 0
-    for fn in sorted(os.listdir(mradir)):
-        if not fn.endswith('.mra'): continue
-        try: root = ET.parse(os.path.join(mradir, fn)).getroot()
-        except ET.ParseError: continue
-        if (root.findtext('rbf') or '').strip() != 'TomSVR_megatech': continue
-        name = (root.findtext('name') or fn[:-4]).replace(' [TomSVR]', '').strip()
-        rom = [r for r in root.findall('rom') if r.get('index') == '0'][0]
+    ok = bad = seen = mt = 0; done = set()
+    for path in find_mras(mradir):
+        seen += 1
+        try: root = ET.parse(path).getroot()
+        except Exception as e:
+            if 'mega-tech' in path.lower(): print('cannot read %s: %s' % (path, e))
+            continue
+        if not (root.findtext('rbf') or '').strip().lower().startswith('tomsvr_megatech'): continue
+        mt += 1
+        name = (root.findtext('name') or os.path.basename(path)[:-4]).replace(' [TomSVR]', '').strip()
+        if name in done: continue
+        roms = [r for r in root.findall('rom') if r.get('index') == '0']
+        if not roms: continue
         try:
-            img = assemble(rom, zipdir)
-        except LookupError as e:
+            img = assemble(roms[0], zipdir)
+        except Exception as e:
             print('skip %s: %s' % (name, e)); bad += 1; continue
         safe = re.sub(r'[\\/:*?"<>|]', '_', name)
         with open(os.path.join(outdir, safe + '.mtc'), 'wb') as f: f.write(img)
-        print('ok   %s (%d kB)' % (name, len(img) // 1024)); ok += 1
+        print('ok   %s (%d kB)' % (name, len(img) // 1024)); ok += 1; done.add(name)
+    print('%d MRAs looked at, %d for TomSVR_megatech' % (seen, mt))
     print('%d cartridges written to %s, %d skipped' % (ok, outdir, bad))
 
 if __name__ == '__main__':

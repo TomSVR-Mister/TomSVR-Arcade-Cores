@@ -59,7 +59,7 @@ MRA would build, in one file. It contains ROM data, so it is not distributed; yo
 1. Copy `tools/megatech_mtc.py` and `tools/megatech_make_mtc.sh` from this repository to `/media/fat/Scripts/` on
    your MiSTer SD card.
 2. On the MiSTer, open the Scripts menu and run **megatech_make_mtc**. It reads the Mega-Tech MRAs in
-   `_Arcade` and `_Arcade/_TomSVR` and your zips in `games/mame` (megatech.zip is not needed), and writes one file
+   `_Arcade` and its subfolders and your zips in `games/mame` (megatech.zip is not needed), and writes one file
    per game to `games/Mega-Tech/` (48 files, about 29 MB in total). Games whose zips are missing are skipped.
 3. Run it again only if you add more Mega-Tech zips later.
 
