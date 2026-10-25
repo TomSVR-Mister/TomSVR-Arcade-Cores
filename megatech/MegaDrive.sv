@@ -87,6 +87,14 @@ localparam CONF_STR = {
 	"O[65],Coin Sound,Off,On;",
 	"O[66],Time Up Background,Black,Blue;",
 	"O[67],Flash Warning,Dim,Shadow;",
+	"P3,Cartridge Slots 2-8;",
+	"P3FC2,MTC,Slot 2;",
+	"P3FC3,MTC,Slot 3;",
+	"P3FC4,MTC,Slot 4;",
+	"P3FC5,MTC,Slot 5;",
+	"P3FC6,MTC,Slot 6;",
+	"P3FC7,MTC,Slot 7;",
+	"P3FC8,MTC,Slot 8;",
 	"DIP;",
 	"-;",
 	"O[7:6],Region,JP,US,EU;",
@@ -321,21 +329,34 @@ wire       gun_btn_mode = status[42];
 // Mega-Tech (TomSVR): the MRA sends one image on index 0 (see docs/design.md):
 // 0x000000 BIOS 32 kB, 0x008000 instruction ROM 32 kB, 0x010000 header, 0x020000 game ROM (.bin order).
 // The console's own .bin/.sms loading (index 1/2) and the TMSS boot ROM (index 0) are not used.
+// Slots 2-8 (OSD "FC2".."FC8", remembered by MiSTer per MRA): index n = slot n, a .mtc file with the same layout as
+// the MRA image (the BIOS part is ignored). NVRAM is index 9.
+wire [5:0] mt_idx     = ioctl_index[5:0];
 wire mt_download   = ioctl_download & (ioctl_index == 0);
+wire mt_slot_dl    = ioctl_download & (mt_idx >= 6'd2) & (mt_idx <= 6'd8);
+wire [2:0] mt_dl_slot = mt_slot_dl ? mt_idx[2:0] - 3'd1 : 3'd0;
 wire mt_cart_part  = ioctl_addr >= 25'h020000;
-wire cart_download = mt_download;
-wire [24:0] cart_addr_dl = ioctl_addr - 25'h020000;
-wire cart_wr_dl    = ioctl_wr & mt_cart_part;
+wire mt_ins_part   = ioctl_addr[24:15] == 10'd1;     // 0x8000-0xffff
+wire cart_download = mt_download | mt_slot_dl;
+wire [24:0] cart_addr_dl = mt_ins_part ? (25'h1000000 | {10'd0, ioctl_addr[14:0]}) : ioctl_addr - 25'h020000;
+wire cart_wr_dl    = ioctl_wr & (mt_cart_part | mt_ins_part);
 wire code_download = ioctl_download & &ioctl_index;
 wire tmss_download = 1'b0;
 
-reg cart_ms;
+// per slot: present, SMS flag (header byte 0 bit 0)
+reg  [7:0] mt_present = 0, mt_ms = 0;
+wire  [2:0] mt_cart_sel;
+wire        mt_ins_req, mt_ins_ack;
+wire [14:1] mt_ins_a;
+wire [15:0] mt_ins_data;
+wire  [2:0] mt_ins_slot = mt_cart_sel;
 always @(posedge clk_sys) begin
-	reg old_download;
-	
-	old_download <= cart_download;
-	if(mt_download & ioctl_wr & (ioctl_addr == 25'h010000)) cart_ms <= ioctl_data[0]; // header byte 0 bit 0 = SMS cart
+	if(cart_download & ioctl_wr & (ioctl_addr == 25'h010000)) begin
+		mt_ms[mt_dl_slot] <= ioctl_data[0];
+		mt_present[mt_dl_slot] <= 1;
+	end
 end
+wire cart_ms = mt_ms[cart_download ? mt_dl_slot : mt_cart_sel];
 
 reg osd_btn = 0;
 always @(posedge clk_sys) begin
@@ -694,13 +715,17 @@ cartridge cartridge
 	.SDRAM_nWE(SDRAM_nWE),
 	
 	.cart_dl(cart_download),
+	.cart_dl_slot(mt_dl_slot),
+	.cart_dl_ins(mt_ins_part),
 	.cart_dl_addr(cart_addr_dl),
 	.cart_dl_data(ioctl_data),
 	.cart_dl_wr(cart_wr_dl),
 	.cart_dl_wait(ioctl_wait),
 
 	.cart_ms(cart_ms),
+	.cart_slot(mt_cart_sel),
 	.cart_addr(cart_addr),
+	.ins_slot(mt_ins_slot), .ins_a(mt_ins_a), .ins_req(mt_ins_req), .ins_ack(mt_ins_ack), .ins_data(mt_ins_data),
 	.cart_data(cart_data_rom),
 	.cart_data_en(cart_data_en_rom),
 	.cart_data_wr(cart_data_wr),
@@ -1121,15 +1146,14 @@ assign AUDIO_MIX = status[58:57];
 reg [7:0] mt_dsw0 = 8'h7f, mt_dsw1 = 8'ha1;
 always @(posedge clk_sys) if (ioctl_wr && ioctl_index == 8'd254 && !ioctl_addr[24:1]) {mt_dsw1, mt_dsw0} <= ioctl_data;
 
-wire [2:0] mt_cart_sel;
 wire       mt_game_reset;
 // The BIOS side has its own reset: sys_reset also follows the game reset that the BIOS itself triggers
 // (then: cart select -> game reset -> loading -> sys_reset), which made the BIOS reset itself in a loop (test 2: black).
 reg mt_bios_rst = 1;
 // NVRAM (MRA <nvram index="4" size="8192">): MiSTer loads it from the SD card after the ROMs (the BIOS is held in
 // reset meanwhile and then boots with the saved settings) and saves it whenever the OSD is opened.
-wire mt_nv_dl = ioctl_download & (ioctl_index == 8'd4);
-always @(posedge clk_sys) mt_bios_rst <= RESET | status[0] | buttons[1] | mt_download | mt_nv_dl;
+wire mt_nv_dl = ioctl_download & (ioctl_index == 8'd9);
+always @(posedge clk_sys) mt_bios_rst <= RESET | status[0] | buttons[1] | mt_download | mt_slot_dl | mt_nv_dl;
 
 // Select (= next cart, restarts the game side on the real board) only after a ~1 s hold, so an accidental
 // press on a pad shoulder doesn't restart the game. Then a 0.2 s press is passed to the BIOS.
@@ -1164,14 +1188,14 @@ mt_bios mt_bios
 	.service_coin(mt_kb[4]),
 	.start1(joystick_0[7] | mt_kb[2]),
 	.start2(joystick_1[7] | mt_kb[3]),
-	.sel_btn(mt_sel_pulse | mt_kb[5]),
+	.sel_btn(mt_sel_pulse | mt_kb[5] | (mt_test_on & (joystick_0[13] | joystick_1[13]))),   // TEST MODE: pad Select at once
 	.enter_btn(joystick_0[14] | joystick_1[14] | mt_kb[6]),
 	.service(joystick_0[15] | mt_kb[7]),
 	.door1(1'b0),
 	.door2(1'b0),
 	.dsw0(mt_dsw0),
 	.dsw1(mt_dsw1),
-	.cart_present(8'hfe),          // one cart, in slot 1 (MAME reads 00 = all slots)
+	.cart_present(~mt_present),    // active low: slots loaded from the MRA (1) and the OSD (2-8)
 	.pad1(~{joystick_0[6], joystick_0[5], joystick_0[0], joystick_0[1], joystick_0[2], joystick_0[3]}),
 	.pad2(~{joystick_1[6], joystick_1[5], joystick_1[0], joystick_1[1], joystick_1[2], joystick_1[3]}),
 	.pad1_a(~joystick_0[4]),

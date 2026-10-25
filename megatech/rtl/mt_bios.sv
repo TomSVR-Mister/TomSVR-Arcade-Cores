@@ -33,6 +33,12 @@ module mt_bios (
     input      [15:0] nv_din,
     output     [15:0] nv_dout,    // bytes at {nv_addr[12:1], 1} / {nv_addr[12:1], 0}
 
+    // instruction ROM of the selected cart, in SDRAM (word = {byte 2n, byte 2n+1}); req toggles, ack follows
+    output reg [14:1] ins_a,
+    output reg        ins_req,
+    input             ins_ack,
+    input      [15:0] ins_data,
+
     // cabinet inputs, active high
     input             coin1, coin2, service_coin, start1, start2,
     input       [8:0] tu_x, tu_y,          // pixel position relative to the TIME UP text (game screen timing)
@@ -91,7 +97,7 @@ T80s z80 (            // Verilog copy made with GHDL for Verilator (generics fix
 T80s #(.Mode(0), .T2Write(1), .IOWait(1)) z80 (
 `endif
     .RESET_n(~reset), .CLK(clk), .CEN(zcen),
-    .WAIT_n(1'b1), .INT_n(vdp_irq_n), .NMI_n(1'b1), .BUSRQ_n(1'b1),
+    .WAIT_n(~ins_wait), .INT_n(vdp_irq_n), .NMI_n(1'b1), .BUSRQ_n(1'b1),
     .M1_n(m1_n), .MREQ_n(mreq_n), .IORQ_n(iorq_n), .RD_n(rd_n), .WR_n(wr_n),
     .RFSH_n(), .HALT_n(), .BUSAK_n(),
     .A(A), .DI(zdi), .DO(zdo)
@@ -101,6 +107,7 @@ T80s #(.Mode(0), .T2Write(1), .IOWait(1)) z80 (
 );
 
 wire mem_rd = ~mreq_n & ~rd_n;
+wire ins_wait;
 wire io_rd  = ~iorq_n & ~rd_n & m1_n;
 wire io_wr  = ~iorq_n & ~wr_n;
 // one-clk write strobes (the Z80 holds WR_n low for many clk)
@@ -115,28 +122,25 @@ wire rd_edge = ~rd_n & ~rd_d;
 
 // ------------------------------------------------------------- memories
 reg  [7:0] bios_rom [0:32767];
-reg  [7:0] instr_rom[0:32767];
 reg  [7:0] ram      [0:8191];
 reg  [7:0] bram     [0:8191];      // {slot != 0, 12-bit offset}
-reg  [7:0] bios_q, instr_q, ram_q, bram_q;
+reg  [7:0] bios_q, ram_q, bram_q;
 
 // download: two bytes per WIDE ioctl word, written on two consecutive clocks
 reg        dl_ph1, dl_ph2;
 reg [15:0] dl_w;
 reg [14:0] dl_a;
-reg        dl_hi;      // 0: BIOS (0x0000-0x7fff), 1: instruction ROM (0x8000-0xffff)
 always @(posedge clk) begin
     dl_ph1 <= 0;
     dl_ph2 <= dl_ph1;
-    if (dl & dl_wr & ~|dl_addr[24:16]) begin dl_ph1 <= 1; dl_w <= dl_data; dl_a <= {dl_addr[14:1], 1'b0}; dl_hi <= dl_addr[15]; end
+    if (dl & dl_wr & ~|dl_addr[24:15]) begin dl_ph1 <= 1; dl_w <= dl_data; dl_a <= {dl_addr[14:1], 1'b0}; end
 end
-// one write port per ROM: low byte on the first clock, high byte on the second
+// BIOS ROM write: low byte on the first clock, high byte on the second (the instruction ROM goes to SDRAM)
 wire        rom_we = dl_ph1 | dl_ph2;
 wire [14:0] rom_wa = dl_ph1 ? dl_a : (dl_a | 15'd1);
 wire  [7:0] rom_wd = dl_ph1 ? dl_w[7:0] : dl_w[15:8];
 always @(posedge clk) begin
-    if (rom_we &  dl_hi) instr_rom[rom_wa] <= rom_wd;
-    if (rom_we & ~dl_hi) bios_rom[rom_wa]  <= rom_wd;
+    if (rom_we) bios_rom[rom_wa] <= rom_wd;
 end
 
 // 68000 window (8000-9fff): bank_addr is a 9-bit shift register (MAME mt_z80_bank_w)
@@ -146,10 +150,30 @@ wire        win_ins = (win_a[23:16] == 8'h30);          // 0x300000-0x30ffff: in
 
 always @(posedge clk) begin
     bios_q  <= bios_rom[A[14:0]];
-    instr_q <= instr_rom[win_a[15:1]];
     bram_q  <= bram[{cart_sel != 3'd0, A[11:0]}];
     if (mem_we && A[15:12] == 4'h3) bram[{cart_sel != 3'd0, A[11:0]}] <= zdo;
 end
+
+// Instruction ROM of the selected cart (window 0x300000, odd bytes): read from SDRAM, the Z80 waits until it arrives
+wire       ins_rd = mem_rd & (A[15:13] == 3'b100) & win_ins & win_a[0] & ~cart_present[cart_sel];
+reg        ins_busy, ins_have, ins_sel;
+reg  [1:0] ins_ack_s;
+reg  [7:0] ins_q;
+always @(posedge clk) begin
+    ins_ack_s <= {ins_ack_s[0], ins_ack};
+    if (reset) begin ins_busy <= 0; ins_have <= 0; end
+    else begin
+        if (~mem_rd) ins_have <= 0;
+        if (ins_rd & ~ins_busy & ~ins_have) begin
+            ins_a <= win_a[15:2]; ins_sel <= win_a[1]; ins_req <= ~ins_req; ins_busy <= 1;
+        end
+        if (ins_busy && ins_req == ins_ack_s[1]) begin
+            ins_busy <= 0; ins_have <= 1;
+            ins_q <= ins_sel ? ins_data[7:0] : ins_data[15:8];
+        end
+    end
+end
+assign ins_wait = ins_rd & ~ins_have;
 
 // RAM 4000-5fff = NVRAM, one port (a second read port made Quartus duplicate the RAM: +8 blocks at 98%).
 // The Z80, or the NVRAM load (the Z80 is held in reset meanwhile, two bytes per WIDE word on two clocks as the
@@ -267,7 +291,7 @@ always @(*) begin
             16'b0110_01??_????_????: zdi = io1_cs ? io_rd_data : 8'h00;
             16'b0110_10??_????_????: zdi = io2_cs ? io_rd_data : 8'h00;
             16'b0111_0???_????_????: zdi = bios_q;                                   // 7000-77ff
-            16'b100?_????_????_????: zdi = (win_ins && win_a[0] && cart_sel == 3'd0) ? instr_q : 8'h00;
+            16'b100?_????_????_????: zdi = (win_ins && win_a[0] && ~cart_present[cart_sel]) ? ins_q : 8'h00;
             default: zdi = 8'h00;
         endcase
     end else if (~iorq_n) begin

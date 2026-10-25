@@ -37,13 +37,23 @@ module cartridge
 	output            SDRAM_nWE,
 
 	input             cart_dl,
+	input       [2:0] cart_dl_slot,  // Mega-Tech: slot being loaded (0-7)
+	input             cart_dl_ins,   // Mega-Tech: this download word is instruction ROM (cart_dl_addr = its offset)
 	input      [24:0] cart_dl_addr,
 	input      [15:0] cart_dl_data,
 	input             cart_dl_wr,
 	output reg        cart_dl_wait,
 
 	input             cart_ms,
+	input       [2:0] cart_slot,     // Mega-Tech: slot the game side runs (BIOS cart select)
 	input      [23:1] cart_addr,
+
+	// Mega-Tech: instruction ROM reads for the BIOS (req toggles, ack follows)
+	input       [2:0] ins_slot,
+	input      [14:1] ins_a,
+	input             ins_req,
+	output            ins_ack,
+	output     [15:0] ins_data,
 	output reg [15:0] cart_data,
 	input      [15:0] cart_data_wr,
 	input             cart_cs,
@@ -98,21 +108,27 @@ sdram sdram
 	.req1(rom_req),
 	.ack1(rom_ack),
 
-	.addr2(rom2_a),
+	.addr2({1'b1, 6'd0, ins_slot, ins_a}),
 	.din2(0),
-	.dout2(rom2_data),
+	.dout2(ins_data),
 	.wrl2(0),
 	.wrh2(0),
-	.req2(rom2_req),
-	.ack2(rom2_ack)
+	.req2(ins_req),
+	.ack2(ins_ack)
 );
 
+// Mega-Tech (TomSVR): 8 cartridge slots in SDRAM. Slot n game ROM at byte n * 2 MB (word {0, n, 20 bits}), its
+// instruction ROM at 16 MB + n * 32 kB (word {1, 000000, n, 14 bits}). ROM size/mask are kept per slot.
 reg        cart_wr_addr0;
 reg        rom_wr = 0;
 wire       rom_wrack;
-reg [24:1] rom_mask;
-reg [25:1] rom_sz;
-reg [26:0] cart_wr_addr;
+reg [20:1] dl_mask;
+reg [21:1] dl_sz;
+reg [24:1] cart_wr_addr;
+reg [20:1] mask_s[0:7];
+reg [21:1] sz_s[0:7];
+wire [24:1] rom_mask = {4'd0, mask_s[cart_slot]};
+wire [25:1] rom_sz   = {4'd0, sz_s[cart_slot]};
 
 always @(posedge clk) begin
 	reg old_dl, old_reset;
@@ -122,26 +138,35 @@ always @(posedge clk) begin
 	
 	old_dl <= cart_dl;
 	if(~old_dl & cart_dl) begin
-		rom_mask <= 0;
-		cart_wr_addr <= 0;
-		rom_sz <= 0;
+		dl_mask <= 0;
+		dl_sz <= 0;
+	end
+	if(old_dl & ~cart_dl) begin
+		mask_s[cart_dl_slot] <= dl_mask;
+		sz_s[cart_dl_slot]   <= dl_sz;
 	end
 
-	if (cart_dl & cart_dl_wr) begin
+	if (cart_dl & cart_dl_wr & cart_dl_ins) begin
+		cart_dl_wait <= 1;
+		cart_wr_addr0 <= 0;
+		rom_wr <= ~rom_wr;
+		cart_wr_addr <= {1'b1, 6'd0, cart_dl_slot, cart_dl_addr[14:1]};
+	end
+	else if (cart_dl & cart_dl_wr) begin
 		cart_dl_wait <= 1;
 		cart_wr_addr0 <= cart_ms;
 		rom_wr <= ~rom_wr;
-		cart_wr_addr <= rom_sz;
-		rom_mask <= rom_mask | rom_sz[24:1];
-		rom_sz <= rom_sz + 1'd1;
+		cart_wr_addr <= {1'b0, cart_dl_slot, dl_sz[20:1]};
+		dl_mask <= dl_mask | dl_sz[20:1];
+		dl_sz <= dl_sz + 1'd1;
 	end
 	else if(rom_wr == rom_wrack) begin
 		if(cart_wr_addr0) begin
 			cart_wr_addr0 <= 0;
 			rom_wr <= ~rom_wr;
-			cart_wr_addr <= rom_sz;
-			rom_mask <= rom_mask | rom_sz[24:1];
-			rom_sz <= rom_sz + 1'd1;
+			cart_wr_addr <= {1'b0, cart_dl_slot, dl_sz[20:1]};
+			dl_mask <= dl_mask | dl_sz[20:1];
+			dl_sz <= dl_sz + 1'd1;
 		end
 		else begin
 			cart_dl_wait <= 0;
@@ -184,7 +209,7 @@ always @(posedge clk_ram) begin
 	we_old <= rom_we;
 	rd_old <= sdram_rd & rom_data_req;
 	if((~rd_old & sdram_rd & rom_data_req) || (~we_old & rom_we)) begin
-		rom_addr <= (cart_ms ? ms_cart_addr : md_cart_addr) & rom_mask[24:1];
+		rom_addr <= {1'b0, cart_slot, ((cart_ms ? ms_cart_addr[20:1] : md_cart_addr[20:1]) & rom_mask[20:1])};
 		rom_req <= ~rom_req;
 		rom_rd <= sdram_rd;
 	end
@@ -366,8 +391,6 @@ assign svp_dtack_n = 1'b1;
 assign svp_dram_a  = 16'h0;
 assign svp_dram_do = 16'h0;
 assign svp_dram_we = 1'b0;
-assign rom2_a      = '0;
-assign rom2_req    = 1'b0;
 `endif
 
 // SRAM
