@@ -58,6 +58,11 @@ module mt_bios (
 
     // TIME UP screen for the main monitor, in the menu video timing (see "TIME UP on the main monitor")
     output reg        timeup,
+    // TEST MODE screens: the BIOS draws them into the game's VDP (port D bit 7 = 0, pads on), here a second
+    // Mode 4 VDP shown on the main monitor in its own timing while test_on
+    output            test_on,
+    output      [1:0] t_r, t_g, t_b,
+    output            t_hs, t_vs, t_hblank, t_vblank,
     output            tu_px                // TIME UP text pixel at (tu_x, tu_y)
 );
 
@@ -240,6 +245,10 @@ wire       pd7       = portd[7];
 wire       vdp_cs_io = ~iorq_n & m1_n & (A[7:6] == 2'b10) & pd7;     // 80-bf: VDP data/control
 wire       cnt_cs_io = ~iorq_n & m1_n & (A[7:6] == 2'b01) & pd7;     // 40-7f: counters (read) / PSG (write)
 wire [7:0] vdp_dout;
+// with port D bit 7 = 0 the same ports reach the game's VDP: modelled by a second Mode 4 VDP (vdp_md)
+wire       mdv_cs_io = ~iorq_n & m1_n & (A[7:6] == 2'b10) & ~pd7;
+wire       mdc_cs_io = ~iorq_n & m1_n & (A[7:6] == 2'b01) & ~pd7 & wr_n;   // counter reads (writes = game PSG)
+wire [7:0] mdv_dout;
 
 always @(posedge clk) if (reset) port3f <= 0; else if (io_we && A[7:0] == 8'h3f) port3f <= zdo;
 
@@ -261,6 +270,7 @@ always @(*) begin
         endcase
     end else if (~iorq_n) begin
         if (vdp_cs_io || cnt_cs_io) zdi = vdp_dout;
+        else if (mdv_cs_io || mdc_cs_io) zdi = mdv_dout;
         else if (A[7:0] == 8'hdc) zdi = pad_dc;
         else if (A[7:0] == 8'hdd) zdi = pad_dd;
     end
@@ -326,7 +336,21 @@ mt_vdp4 vdp (
     .rd(rd_edge & ~iorq_n), .wr(io_we & vdp_cs_io), .a0(A[0]),
     .din(zdo), .dout(vdp_dout), .irq_n(vdp_irq_n),
     .r(r), .g(g), .b(b), .hs(hs), .vs(vs), .hblank(hblank), .vblank(vblank),
-    .hpos(mh), .vpos(mv)
+    .hpos(mh), .vpos(mv), .disp_on()
 );
+
+// ------------------------------------------------------------- game VDP in Mode 4 (TEST MODE screens)
+// 12 kB VRAM (SMALL, see mt_vdp4 vmap): the BIOS uses 0000-13ff, 2a00-36ff (font) and 3800-3fff (names, sprites).
+// TIME UP also writes here, but keeps its own overlay (pads off = port D bit 2 set, so test_on stays low).
+wire mdv_disp;
+mt_vdp4 #(.SMALL(1)) vdp_md (
+    .clk(clk), .rst(reset), .ce_pix(ce_pix),
+    .cs(mdv_cs_io | mdc_cs_io), .sel_cnt(mdc_cs_io),
+    .rd(rd_edge & ~iorq_n), .wr(io_we & mdv_cs_io), .a0(A[0]),
+    .din(zdo), .dout(mdv_dout), .irq_n(),
+    .r(t_r), .g(t_g), .b(t_b), .hs(t_hs), .vs(t_vs), .hblank(t_hblank), .vblank(t_vblank),
+    .hpos(), .vpos(), .disp_on(mdv_disp)
+);
+assign test_on = ~pd7 & ~portd[2] & ~portd[4] & mdv_disp;
 
 endmodule

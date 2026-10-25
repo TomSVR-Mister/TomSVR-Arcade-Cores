@@ -14,7 +14,7 @@
  *  during the current line by a state machine running on every clk, so clk must be at least ~6x ce_pix.
  *  Line counter vcnt: 0..223 active (224-line mode), 0..191 in 192-line mode, total 262 lines.
  */
-module mt_vdp4 (
+module mt_vdp4 #(parameter SMALL = 0) (   // SMALL = 1: 12 kB VRAM for the BIOS TEST MODE screens (see vmap)
     input             clk,
     input             rst,
     input             ce_pix,
@@ -38,7 +38,8 @@ module mt_vdp4 (
     output reg        hblank,
     output reg        vblank,
     output      [8:0] hpos,
-    output      [8:0] vpos
+    output      [8:0] vpos,
+    output            disp_on      // register 1 bit 6
 );
 
 // ---------------------------------------------------------------- registers and CPU interface
@@ -53,10 +54,17 @@ reg        vint_flag, line_flag, spr_ovr;
 
 wire       m224   = R[0][1] & R[1][4];               // 224-line mode (M2 + M1 with M4)
 wire       disp   = R[1][6];
+assign     disp_on = disp;
 wire [8:0] lines  = m224 ? 9'd224 : 9'd192;
 
 // VRAM: port A CPU, port B renderer
-reg  [7:0] vram[0:16383];
+// SMALL: the TEST MODE screens use VRAM 0000-13ff, 2a00-36ff and 3800-3fff only (logged in sim/bios):
+// 2000-3fff is stored at 1000-2fff, so 12 kB hold all three (2000-27ff and 1800-1fff are never written)
+localparam VSIZE = SMALL ? 12288 : 16384;
+function [13:0] vmap(input [13:0] a);
+    vmap = (SMALL && a[13]) ? a - 14'h1000 : a;
+endfunction
+reg  [7:0] vram[0:VSIZE-1];
 reg  [7:0] vq_cpu, vq;
 reg [13:0] va_r;
 reg        vwe;
@@ -129,8 +137,8 @@ always @(*) begin
 end
 
 always @(posedge clk) begin
-    if (vwe) vram[va_r] <= vdin;
-    vq_cpu <= vram[va_r];
+    if (vwe) vram[vmap(va_r)] <= vdin;
+    vq_cpu <= vram[vmap(va_r)];
 end
 
 // ---------------------------------------------------------------- timing
@@ -181,7 +189,7 @@ always @(posedge clk) begin
 end
 
 reg [13:0] ra;          // renderer VRAM address
-always @(posedge clk) vq <= vram[ra];
+always @(posedge clk) vq <= vram[vmap(ra)];
 
 localparam S_IDLE=0, S_SPR=1, S_SPRX=2, S_BG=3, S_BGPIX=4, S_SPD=5, S_LEFT=6, S_DONE=7;
 reg  [2:0] st;

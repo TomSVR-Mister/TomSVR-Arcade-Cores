@@ -364,6 +364,9 @@ wire [1:0] mt_r, mt_g, mt_b;           // Mega-Tech menu screen (mt_bios)
 wire       mt_hs, mt_vs, mt_hbl, mt_vbl, mt_ce_pix;
 wire signed [10:0] mt_snd;                // menu PSG
 wire       mt_timeup;                     // TIME UP screen on the main monitor
+wire       mt_test_on;                    // TEST MODE screens on the main monitor (mt_bios second Mode 4 VDP)
+wire [1:0] mt_t_r, mt_t_g, mt_t_b;
+wire       mt_t_hs, mt_t_vs, mt_t_hbl, mt_t_vbl;
 wire loading = cart_download | bk_loading | RESET;
 
 reg        btn_reset;
@@ -920,6 +923,12 @@ assign VGA_F1 = f1;
 // its display off and on again (VDP register 1 bit 6), at least 16 frames after the last CPU reset (the BIOS
 // releases the 68k ~9 frames before its cart select restarts it again), at most 4 s.
 wire menu_on = status[64];
+// TEST MODE (BIOS test menu, entered with Test pressed and released): drawn by the BIOS into the game's VDP in
+// Mode 4; shown here from mt_bios's second Mode 4 VDP in its own timing (the scaler re-syncs once, as for the
+// OSD menu screen)
+reg  [1:0] mt_test_s;
+always @(posedge CLK_VIDEO) mt_test_s <= {mt_test_s[0], mt_test_on};
+wire bios_vid = ~menu_on & mt_test_s[1];
 reg  mt_tu_on, mt_tu_vb, mt_blk, mt_blk_on, mt_seen0;
 reg  [1:0] mt_tu_s, mt_disp_s, mt_hold_s, mt_sel_s;
 reg  [4:0] mt_rel_cnt;
@@ -989,22 +998,22 @@ wire [7:0] mt_tu_b = mt_tu_px ? 8'hff : status[66] ? 8'hff : 8'h00;
 video_mixer #(.LINE_LENGTH(400), .GAMMA(1)) video_mixer
 (
 	.*,
-	.ce_pix(menu_on ? mt_ce_pix : ce_pix),
+	.ce_pix((menu_on | bios_vid) ? mt_ce_pix : ce_pix),
 
 	.scandoubler(~interlace && (scale || forced_scandoubler)),
 	.hq2x(scale==1),
 	.freeze_sync(),
 
 	.VGA_DE(vga_de),
-	.R(menu_on ? {4{mt_r}} : mt_tu_on ? mt_tu_r : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c),
-	.G(menu_on ? {4{mt_g}} : mt_tu_on ? mt_tu_g : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c),
-	.B(menu_on ? {4{mt_b}} : mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c),
+	.R(menu_on ? {4{mt_r}} : bios_vid ? {4{mt_t_r}} : mt_tu_on ? mt_tu_r : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c),
+	.G(menu_on ? {4{mt_g}} : bios_vid ? {4{mt_t_g}} : mt_tu_on ? mt_tu_g : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c),
+	.B(menu_on ? {4{mt_b}} : bios_vid ? {4{mt_t_b}} : mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c),
 
 	// Positive pulses.
-	.HSync(menu_on ? mt_hs : hs_c),
-	.VSync(menu_on ? mt_vs : vs_c),
-	.HBlank(menu_on ? mt_hbl : hblank_c),
-	.VBlank(menu_on ? mt_vbl : vblank_c)
+	.HSync(menu_on ? mt_hs : bios_vid ? mt_t_hs : hs_c),
+	.VSync(menu_on ? mt_vs : bios_vid ? mt_t_vs : vs_c),
+	.HBlank(menu_on ? mt_hbl : bios_vid ? mt_t_hbl : hblank_c),
+	.VBlank(menu_on ? mt_vbl : bios_vid ? mt_t_vbl : vblank_c)
 );
 
 
@@ -1141,7 +1150,10 @@ mt_bios mt_bios
 	.ce_pix(mt_ce_pix),
 	.snd(mt_snd),
 	.tu_x(mt_tux), .tu_y(mt_tuy), .tu_px(mt_tu_px),
-	.timeup(mt_timeup)
+	.timeup(mt_timeup),
+	.test_on(mt_test_on),
+	.t_r(mt_t_r), .t_g(mt_t_g), .t_b(mt_t_b),
+	.t_hs(mt_t_hs), .t_vs(mt_t_vs), .t_hblank(mt_t_hbl), .t_vblank(mt_t_vbl)
 );
 
 // RetroSix "Coin Meter": io2 port D2 (no credits) or D3 high disables the Mega Drive controller buffers
@@ -1263,7 +1275,7 @@ md_io md_io
 	.P1_LEFT(joy0[1]),
 	.P1_RIGHT(joy0[0]),
 	.P1_A(joy0[4]),
-	.P1_B(joy0[5] | (cart_ms & joy0[4])), // SMS carts: A also = button 1
+	.P1_B(joy0[5] | (cart_ms & (joy0[4] | joy0[7]))), // SMS carts: A and Start also = button 1 ("PUSH START BUTTON")
 	.P1_C(joy0[6]),
 	.P1_START(joy0[7]),
 	.P1_MODE(joy0[8]),
@@ -1276,7 +1288,7 @@ md_io md_io
 	.P2_LEFT(joy1[1]),
 	.P2_RIGHT(joy1[0]),
 	.P2_A(joy1[4]),
-	.P2_B(joy1[5] | (cart_ms & joy1[4])), // SMS carts: A also = button 1
+	.P2_B(joy1[5] | (cart_ms & (joy1[4] | joy1[7]))), // SMS carts: A and Start also = button 1
 	.P2_C(joy1[6]),
 	.P2_START(joy1[7]),
 	.P2_MODE(joy1[8]),
