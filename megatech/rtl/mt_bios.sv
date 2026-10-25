@@ -52,6 +52,8 @@ module mt_bios (
     output      [1:0] r, g, b,
     output            hs, vs, hblank, vblank,
     output            ce_pix,
+    input             sync_tgl,   // side-by-side: toggles at the game picture's first active pixel (other clock)
+    input             sync_en,
 
     // menu sound: SN76489 of the 315-5246 (jt89 by Jose Tejada, GPL-3)
     output signed [10:0] snd,
@@ -330,8 +332,13 @@ jt89 psg (
 );
 
 // ------------------------------------------------------------- menu VDP
+// side-by-side: lock the menu picture to the game picture (same line and frame length, see mt_sbs)
+reg [2:0] sync_s;
+always @(posedge clk) sync_s <= {sync_s[1:0], sync_tgl};
+wire vdp_sync = sync_en & (sync_s[2] ^ sync_s[1]);
+
 mt_vdp4 vdp (
-    .clk(clk), .rst(reset), .ce_pix(ce_pix),
+    .clk(clk), .rst(reset), .ce_pix(ce_pix), .sync(vdp_sync),
     .cs(vdp_cs_io | cnt_cs_io), .sel_cnt(cnt_cs_io),
     .rd(rd_edge & ~iorq_n), .wr(io_we & vdp_cs_io), .a0(A[0]),
     .din(zdo), .dout(vdp_dout), .irq_n(vdp_irq_n),
@@ -344,7 +351,7 @@ mt_vdp4 vdp (
 // TIME UP also writes here, but keeps its own overlay (pads off = port D bit 2 set, so test_on stays low).
 wire mdv_disp;
 mt_vdp4 #(.SMALL(1)) vdp_md (
-    .clk(clk), .rst(reset), .ce_pix(ce_pix),
+    .clk(clk), .rst(reset), .ce_pix(ce_pix), .sync(1'b0),
     .cs(mdv_cs_io | mdc_cs_io), .sel_cnt(mdc_cs_io),
     .rd(rd_edge & ~iorq_n), .wr(io_we & mdv_cs_io), .a0(A[0]),
     .din(zdo), .dout(mdv_dout), .irq_n(),

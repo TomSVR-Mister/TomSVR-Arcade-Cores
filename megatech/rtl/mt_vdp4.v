@@ -18,6 +18,7 @@ module mt_vdp4 #(parameter SMALL = 0) (   // SMALL = 1: 12 kB VRAM for the BIOS 
     input             clk,
     input             rst,
     input             ce_pix,
+    input             sync,        // one clk pulse: next pixel is the first active pixel (side-by-side lock)
 
     // CPU port (Z80): a0 = 0 data, 1 control. sel_cnt reads the V (a0=0) / H (a0=1) counters (ports 40/41)
     input             cs,
@@ -142,10 +143,16 @@ always @(posedge clk) begin
 end
 
 // ---------------------------------------------------------------- timing
+reg sync_p;
 always @(posedge clk) begin
-    if (rst) begin h <= 0; v <= 0; end
-    else if (ce_pix) begin
-        if (h == 9'd341) begin
+    if (rst) begin h <= 0; v <= 0; sync_p <= 0; end
+    else if (sync) sync_p <= 1;
+    if (!rst && ce_pix) begin
+        if (sync_p || sync) begin
+            sync_p <= 0;
+            h <= 0;
+            v <= m224 ? 9'd0 : 9'd246;          // wy = 0
+        end else if (h == 9'd341) begin
             h <= 0;
             v <= (v == 9'd261) ? 9'd0 : v + 9'd1;
         end else h <= h + 9'd1;

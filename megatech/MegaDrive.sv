@@ -51,6 +51,7 @@ assign HDMI_BLACKOUT = 0;
 assign HDMI_BOB_DEINT = 0;
 
 wire  [1:0] ar = status[49:48];
+wire        sbs_vid;   // side-by-side output (see mt_sbs)
 
 wire       vcrop_en = status[34];
 wire [3:0] vcopt    = status[53:50];
@@ -66,7 +67,7 @@ video_freak video_freak
 (
 	.*,
 	.VGA_DE_IN(vga_de),
-	.ARX((!ar) ? arx : (ar - 1'd1)),
+	.ARX((!ar) ? (sbs_vid ? {arx[10:0], 1'b0} : arx) : (ar - 1'd1)),
 	.ARY((!ar) ? ary : 12'd0),
 	.CROP_SIZE((en216p & vcrop_en) ? 10'd216 : 10'd0),
 	.CROP_OFF(voff),
@@ -78,6 +79,7 @@ localparam CONF_STR = {
 	"Mega-Tech;;",
 	"-;",
 	"O[64],Screen,Game,Menu;",
+	"O[68],Side by Side,Off,On;",
 	"O[65],Coin Sound,Off,On;",
 	"O[66],Time Up Background,Black,Blue;",
 	"O[67],Flash Warning,Dim,Shadow;",
@@ -995,25 +997,46 @@ wire [7:0] mt_tu_r = mt_tu_px ? 8'hff : 8'h00;
 wire [7:0] mt_tu_g = mt_tu_px ? 8'hff : status[66] ? 8'h55 : 8'h00;
 wire [7:0] mt_tu_b = mt_tu_px ? 8'hff : status[66] ? 8'hff : 8'h00;
 
-video_mixer #(.LINE_LENGTH(400), .GAMMA(1)) video_mixer
+// game picture with the Mega-Tech overlays (TIME UP, black, FLASH) and the light gun target
+wire [7:0] mt_gr = mt_tu_on ? mt_tu_r : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c;
+wire [7:0] mt_gg = mt_tu_on ? mt_tu_g : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c;
+wire [7:0] mt_gb = mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c;
+
+// Side by side (OSD): game screen left, menu screen right, as the cabinet's two monitors (TEST MODE keeps the
+// full screen)
+assign     sbs_vid = status[68] & ~bios_vid;
+wire       sbs_sync, sbs_ce, sbs_hbl, sbs_vbl, sbs_hs, sbs_vs;
+wire [7:0] sbs_r, sbs_g, sbs_b;
+mt_sbs mt_sbs
+(
+	.clk(CLK_VIDEO),
+	.g_ce(ce_pix), .g_r(mt_gr), .g_g(mt_gg), .g_b(mt_gb),
+	.g_hbl(hblank_c), .g_vbl(vblank_c), .g_hs(hs_c), .g_vs(vs_c),
+	.sync_tgl(sbs_sync),
+	.clk_m(clk_sys), .m_ce(mt_ce_pix), .m_r(mt_r), .m_g(mt_g), .m_b(mt_b), .m_hbl(mt_hbl), .m_vbl(mt_vbl),
+	.ce(sbs_ce), .r(sbs_r), .g(sbs_g), .b(sbs_b), .hbl(sbs_hbl), .vbl(sbs_vbl), .hs(sbs_hs), .vs(sbs_vs)
+);
+
+wire mt_menu_vid = menu_on & ~sbs_vid;
+video_mixer #(.LINE_LENGTH(640), .GAMMA(1)) video_mixer
 (
 	.*,
-	.ce_pix((menu_on | bios_vid) ? mt_ce_pix : ce_pix),
+	.ce_pix(sbs_vid ? sbs_ce : (mt_menu_vid | bios_vid) ? mt_ce_pix : ce_pix),
 
 	.scandoubler(~interlace && (scale || forced_scandoubler)),
 	.hq2x(scale==1),
 	.freeze_sync(),
 
 	.VGA_DE(vga_de),
-	.R(menu_on ? {4{mt_r}} : bios_vid ? {4{mt_t_r}} : mt_tu_on ? mt_tu_r : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c),
-	.G(menu_on ? {4{mt_g}} : bios_vid ? {4{mt_t_g}} : mt_tu_on ? mt_tu_g : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c),
-	.B(menu_on ? {4{mt_b}} : bios_vid ? {4{mt_t_b}} : mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c),
+	.R(sbs_vid ? sbs_r : mt_menu_vid ? {4{mt_r}} : bios_vid ? {4{mt_t_r}} : mt_gr),
+	.G(sbs_vid ? sbs_g : mt_menu_vid ? {4{mt_g}} : bios_vid ? {4{mt_t_g}} : mt_gg),
+	.B(sbs_vid ? sbs_b : mt_menu_vid ? {4{mt_b}} : bios_vid ? {4{mt_t_b}} : mt_gb),
 
 	// Positive pulses.
-	.HSync(menu_on ? mt_hs : bios_vid ? mt_t_hs : hs_c),
-	.VSync(menu_on ? mt_vs : bios_vid ? mt_t_vs : vs_c),
-	.HBlank(menu_on ? mt_hbl : bios_vid ? mt_t_hbl : hblank_c),
-	.VBlank(menu_on ? mt_vbl : bios_vid ? mt_t_vbl : vblank_c)
+	.HSync(sbs_vid ? sbs_hs : mt_menu_vid ? mt_hs : bios_vid ? mt_t_hs : hs_c),
+	.VSync(sbs_vid ? sbs_vs : mt_menu_vid ? mt_vs : bios_vid ? mt_t_vs : vs_c),
+	.HBlank(sbs_vid ? sbs_hbl : mt_menu_vid ? mt_hbl : bios_vid ? mt_t_hbl : hblank_c),
+	.VBlank(sbs_vid ? sbs_vbl : mt_menu_vid ? mt_vbl : bios_vid ? mt_t_vbl : vblank_c)
 );
 
 
@@ -1148,6 +1171,7 @@ mt_bios mt_bios
 	.r(mt_r), .g(mt_g), .b(mt_b),
 	.hs(mt_hs), .vs(mt_vs), .hblank(mt_hbl), .vblank(mt_vbl),
 	.ce_pix(mt_ce_pix),
+	.sync_tgl(sbs_sync), .sync_en(status[68]),
 	.snd(mt_snd),
 	.tu_x(mt_tux), .tu_y(mt_tuy), .tu_px(mt_tu_px),
 	.timeup(mt_timeup),
