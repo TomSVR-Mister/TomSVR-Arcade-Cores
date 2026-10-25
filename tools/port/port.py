@@ -2,8 +2,8 @@
 """Generic Comad -> jtgals port library. A game config script imports this."""
 import struct, os, json, zlib, hashlib, subprocess, re
 
-S = '/tmp/claude-0/-home-claude/e1042311-2b93-5281-bddb-91ed22183aec/scratchpad'
-ROMS = f'{S}/roms'
+BASE = os.path.dirname(os.path.abspath(__file__))   # tools/port
+ROMS = os.environ.get('COMAD_ROMS', os.path.join(BASE, 'roms'))   # unpacked MAME ROM folders (not in the repo)
 SHADOW, FLAGS, MARK = 0x53c400, 0x53c100, 0x53c300
 # COMAD=1: build for the jtcomad fork (not a beta core). CPU ROM 000000-4FFFFF = image 000000-4FFFFF,
 # extension ROM CPU B00000-BFFFFF = image 500000-5FFFFF, OKI at A80001.
@@ -12,7 +12,7 @@ ROMSIZE = 0x600000 if COMAD else 0x400000
 EXT = 0x500000                       # image offset of the extension ROM (COMAD only)
 OKIA = 0xa80001 if COMAD else 0x400001
 def cpu_addr(a): return a - EXT + 0xb00000 if COMAD and a >= EXT else a
-OUT = f'{S}/out_comad' if COMAD else f'{S}/out'
+OUT = os.environ.get('COMAD_OUT', os.path.join(BASE, 'out_comad' if COMAD else 'out'))
 CORE = 'jtcomad' if COMAD else 'jtgals'
 L = lambda v: struct.pack('>I', v)
 
@@ -69,7 +69,7 @@ class Port:
     # ------------------------------------------------------------- reference relocation
     DESYNC_OK = re.compile(r'^(lea|move|movea|cmp|tst|clr|btst|bset|bclr|bchg|add|sub|and|or|eor|neg|not|jsr|jmp|pea|mul|div)')
     def relocate(self, refs_json, mapper, label, skip=(), data_patch=(), coords=True):
-        refs = json.load(open(refs_json)); n = 0
+        refs = json.load(open(os.path.join(BASE, refs_json))); n = 0
         for r in refs:
             if r['lab'] != label: continue
             j, v = r['j'], r['v']
@@ -98,8 +98,8 @@ class Port:
     def converter(self, hook, copyfn, ofs1, ofs2, addr=0x7f000, yoff=15, irq4fn=0, bufs=None, pad=b'\xff'):
         args = ['m68k-linux-gnu-as', '-m68000']
         for k, v in dict(OFS1=ofs1, OFS2=ofs2, YOFF=yoff, COPYFN=copyfn, IRQ4FN=irq4fn, **(bufs or {})).items(): args += ['--defsym', '%s=%d' % (k, v)]
-        o = f'{S}/work/asm/{self.name}.o'; b = f'{S}/work/asm/{self.name}.bin'
-        subprocess.run(args + ['-o', o, f'{S}/work/asm/conv_t.s'], check=True)
+        o = f'{BASE}/asm/{self.name}.o'; b = f'{BASE}/asm/{self.name}.bin'
+        subprocess.run(args + ['-o', o, f'{BASE}/asm/conv_t.s'], check=True)
         subprocess.run(['m68k-linux-gnu-objcopy', '-O', 'binary', '-j', '.text', o, b], check=True)
         code = open(b, 'rb').read()
         assert self.unpatched[addr:addr + 0x400] == pad * 0x400, 'converter area is not layout padding'

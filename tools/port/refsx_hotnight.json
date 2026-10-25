@@ -1,0 +1,1996 @@
+[
+{
+"j": 271304,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0423c4 bset #4,0xc87004"
+},
+{
+"j": 271312,
+"v": 13135877,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0423ce moveb 0xc87005,%d0"
+},
+{
+"j": 271330,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0423de bclr #4,0xc87004"
+},
+{
+"j": 271338,
+"v": 13135886,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0423e8 moveb 0xc8700e,%d0"
+},
+{
+"j": 271346,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0423ee btst #0,0xc8701e"
+},
+{
+"j": 271354,
+"v": 13135887,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0423f8 moveb 0xc8700f,%d0"
+},
+{
+"j": 271386,
+"v": 13115708,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042418 moveal #13115708,%a1"
+},
+{
+"j": 271440,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04244c andib #-7,0xc87021"
+},
+{
+"j": 271448,
+"v": 13117280,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042454 cmpiw #100,0xc82760"
+},
+{
+"j": 271466,
+"v": 13135942,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042468 clrw 0xc87046"
+},
+{
+"j": 271474,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04246e eorib #16,0xc87021"
+},
+{
+"j": 271486,
+"v": 13135926,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04247a movew #111,0xc87036"
+},
+{
+"j": 271496,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042482 movew 0x800000,0xc87008"
+},
+{
+"j": 271506,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04248c movew 0x800002,0xc8700c"
+},
+{
+"j": 271512,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042496 notb 0xc87008"
+},
+{
+"j": 271518,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04249c notb 0xc8700c"
+},
+{
+"j": 271534,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0424aa btst #4,0xc87008"
+},
+{
+"j": 271544,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0424b4 btst #4,0xc8700c"
+},
+{
+"j": 271554,
+"v": 13135926,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0424be subiw #1,0xc87036"
+},
+{
+"j": 271580,
+"v": 13135950,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0424da clrw 0xc8704e"
+},
+{
+"j": 271590,
+"v": 13135958,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0424e4 tstw 0xc87056"
+},
+{
+"j": 271598,
+"v": 13135958,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0424ec subqw #1,0xc87056"
+},
+{
+"j": 271626,
+"v": 13135950,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042508 tstw 0xc8704e"
+},
+{
+"j": 271636,
+"v": 13135950,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042510 subiw #1,0xc8704e"
+},
+{
+"j": 271644,
+"v": 13135918,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04251a moveal 0xc8702e,%a5"
+},
+{
+"j": 271674,
+"v": 13135918,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042538 moveal 0xc8702e,%a5"
+},
+{
+"j": 271682,
+"v": 13135932,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042540 clrw 0xc8703c"
+},
+{
+"j": 271688,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042546 clrw 0xc87040"
+},
+{
+"j": 271696,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04254c bclr #0,0xc87021"
+},
+{
+"j": 271738,
+"v": 13135938,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042574 movew 0x800004,0xc87042"
+},
+{
+"j": 271744,
+"v": 13135938,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04257e notb 0xc87042"
+},
+{
+"j": 271752,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042584 btst #0,0xc8701e"
+},
+{
+"j": 271762,
+"v": 13135938,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04258e btst #0,0xc87042"
+},
+{
+"j": 271776,
+"v": 13135938,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04259c btst #1,0xc87042"
+},
+{
+"j": 271786,
+"v": 13135932,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425a8 addqw #1,0xc8703c"
+},
+{
+"j": 271794,
+"v": 13135932,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425ae cmpiw #128,0xc8703c"
+},
+{
+"j": 271808,
+"v": 13135932,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425be clrw 0xc8703c"
+},
+{
+"j": 271814,
+"v": 13135954,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425c4 clrw 0xc87052"
+},
+{
+"j": 271820,
+"v": 13135928,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425ca moveb 0xc87038,%d0"
+},
+{
+"j": 271830,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425d4 movew %d0,0xc87040"
+},
+{
+"j": 271838,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425da cmpiw #3,0xc87040"
+},
+{
+"j": 271846,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425e4 clrw 0xc87040"
+},
+{
+"j": 271854,
+"v": 13135940,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425ea movew #9,0xc87044"
+},
+{
+"j": 271866,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0425f6 bclr #0,0xc87021"
+},
+{
+"j": 271876,
+"v": 13135944,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042602 movew %d6,0xc87048"
+},
+{
+"j": 271896,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042614 btst #0,0xc87021"
+},
+{
+"j": 271906,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042620 movew 0xc87040,%d6"
+},
+{
+"j": 271916,
+"v": 13135944,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04262a movew 0xc87048,%d6"
+},
+{
+"j": 271936,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04263c cmpiw #0,0xc87040"
+},
+{
+"j": 271946,
+"v": 13135944,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042646 cmpiw #1,0xc87048"
+},
+{
+"j": 271958,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042652 cmpiw #1,0xc87040"
+},
+{
+"j": 271968,
+"v": 13135944,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04265c cmpiw #2,0xc87048"
+},
+{
+"j": 271980,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042668 cmpiw #2,0xc87040"
+},
+{
+"j": 271990,
+"v": 13135944,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042672 cmpiw #0,0xc87048"
+},
+{
+"j": 272068,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0426c0 bclr #1,0xc87021"
+},
+{
+"j": 272076,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0426c8 bclr #2,0xc87021"
+},
+{
+"j": 272104,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0426e4 bclr #0,0xc87021"
+},
+{
+"j": 272112,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0426ec bset #1,0xc87021"
+},
+{
+"j": 272120,
+"v": 13135942,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0426f4 cmpiw #1,0xc87046"
+},
+{
+"j": 272130,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0426fe bclr #1,0xc87021"
+},
+{
+"j": 272138,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042706 bset #2,0xc87021"
+},
+{
+"j": 272148,
+"v": 13135942,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042712 addqw #1,0xc87046"
+},
+{
+"j": 272158,
+"v": 13135932,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04271c addqw #1,0xc8703c"
+},
+{
+"j": 272166,
+"v": 13135932,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042722 andiw #7,0xc8703c"
+},
+{
+"j": 272174,
+"v": 13135954,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04272c addqw #1,0xc87052"
+},
+{
+"j": 272180,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042732 addqw #1,0xc87040"
+},
+{
+"j": 272188,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042738 cmpiw #3,0xc87040"
+},
+{
+"j": 272196,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042742 clrw 0xc87040"
+},
+{
+"j": 272204,
+"v": 13135954,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042748 cmpiw #3,0xc87052"
+},
+{
+"j": 272212,
+"v": 13135940,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042752 tstw 0xc87044"
+},
+{
+"j": 272222,
+"v": 13135954,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04275c clrw 0xc87052"
+},
+{
+"j": 272228,
+"v": 13135940,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042762 subqw #1,0xc87044"
+},
+{
+"j": 272248,
+"v": 13135936,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042776 movew 0xc87040,%d6"
+},
+{
+"j": 272264,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042784 btst #0,0xc8701e"
+},
+{
+"j": 272276,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04278e movew 0x800000,0xc87008"
+},
+{
+"j": 272282,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042798 notb 0xc87008"
+},
+{
+"j": 272288,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04279e moveb 0xc87008,%d0"
+},
+{
+"j": 272300,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427a6 movew 0x800002,0xc8700c"
+},
+{
+"j": 272306,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427b0 notb 0xc8700c"
+},
+{
+"j": 272312,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427b6 moveb 0xc8700c,%d0"
+},
+{
+"j": 272344,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427d4 bset #0,0xc87021"
+},
+{
+"j": 272354,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427de bset #0,0xc87021"
+},
+{
+"j": 272368,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427ec bset #0,0xc87021"
+},
+{
+"j": 272380,
+"v": 13135958,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0427fa clrw 0xc87056"
+},
+{
+"j": 272386,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042800 moveb 0xc87021,%d0"
+},
+{
+"j": 272406,
+"v": 13135958,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042812 movew #208,0xc87056"
+},
+{
+"j": 272420,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042820 btst #4,0xc87021"
+},
+{
+"j": 272430,
+"v": 13135930,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04282a movew #2,0xc8703a"
+},
+{
+"j": 272440,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042834 btst #0,0xc8701e"
+},
+{
+"j": 272448,
+"v": 13117026,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04283e addqb #1,0xc82662"
+},
+{
+"j": 272456,
+"v": 13117027,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042846 addqb #1,0xc82663"
+},
+{
+"j": 272516,
+"v": 13135948,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042882 movew 0xc8704c,%d0"
+},
+{
+"j": 272530,
+"v": 13135948,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042890 clrw 0xc8704c"
+},
+{
+"j": 272578,
+"v": 13135950,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0428be movew #16,0xc8704e"
+},
+{
+"j": 272584,
+"v": 13135948,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0428c6 addqw #1,0xc8704c"
+},
+{
+"j": 272604,
+"v": 13135956,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0428da addqw #1,0xc87054"
+},
+{
+"j": 272612,
+"v": 13135956,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0428e0 andiw #7,0xc87054"
+},
+{
+"j": 272622,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0428ea eorib #32,0xc87021"
+},
+{
+"j": 272630,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0428f2 btst #5,0xc87021"
+},
+{
+"j": 272830,
+"v": 13135946,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0429bc addqw #1,0xc8704a"
+},
+{
+"j": 272838,
+"v": 13135946,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0429c2 andiw #15,0xc8704a"
+},
+{
+"j": 272848,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0429cc eorib #8,0xc87021"
+},
+{
+"j": 272856,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0429d4 btst #3,0xc87021"
+},
+{
+"j": 272902,
+"v": 12594748,
+"lab": "RAMC0",
+"cls": "data",
+"insn": "",
+"ctx": "4e71 2c7c 0032 00c0 2e3c 0003 007c"
+},
+{
+"j": 272932,
+"v": 13135940,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042a22 movew 0xc87044,%d7"
+},
+{
+"j": 272944,
+"v": 7340160,
+"lab": "SPR",
+"cls": "covered",
+"insn": "042a2e moveal #7340160,%fp"
+},
+{
+"j": 272952,
+"v": 12595260,
+"lab": "RAMC0",
+"cls": "data",
+"insn": "",
+"ctx": "0080 2e3c 0008 00c0 303c 0001 323c"
+},
+{
+"j": 272974,
+"v": 13135942,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042a4a cmpiw #0,0xc87046"
+},
+{
+"j": 272998,
+"v": 13135905,
+"lab": "RAM",
+"cls": "covered",
+"insn": "042a62 btst #4,0xc87021"
+},
+{
+"j": 274262,
+"v": 12591430,
+"lab": "RAMC0",
+"cls": "data",
+"insn": "",
+"ctx": "0844 1142 0042 00c0 2146 11c6 4b4e"
+},
+{
+"j": 274646,
+"v": 13135906,
+"lab": "RAM",
+"cls": "desync",
+"insn": "0430d4 lea 0xc87022,%a0",
+"ctx": "0000 0000 41f9 00c8 7022 7005 10fc"
+},
+{
+"j": 274664,
+"v": 13135912,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0430e6 lea 0xc87028,%a0"
+},
+{
+"j": 274684,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0430f8 andib #-16,0xc87004"
+},
+{
+"j": 274692,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043100 bset #4,0xc87004"
+},
+{
+"j": 274704,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04310c movew #0,0xc87006"
+},
+{
+"j": 274718,
+"v": 13135922,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043118 movel #511,0xc87032"
+},
+{
+"j": 274818,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04317e andib #-16,0xc87004"
+},
+{
+"j": 274878,
+"v": 13116156,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0431bc moveal #13116156,%a0"
+},
+{
+"j": 274900,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0431d0 btst #5,0xc87004"
+},
+{
+"j": 274912,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0431dc bclr #4,0xc87004"
+},
+{
+"j": 274936,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0431f4 movew #0,0xc87006"
+},
+{
+"j": 274944,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0431fc movew #512,0xc8700a"
+},
+{
+"j": 274952,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043204 btst #0,0xc82664"
+},
+{
+"j": 274966,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043212 btst #1,0xc82664"
+},
+{
+"j": 274994,
+"v": 13135922,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04322c movel #511,0xc87032"
+},
+{
+"j": 275000,
+"v": 13135922,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043236 subql #1,0xc87032"
+},
+{
+"j": 275010,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04323e btst #1,0xc82664"
+},
+{
+"j": 275020,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043248 moveb #12,0xc87004"
+},
+{
+"j": 275030,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043252 moveb #4,0xc87004"
+},
+{
+"j": 275048,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043266 moveb 0xc87004,%d0"
+},
+{
+"j": 275090,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04328e bclr #2,0xc87004"
+},
+{
+"j": 275106,
+"v": 13135960,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0432a0 movel %a5,0xc87058"
+},
+{
+"j": 275126,
+"v": 13135922,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0432b4 subql #1,0xc87032"
+},
+{
+"j": 275136,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0432bc moveb #12,0xc87004"
+},
+{
+"j": 275154,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0432d0 moveb 0xc87004,%d0"
+},
+{
+"j": 275238,
+"v": 13115688,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043324 clrw 0xc82128"
+},
+{
+"j": 275258,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043338 moveb 0xc87006,%d0"
+},
+{
+"j": 275264,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04333e moveb 0xc87007,%d1"
+},
+{
+"j": 275276,
+"v": 13135886,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04334a moveb %d0,0xc8700e"
+},
+{
+"j": 275286,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043354 moveb 0xc8700a,%d0"
+},
+{
+"j": 275292,
+"v": 13135883,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04335a moveb 0xc8700b,%d1"
+},
+{
+"j": 275304,
+"v": 13135887,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043366 moveb %d0,0xc8700f"
+},
+{
+"j": 275316,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043372 moveb 0xc87006,%d0"
+},
+{
+"j": 275322,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043378 moveb 0xc87007,%d1"
+},
+{
+"j": 275334,
+"v": 13135890,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043384 lea 0xc87012,%a0"
+},
+{
+"j": 275346,
+"v": 13135877,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043390 moveb %d1,0xc87005"
+},
+{
+"j": 275362,
+"v": 13135911,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433a0 lea 0xc87027,%a0"
+},
+{
+"j": 275368,
+"v": 13135917,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433a6 lea 0xc8702d,%a1"
+},
+{
+"j": 275400,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433c4 btst #0,0xc8701e"
+},
+{
+"j": 275410,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433ce btst #1,0xc8701e"
+},
+{
+"j": 275420,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433d8 bclr #1,0xc8701e"
+},
+{
+"j": 275436,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433e8 bclr #0,0xc8701e"
+},
+{
+"j": 275456,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0433fc btst #0,0xc8701e"
+},
+{
+"j": 275466,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043406 bset #0,0xc8701e"
+},
+{
+"j": 275478,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043412 bclr #1,0xc8701e"
+},
+{
+"j": 275492,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043420 btst #1,0xc8701e"
+},
+{
+"j": 275502,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04342a bset #1,0xc8701e"
+},
+{
+"j": 275514,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043436 bclr #0,0xc8701e"
+},
+{
+"j": 275548,
+"v": 13135886,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04345a moveb 0xc8700e,%d0"
+},
+{
+"j": 275562,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043466 btst #0,0xc8701e"
+},
+{
+"j": 275588,
+"v": 13135887,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043482 moveb 0xc8700f,%d0"
+},
+{
+"j": 275602,
+"v": 13135902,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04348e btst #1,0xc8701e"
+},
+{
+"j": 275768,
+"v": 13135888,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043536 movew 0xc87010,%d0"
+},
+{
+"j": 275774,
+"v": 13135890,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04353c lea 0xc87012,%a0"
+},
+{
+"j": 275812,
+"v": 13135888,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043560 cmpiw #34,0xc87010"
+},
+{
+"j": 275820,
+"v": 13135888,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04356a clrw 0xc87010"
+},
+{
+"j": 275828,
+"v": 13135888,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043572 addqw #1,0xc87010"
+},
+{
+"j": 275836,
+"v": 13135890,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04357a lea 0xc87012,%a1"
+},
+{
+"j": 275882,
+"v": 13135890,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0435a8 moveb 0xc87012,%d0"
+},
+{
+"j": 275902,
+"v": 13135891,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0435bc moveb 0xc87013,%d0"
+},
+{
+"j": 275930,
+"v": 13135892,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0435d8 moveb 0xc87014,%d0"
+},
+{
+"j": 275950,
+"v": 13135893,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0435ec moveb 0xc87015,%d0"
+},
+{
+"j": 275978,
+"v": 13135894,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043608 moveb 0xc87016,%d0"
+},
+{
+"j": 275998,
+"v": 13135895,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04361c moveb 0xc87017,%d0"
+},
+{
+"j": 276026,
+"v": 13115708,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043638 moveal #13115708,%a1"
+},
+{
+"j": 276044,
+"v": 13116156,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04364a moveal #13116156,%a1"
+},
+{
+"j": 276102,
+"v": 7340032,
+"lab": "SPR",
+"cls": "covered",
+"insn": "043684 lea 0x700000,%a0"
+},
+{
+"j": 276124,
+"v": 13115678,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04369a clrw 0xc8211e"
+},
+{
+"j": 276130,
+"v": 13107214,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0436a0 moveal #13107214,%a1"
+},
+{
+"j": 276156,
+"v": 7340928,
+"lab": "SPR",
+"cls": "covered",
+"insn": "0436ba lea 0x700380,%a0"
+},
+{
+"j": 276178,
+"v": 13115678,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0436d0 clrw 0xc8211e"
+},
+{
+"j": 276184,
+"v": 13107214,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0436d6 moveal #13107214,%a1"
+},
+{
+"j": 276214,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0436f0 movew 0x800000,0xc87008"
+},
+{
+"j": 276224,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0436fa movew 0x800002,0xc8700c"
+},
+{
+"j": 276230,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043704 notb 0xc87008"
+},
+{
+"j": 276236,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04370a notb 0xc8700c"
+},
+{
+"j": 276264,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043722 movew 0x800000,0xc87008"
+},
+{
+"j": 276274,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04372c movew 0x800002,0xc8700c"
+},
+{
+"j": 276280,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043736 notb 0xc87008"
+},
+{
+"j": 276286,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04373c notb 0xc8700c"
+},
+{
+"j": 276308,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043750 btst #2,0xc87004"
+},
+{
+"j": 276320,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04375c btst #0,0xc82664"
+},
+{
+"j": 276330,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043766 btst #3,0xc87004"
+},
+{
+"j": 276340,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043772 movew 0xc8700a,0xc87006"
+},
+{
+"j": 276344,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043772 movew 0xc8700a,0xc87006"
+},
+{
+"j": 276352,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04377c eoriw #1,0xc87006"
+},
+{
+"j": 276362,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043786 btst #4,0xc87008"
+},
+{
+"j": 276370,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043790 movew 0xc87006,%d0"
+},
+{
+"j": 276376,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043796 cmpw 0xc8700a,%d0"
+},
+{
+"j": 276386,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04379e btst #3,0xc87004"
+},
+{
+"j": 276398,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437aa bset #2,0xc87004"
+},
+{
+"j": 276406,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437b4 moveb 0xc87008,%d0"
+},
+{
+"j": 276422,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437c2 bclr #0,0xc87004"
+},
+{
+"j": 276432,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437cc btst #0,0xc87004"
+},
+{
+"j": 276444,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437d8 bset #0,0xc87004"
+},
+{
+"j": 276466,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437f0 addb 0xc87006,%d1"
+},
+{
+"j": 276472,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0437f6 addb 0xc87007,%d2"
+},
+{
+"j": 276506,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043816 btst #1,0xc82664"
+},
+{
+"j": 276514,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043820 cmpb 0xc8700a,%d1"
+},
+{
+"j": 276522,
+"v": 13135883,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043828 cmpb 0xc8700b,%d2"
+},
+{
+"j": 276532,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043832 moveb %d1,0xc87006"
+},
+{
+"j": 276538,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043838 moveb %d2,0xc87007"
+},
+{
+"j": 276548,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043840 btst #3,0xc87004"
+},
+{
+"j": 276560,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04384c btst #1,0xc82664"
+},
+{
+"j": 276570,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043856 btst #2,0xc87004"
+},
+{
+"j": 276580,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043862 movew 0xc87006,0xc8700a"
+},
+{
+"j": 276584,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043862 movew 0xc87006,0xc8700a"
+},
+{
+"j": 276592,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04386c eoriw #1,0xc8700a"
+},
+{
+"j": 276598,
+"v": 13135928,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043874 moveb 0xc87038,%d0"
+},
+{
+"j": 276608,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04387e addb %d0,0xc8700a"
+},
+{
+"j": 276616,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043884 cmpib #2,0xc8700a"
+},
+{
+"j": 276626,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04388e moveb #0,0xc8700a"
+},
+{
+"j": 276636,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043898 btst #4,0xc8700c"
+},
+{
+"j": 276644,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438a2 movew 0xc8700a,%d0"
+},
+{
+"j": 276650,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438a8 cmpw 0xc87006,%d0"
+},
+{
+"j": 276660,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438b0 btst #2,0xc87004"
+},
+{
+"j": 276672,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438bc bset #3,0xc87004"
+},
+{
+"j": 276680,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438c6 moveb 0xc8700c,%d0"
+},
+{
+"j": 276696,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438d4 bclr #1,0xc87004"
+},
+{
+"j": 276706,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438de btst #1,0xc87004"
+},
+{
+"j": 276718,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0438ea bset #1,0xc87004"
+},
+{
+"j": 276740,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043902 addb 0xc8700a,%d1"
+},
+{
+"j": 276746,
+"v": 13135883,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043908 addb 0xc8700b,%d2"
+},
+{
+"j": 276780,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043928 btst #0,0xc82664"
+},
+{
+"j": 276788,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043932 cmpb 0xc87006,%d1"
+},
+{
+"j": 276796,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04393a cmpb 0xc87007,%d2"
+},
+{
+"j": 276806,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043944 moveb %d1,0xc8700a"
+},
+{
+"j": 276812,
+"v": 13135883,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04394a moveb %d2,0xc8700b"
+},
+{
+"j": 276822,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043952 btst #3,0xc87004"
+},
+{
+"j": 276834,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04395e btst #0,0xc82664"
+},
+{
+"j": 276846,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04396a btst #4,0xc87008"
+},
+{
+"j": 276856,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043974 bset #2,0xc87004"
+},
+{
+"j": 276864,
+"v": 13135880,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04397e moveb 0xc87008,%d0"
+},
+{
+"j": 276880,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "04398c bclr #0,0xc87004"
+},
+{
+"j": 276890,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043996 btst #0,0xc87004"
+},
+{
+"j": 276902,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0439a2 bset #0,0xc87004"
+},
+{
+"j": 276934,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0439c4 addb 0xc87006,%d1"
+},
+{
+"j": 276940,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0439ca addb 0xc87007,%d2"
+},
+{
+"j": 276972,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0439ea moveb %d1,0xc87006"
+},
+{
+"j": 276978,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0439f0 moveb %d2,0xc87007"
+},
+{
+"j": 276988,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "0439f8 btst #2,0xc87004"
+},
+{
+"j": 277000,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a04 btst #1,0xc82664"
+},
+{
+"j": 277012,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a10 btst #4,0xc8700c"
+},
+{
+"j": 277022,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a1a bset #3,0xc87004"
+},
+{
+"j": 277030,
+"v": 13135884,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a24 moveb 0xc8700c,%d0"
+},
+{
+"j": 277046,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a32 bclr #1,0xc87004"
+},
+{
+"j": 277056,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a3c btst #1,0xc87004"
+},
+{
+"j": 277068,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a48 bset #1,0xc87004"
+},
+{
+"j": 277114,
+"v": 13117028,
+"lab": "RAM",
+"cls": "desync",
+"insn": "043a76 btst #0,0xc82664",
+"ctx": "0000 0839 0000 00c8 2664 660c 0839"
+},
+{
+"j": 277124,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a80 btst #2,0xc87004"
+},
+{
+"j": 277142,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043a92 btst #2,0xc87004"
+},
+{
+"j": 277166,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043aac moveb 0xc87006,%d0"
+},
+{
+"j": 277172,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043ab2 moveb 0xc87007,%d1"
+},
+{
+"j": 277212,
+"v": 13117028,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043ad8 btst #1,0xc82664"
+},
+{
+"j": 277222,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043ae2 btst #3,0xc87004"
+},
+{
+"j": 277240,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043af4 btst #3,0xc87004"
+},
+{
+"j": 277264,
+"v": 13135882,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043b0e moveb 0xc8700a,%d0"
+},
+{
+"j": 277270,
+"v": 13135883,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043b14 moveb 0xc8700b,%d1"
+},
+{
+"j": 277314,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043b40 moveb 0xc87004,%d0"
+},
+{
+"j": 277342,
+"v": 13135878,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043b5c moveb 0xc87006,%d0"
+},
+{
+"j": 277348,
+"v": 13135879,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043b62 moveb 0xc87007,%d1"
+},
+{
+"j": 277680,
+"v": 13135876,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043cac btst #4,0xc87004"
+},
+{
+"j": 277958,
+"v": 13135968,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043dc0 movel #131200,0xc87060"
+},
+{
+"j": 277964,
+"v": 13135966,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043dca clrw 0xc8705e"
+},
+{
+"j": 277970,
+"v": 13135964,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043dd0 clrw 0xc8705c"
+},
+{
+"j": 277980,
+"v": 13135968,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043dda movel 0xc87060,%d7"
+},
+{
+"j": 277986,
+"v": 13135964,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043de0 movew 0xc8705c,%d4"
+},
+{
+"j": 277998,
+"v": 13135966,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043dec movew 0xc8705e,%d3"
+},
+{
+"j": 278040,
+"v": 13135966,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043e16 addqw #1,0xc8705e"
+},
+{
+"j": 278050,
+"v": 13135964,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043e20 addqw #1,0xc8705c"
+},
+{
+"j": 278060,
+"v": 13135968,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043e26 addil #16,0xc87060"
+},
+{
+"j": 278066,
+"v": 13135966,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043e30 clrw 0xc8705e"
+},
+{
+"j": 278076,
+"v": 13135960,
+"lab": "RAM",
+"cls": "covered",
+"insn": "043e3a moveal 0xc87058,%a5"
+},
+{
+"j": 280712,
+"v": 13135876,
+"lab": "RAM",
+"cls": "desync",
+"insn": "044884 btst #4,0xc87004",
+"ctx": "4e71 0839 0004 00c8 7004 6606 43fa"
+}
+]

@@ -1,5 +1,6 @@
 import struct,sys
-R='../roms/'
+import os
+R=os.environ.get('COMAD_ROMS', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'roms')) + '/'
 def il(e,o):
   a=open(R+e,'rb').read(); b=open(R+o,'rb').read(); r=bytearray(len(a)*2); r[0::2]=a; r[1::2]=b; return bytes(r)
 def image(banks):

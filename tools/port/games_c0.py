@@ -3,8 +3,8 @@
    - pictures: decompressor replaced by asm/mw_decomp.s (bg bitmap used as LZ window, no 32 KB RAM needed)
    - work RAM pages -> hidden fg rows (0x51c000-0x51ffff, only touched by the boot clear, which we shorten)
    - sprite shadow / flags -> objaux (0x702000-)"""
-import sys, struct, subprocess
-sys.path.insert(0, '/tmp/claude-0/-home-claude/e1042311-2b93-5281-bddb-91ed22183aec/scratchpad/work')
+import os, sys, struct, subprocess
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from port import *
 
 SHADOW_C0, FLAGS_C0, MARK_C0 = 0x702000, 0x703000, 0x703200
@@ -17,10 +17,10 @@ def ram_map_c0(v):
 spr_map_c0 = lambda v: SHADOW_C0 + (v - 0x700000) if 0x700000 <= v < 0x701000 else None
 
 def asm(name, src, syms):
-    o = f'{S}/work/asm/{name}.o'; b = f'{S}/work/asm/{name}.bin'
+    o = f'{BASE}/asm/{name}.o'; b = f'{BASE}/asm/{name}.bin'
     args = ['m68k-linux-gnu-as', '-m68000']
     for k, v in syms.items(): args += ['--defsym', '%s=%d' % (k, v)]
-    subprocess.run(args + ['-o', o, f'{S}/work/asm/{src}'], check=True)
+    subprocess.run(args + ['-o', o, f'{BASE}/asm/{src}'], check=True)
     subprocess.run(['m68k-linux-gnu-objcopy', '-O', 'binary', '-j', '.text', o, b], check=True)
     nm = subprocess.run(['m68k-linux-gnu-nm', o], capture_output=True, text=True).stdout
     sym = {l.split()[2]: int(l.split()[0], 16) for l in nm.splitlines() if len(l.split()) == 3}

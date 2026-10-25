@@ -1,0 +1,7 @@
+roms/
+out/
+out_comad/
+an_*/
+*.bin
+*.o
+__pycache__/

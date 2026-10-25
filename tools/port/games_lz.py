@@ -3,8 +3,8 @@
    Same treatment as games_c0 (Miss World '96) for code, plus a girl subset so the data fits the 4 MB ROM space:
    masks (raw 0x9540 each, table of (ptr, meta)) and compressed pictures (offset table) of the kept girls are packed
    into the original mask area and the space after the picture table; dropped girls point at kept ones."""
-import sys, struct, subprocess
-sys.path.insert(0, '/tmp/claude-0/-home-claude/e1042311-2b93-5281-bddb-91ed22183aec/scratchpad/work')
+import os, sys, struct, subprocess
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from port import *
 from games_c0 import asm, one, flip_patch, SHADOW_C0, FLAGS_C0, MARK_C0
 from lzenc import tokens_orig

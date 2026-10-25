@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fantasia family (fantasia, fantasiab, fantasiaa, fantasian): same data ROMs, different program."""
-import sys, struct
-sys.path.insert(0, '/tmp/claude-0/-home-claude/e1042311-2b93-5281-bddb-91ed22183aec/scratchpad/work')
+import os, sys, struct
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from port import *
 
 DATA = [(0x100000, 'il', ('fantasia/9.fg_ind87', 'fantasia/5.fg_ind83')),
