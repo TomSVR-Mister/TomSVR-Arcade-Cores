@@ -79,10 +79,18 @@ def assemble(rom, zipdir):
     return bytes(data[:romlen[0]])
 
 def find_mras(top):
+    """MRA files under top that name the TomSVR_megatech core (cheap text check before any XML parsing).
+    Skips the arcade organizer's _Organized trees (links to the same MRAs) and core/ROM folders."""
     for d, dirs, files in os.walk(top):
-        dirs[:] = [x for x in dirs if x.lower() not in ('cores', 'mame', 'hbmame')]
+        dirs[:] = [x for x in dirs if x.lower() not in ('cores', 'mame', 'hbmame', 'mra_backup')
+                   and not x.lower().startswith('_organized')]
         for fn in sorted(files):
-            if fn.lower().endswith('.mra'): yield os.path.join(d, fn)
+            if not fn.lower().endswith('.mra'): continue
+            path = os.path.join(d, fn)
+            try:
+                with open(path, 'rb') as f: head = f.read(4096)
+            except OSError: continue
+            if b'tomsvr_megatech' in head.lower(): yield path
 
 def main():
     a = sys.argv[1:]
@@ -91,6 +99,7 @@ def main():
     outdir = a[2] if len(a) > 2 else '/media/fat/games/Mega-Tech'
     print('MRAs: %s (and subfolders)\nzips: %s\nout:  %s' % (mradir, zipdir, outdir))
     if not os.path.isdir(zipdir): print('zip folder not found: %s' % zipdir)
+    print('searching for Mega-Tech MRAs...'); sys.stdout.flush()
     os.makedirs(outdir, exist_ok=True)
     ok = bad = seen = mt = 0; done = set()
     for path in find_mras(mradir):
@@ -112,7 +121,7 @@ def main():
         safe = re.sub(r'[\\/:*?"<>|]', '_', name)
         with open(os.path.join(outdir, safe + '.mtc'), 'wb') as f: f.write(img)
         print('ok   %s (%d kB)' % (name, len(img) // 1024)); ok += 1; done.add(name)
-    print('%d MRAs looked at, %d for TomSVR_megatech' % (seen, mt))
+    print('%d Mega-Tech MRAs found' % mt)
     print('%d cartridges written to %s, %d skipped' % (ok, outdir, bad))
 
 if __name__ == '__main__':
