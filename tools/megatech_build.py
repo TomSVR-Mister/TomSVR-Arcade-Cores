@@ -132,7 +132,7 @@ def mra(name, st, bios):
         'The ROM is assembled from your own MAME zips, unmodified. Requires TomSVR_megatech.rbf. -->',
         '<misterromdescription>',
         f'    <name>{title} [TomSVR]</name>',
-        f'    <setname>{name}</setname>',
+        f'    <setname same_dir="1">{name}</setname>',  # same_dir: OSD file browser opens games/Mega-Tech (configs stay per setname)
         '    <rotation>horizontal</rotation>',
         f'    <mameversion>{MAMEVERSION}</mameversion>',
         f'    <year>{st["year"]}</year>',
