@@ -50,7 +50,7 @@ why); the patch is applied in memory by the MRA.
 | Core | Games | MAME driver |
 |---|---|---|
 | chqflag | Chequered Flag (Konami, 1988; steering by joystick or analog stick) | chqflag.cpp |
-| comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Super Miss World, Super Model I/II, WOW New Fantasia, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.) | expro02.cpp |
+| comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Super Miss World, Super Model I/II, WOW New Fantasia, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.). Fantasia (940803 PCB), WOW New Fantasia, Super Model I/II and Super Miss World are also published elsewhere; we added them because in our testing that other core shows visual bugs in these games | expro02.cpp |
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
