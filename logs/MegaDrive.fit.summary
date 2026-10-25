@@ -1,0 +1,20 @@
+Fitter Status : Successful - Sun Oct 25 23:46:11 2026
+Quartus Prime Version : 20.1.1 Build 720 11/11/2020 SJ Lite Edition
+Revision Name : MegaDrive
+Top-level Entity Name : sys_top
+Family : Cyclone V
+Device : 5CSEBA6U23I7
+Timing Models : Final
+Logic utilization (in ALMs) : 33,716 / 41,910 ( 80 % )
+Total registers : 51131
+Total pins : 145 / 314 ( 46 % )
+Total virtual pins : 0
+Total block memory bits : 3,026,940 / 5,662,720 ( 53 % )
+Total RAM Blocks : 463 / 553 ( 84 % )
+Total DSP Blocks : 57 / 112 ( 51 % )
+Total HSSI RX PCSs : 0
+Total HSSI PMA RX Deserializers : 0
+Total HSSI TX PCSs : 0
+Total HSSI PMA TX Serializers : 0
+Total PLLs : 3 / 6 ( 50 % )
+Total DLLs : 0 / 4 ( 0 % )
