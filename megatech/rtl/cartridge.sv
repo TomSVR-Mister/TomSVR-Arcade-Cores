@@ -209,7 +209,7 @@ always @(posedge clk_ram) begin
 	we_old <= rom_we;
 	rd_old <= sdram_rd & rom_data_req;
 	if((~rd_old & sdram_rd & rom_data_req) || (~we_old & rom_we)) begin
-		rom_addr <= {1'b0, cart_slot, ((cart_ms ? ms_cart_addr[20:1] : md_cart_addr[20:1]) & rom_mask[20:1])};
+		rom_addr <= {1'b0, cart_slot, ((cart_ms ? ms_cart_addr[19:0] : md_cart_addr[20:1]) & rom_mask[20:1])}; // SMS: one byte per word
 		rom_req <= ~rom_req;
 		rom_rd <= sdram_rd;
 	end
