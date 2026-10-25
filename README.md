@@ -61,7 +61,7 @@ why); the patch is applied in memory by the MRA.
 | hotblk | Hot Blocks - Tetrix II | hotblock.cpp |
 | jpop | Jumping Pop (Nics) | tnzs.cpp |
 | madd | Mad Donna, Komo Como | oneshot.cpp |
-| megatech | Sega Mega-Tech: 48 MRAs (38 Mega Drive and 10 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen, coin timer, TIME UP and test menu; both monitors side by side; settings saved (see [megatech/README_TomSVR.md](megatech/README_TomSVR.md)) | megatech.cpp |
+| megatech | Sega Mega-Tech: 48 MRAs (38 Mega Drive and 10 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen, coin timer, TIME UP and test menu; both monitors side by side; settings saved. Built from the board's schematics and decoded PAL chips, with timing measured from real cabinet footage (see [megatech/README_TomSVR.md](megatech/README_TomSVR.md)) | megatech.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |

@@ -24,6 +24,24 @@ still marked "not working" (MAME never stops the game when the time runs out).
   (game left, menu right).
 - Cabinet buttons on the pad and keyboard.
 
+## How it was built
+
+- **Starting point:** MegaDrive_MiSTer (Nuked-MD) runs the game side. MAME's `megatech.cpp` gave the set list,
+  ROM layouts, the BIOS memory map, DIP switches and inputs.
+- **The board itself, where MAME is incomplete:** the owner's manual, the schematic and partial KiCad board traces,
+  the CXD1095 I/O chip datasheet and the cabinet pinout. The board's PAL logic chips (315-5346/5347B/5348A/5349A/
+  5356) were decoded from dumps; one dump's checksum had to be repaired first. The PALs show what MAME misses: when
+  port D bit 7 is 0, the BIOS Z80 reaches the Mega Drive's own bus. That is how TIME UP and the test menu appear on
+  the main monitor rather than on the menu monitor.
+- **Real cabinet footage:** frame-by-frame grabs of video from a working cabinet gave the behaviour MAME doesn't
+  have: the warning flash every 12 frames, TIME UP held for about 3.8 seconds, then the restart into attract mode.
+- **Cycle-level simulation:** the BIOS and both video chips ran in Verilator simulations and were checked against
+  MAME traces. The menu, instruction and TIME UP screens and the Sonic game screen are pixel-identical to MAME, and
+  boot, coin and select timing match. The BIOS code was traced there to find what the hardware must do, for example
+  the test-menu screen routing and a VDP status-flag timing detail that broke the test menu's input.
+- **MRAs:** generated from `megatech.cpp` by tools/megatech_build.py. Each image is rebuilt the way MiSTer assembles
+  it and compared with MAME's ROM layout; all 48 match.
+
 ## Controls
 
 | Cabinet | Pad (default) | Keyboard |
