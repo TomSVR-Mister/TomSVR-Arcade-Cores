@@ -129,7 +129,7 @@ localparam CONF_STR = {
 	"P2,Input;",
 	"P2-;",
 	"P2O[4],Swap Joysticks,No,Yes;",
-	"P2O[5],6 Buttons Mode,No,Yes;",
+	// "P2O[5],6 Buttons Mode" removed: Mega-Tech pads have 3 buttons
 	"P2O[39:37],Multitap,Disabled,4-Way,TeamPlayer: Port1,TeamPlayer: Port2,J-Cart;",
 	"P2-;",
 	"P2O[19:18],Mouse,None,Port1,Port2;",
@@ -347,6 +347,7 @@ wire tmss_download = 1'b0;
 // per slot: present, SMS flag (header byte 0 bit 0)
 reg  [7:0] mt_present = 0, mt_ms = 0;
 wire  [2:0] mt_cart_sel;
+wire        mt_game_reset;
 wire        mt_ins_req, mt_ins_ack;
 wire [14:1] mt_ins_a;
 wire [15:0] mt_ins_data;
@@ -412,6 +413,23 @@ wire [1:0] mt_t_r, mt_t_g, mt_t_b;
 wire       mt_t_hs, mt_t_vs, mt_t_hbl, mt_t_vbl;
 wire loading = cart_download | bk_loading | RESET;
 
+// Mega-Tech: a cart select that changes the running cartridge resets the whole game side (VDP, I/O, mappers, RAM),
+// as MAME's switch_cart does: the next cart may be a Master System one (VDP mode 4, SMS mapper) or expect power-on
+// state. Selects of the same cart (boot, start of play, TIME UP) keep the CPU-only reset (no picture glitch).
+reg  [2:0] mt_run_sel = 0;
+reg  [1:0] mt_grst_d = 0;
+reg  [7:0] mt_sw_cnt = 0;
+reg  [1:0] mt_sw_s = 0;
+wire       mt_switch = |mt_sw_cnt;
+always @(posedge clk_sys) begin
+	mt_grst_d <= {mt_grst_d[0], mt_game_reset};
+	if (mt_sw_cnt) mt_sw_cnt <= mt_sw_cnt - 1'd1;
+	if (mt_grst_d[1] && mt_cart_sel != mt_run_sel) begin
+		mt_run_sel <= mt_cart_sel;
+		mt_sw_cnt  <= 8'hff;
+	end
+end
+
 reg        btn_reset;
 reg        md_reset;
 reg        s_reset;
@@ -424,11 +442,12 @@ always @(posedge clk_md) begin
 	if(&ram_rst_a & ~&cnt) cnt <= cnt + 1'd1;
 
 	old_reset <= reset;
-	if(loading | (~old_reset & reset)) cnt <= 0;
+	mt_sw_s <= {mt_sw_s[0], mt_switch};
+	if(loading | mt_sw_s[1] | (~old_reset & reset)) cnt <= 0;
 
 	s_reset <= (cnt < 3);
 	
-	if(loading)       md_reset <= 1;
+	if(loading | mt_sw_s[1]) md_reset <= 1;
 	else if(cnt == 3) md_reset <= 0;
 
 	if(~old_reset & reset) btn_reset <= 1;
@@ -1162,7 +1181,7 @@ assign AUDIO_MIX = status[58:57];
 reg [7:0] mt_dsw0 = 8'h7f, mt_dsw1 = 8'ha1;
 always @(posedge clk_sys) if (ioctl_wr && ioctl_index == 8'd254 && !ioctl_addr[24:1]) {mt_dsw1, mt_dsw0} <= ioctl_data;
 
-wire       mt_game_reset;
+// mt_game_reset declared with mt_cart_sel
 // The BIOS side has its own reset: sys_reset also follows the game reset that the BIOS itself triggers
 // (then: cart select -> game reset -> loading -> sys_reset), which made the BIOS reset itself in a loop (test 2: black).
 reg mt_bios_rst = 1;
@@ -1345,7 +1364,7 @@ md_io md_io
 	.clk(clk_sys),
 	.reset(sys_reset),
 
-	.MODE(status[5]),
+	.MODE(1'b0),        // Mega-Tech: integrated 3-button pads (MAME ctrl1_3button); some carts misread a 6-button pad
 	.SMS(cart_ms),
 	.MULTITAP(cart_ms ? {|status[39:37], 1'b0} : status[38:37]),
 
