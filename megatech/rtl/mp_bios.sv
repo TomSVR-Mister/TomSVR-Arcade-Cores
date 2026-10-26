@@ -233,7 +233,7 @@ dpram_difclk #(13,8,13,8) ic36_ram (
 `endif
 
 // RAM 4000-5fff = NVRAM, one port (as mt_bios)
-reg  [7:0] ram [0:8191];
+reg  [7:0] ram [0:32767];  // 4-slot board: one 8 kB bank per slot (slot select, see below)
 reg  [7:0] ram_q;
 reg        nv_ph1, nv_ph2;
 reg [15:0] nv_w;
@@ -245,7 +245,11 @@ always @(posedge clk) begin
 end
 wire        nv_we  = nv_ph1 | nv_ph2;
 wire        nv_rs  = ~nv_we & (zdiv == 4'd5 || zdiv == 4'd6);
-wire [12:0] ram_a  = nv_we ? (nv_ph1 ? nv_a : (nv_a | 13'd1)) : nv_rs ? {nv_addr[12:1], zdiv == 4'd6} : A[12:0];
+// 4000-5fff holds the selected game's instruction ROM copy and the code the BIOS runs from it (JP (402c) at 01e2).
+// The boot loop at 04f6 selects each slot, clears 4000-5fff and copies that slot's instruction ROM there, which
+// only works if the RAM is banked by the slot select: on the 4-slot board it is (inferred; MAME has 1 slot).
+wire [14:0] ram_a  = nv_we ? {2'b00, nv_ph1 ? nv_a : (nv_a | 13'd1)} : nv_rs ? {2'b00, nv_addr[12:1], zdiv == 4'd6} :
+                             {sl, A[12:0]};
 wire  [7:0] ram_d  = nv_we ? (nv_ph1 ? nv_w[7:0] : nv_w[15:8]) : zdo;
 wire        ram_we = nv_we | (mem_we && A[15:13] == 3'b010);
 always @(posedge clk) begin
