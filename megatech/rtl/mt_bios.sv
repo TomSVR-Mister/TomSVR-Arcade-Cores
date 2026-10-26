@@ -123,7 +123,7 @@ wire rd_edge = ~rd_n & ~rd_d;
 // ------------------------------------------------------------- memories
 reg  [7:0] bios_rom [0:32767];
 reg  [7:0] ram      [0:8191];
-reg  [7:0] bram     [0:8191];      // {slot != 0, 12-bit offset}
+reg  [7:0] bram     [0:32767];     // {slot, 12-bit offset}: 4 kB per cart slot (MAME banked_ram)
 reg  [7:0] bios_q, ram_q, bram_q;
 
 // download: two bytes per WIDE ioctl word, written on two consecutive clocks
@@ -150,8 +150,8 @@ wire        win_ins = (win_a[23:16] == 8'h30);          // 0x300000-0x30ffff: in
 
 always @(posedge clk) begin
     bios_q  <= bios_rom[A[14:0]];
-    bram_q  <= bram[{cart_sel != 3'd0, A[11:0]}];
-    if (mem_we && A[15:12] == 4'h3) bram[{cart_sel != 3'd0, A[11:0]}] <= zdo;
+    bram_q  <= bram[{cart_sel, A[11:0]}];
+    if (mem_we && A[15:12] == 4'h3) bram[{cart_sel, A[11:0]}] <= zdo;
 end
 
 // Instruction ROM of the selected cart (window 0x300000, odd bytes): read from SDRAM, the Z80 waits until it arrives

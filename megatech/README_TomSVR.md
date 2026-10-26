@@ -88,7 +88,7 @@ On a PC: `python3 megatech_mtc.py <MRA folder> <zip folder> <output folder>`, th
 
 Master System games: button 1 also starts the game.
 **Test menu:** tap Test (F2) to open it, move with the joystick, hold Test ~0.5 s to open an item. Inside an item
-(e.g. ALARM TIME SET) pick the row with the joystick and hold Select (0) ~0.2 s to change the value; Test leaves it.
+(e.g. ALARM TIME SET) pick the row with joystick up/down and change the value with joystick left/right; Test leaves it.
 
 ## OSD extras
 
