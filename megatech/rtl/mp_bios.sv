@@ -61,7 +61,7 @@ module mp_bios (
     input      [12:0] zb_a,
     input       [7:0] zb_d,
     input             zb_we,
-    output reg  [7:0] zb_q,
+    output logic [7:0] zb_q,
 
     // overlay video, locked to the game picture
     output      [1:0] r, g, b,
@@ -199,16 +199,26 @@ always @(posedge clk) begin
 end
 
 // IC36: port A = BIOS window a000-bfff (MAME offset - 0x2000), port B = game Z80 bus 2000-3fff
+wire [7:0] ic36_q;
+`ifdef VERILATOR
 reg  [7:0] ic36 [0:8191];
-reg  [7:0] ic36_q;
+reg  [7:0] ic36_qr;
+assign ic36_q = ic36_qr;
 always @(posedge clk) begin
-    ic36_q <= ic36[A[12:0]];
+    ic36_qr <= ic36[A[12:0]];
     if (mem_we && w_ic36) ic36[A[12:0]] <= zdo;
 end
 always @(posedge zb_clk) begin
     zb_q <= ic36[zb_a];
     if (zb_we) ic36[zb_a] <= zb_d;
 end
+`else
+// two clocks (clk_sys / clk_md): Quartus does not infer this, use the altsyncram wrapper
+dpram_difclk #(13,8,13,8) ic36_ram (
+    .clock_a(clk),    .address_a(A[12:0]), .data_a(zdo),  .wren_a(mem_we & w_ic36), .q_a(ic36_q),
+    .clock_b(zb_clk), .address_b(zb_a),    .data_b(zb_d), .wren_b(zb_we),           .q_b(zb_q)
+);
+`endif
 
 // RAM 4000-5fff = NVRAM, one port (as mt_bios)
 reg  [7:0] ram [0:8191];
