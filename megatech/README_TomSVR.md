@@ -73,6 +73,10 @@ On a PC: `python3 megatech_mtc.py <MRA folder> <zip folder> <output folder>`, th
 3. The menu screen now lists all loaded games. Insert coins, choose a game with **Select** (keyboard 0) and start
    it with Start, as on the cabinet.
 4. Next time you start the same MRA, the same cartridges are loaded again. To change a slot, pick another file.
+
+**Collections:** the slots and the operator settings (test menu: alarm and flash times, coin settings, bookkeeping)
+are kept per MRA, not per cabinet. You can use a few MRAs as the "master" of a collection, each with its own
+8 games and settings. Settings changed in the test menu are saved to the SD card the next time you open the OSD.
    Each MRA keeps its own slot list, so you can set up different line-ups under different games.
 
 ## Controls
