@@ -54,7 +54,7 @@ end
 // ---------------------------------------------------------------- menu line buffer (2 x 256 x 6), clk_m
 (* ramstyle = "MLAB" *) reg  [5:0] mbuf[0:511];
 reg  [7:0] mx;
-reg        mline, mhbl_d, mact;
+reg        mline, mhbl_d, mact, mact_line;
 always @(posedge clk_m) begin
     if (m_ce) begin
         mhbl_d <= m_hbl;
@@ -65,6 +65,7 @@ always @(posedge clk_m) begin
         end
         if (m_hbl & ~mhbl_d) begin
             if (mact) mline <= ~mline;
+            mact_line <= mact;
             mx <= 0; mact <= 0;
         end
         if (m_vbl) mline <= 0;
@@ -75,17 +76,26 @@ end
 localparam ASTART = 10'd120, SLOT = 10'd320;
 reg  [1:0] cdiv;
 reg  [9:0] ox;
-reg        ghs_d, rd_line, gact_line;
+reg        ghs_d, rd_line, gact_line, g_show, m_rd_line;
+reg  [1:0] mact_s, mline_s;
+reg  [8:0] oline;
+reg        sync_seen;
+always @(posedge clk) begin mact_s <= {mact_s[0], mact_line}; mline_s <= {mline_s[0], mline}; end
 reg  [8:0] gsrc, gacc, msrc, macc, gw_r;
 always @(posedge clk) begin
     ce <= 0;
     cdiv <= cdiv + 2'd1;
     ghs_d <= g_hs;
     if (g_hs & ~ghs_d) begin
+        oline <= (sync_tgl != sync_seen) ? 9'd0 : oline + 9'd1;
+        sync_seen <= sync_tgl;
         // a new output line shows the game line that just ended (the buffer not being written now)
         ox <= 0; cdiv <= 0;
-        vbl <= ~gact_line;
+        // a line is shown when either picture had an active line: a Master System game has 192 lines, the menu 224
+        vbl <= ~(gact_line | mact_s[1]);
+        g_show <= gact_line;
         rd_line <= ~gline;
+        m_rd_line <= ~mline_s[1];
         gw_r <= (gw > 9'd320 || gw == 0) ? 9'd320 : gw;
     end else if (cdiv == 2'd3) begin
         ce <= 1;
@@ -114,7 +124,7 @@ always @(posedge clk) if (ce) begin
 end
 always @(posedge clk) begin
     gq <= gbuf[{rd_line, gsrc}];
-    mq <= mbuf[{rd_line, msrc[7:0]}];
+    mq <= mbuf[{m_rd_line, msrc[7:0]}];
 end
 
 reg in_g_d, in_m_d;
@@ -122,10 +132,10 @@ always @(posedge clk) if (ce) begin
     in_g_d <= in_g; in_m_d <= in_m;
     hbl <= ~(in_g | in_m);
     hs  <= ox < 10'd64;
-    vs  <= g_vs;
+    vs  <= oline >= 9'd236 && oline < 9'd239;   // own vsync: the shown lines can run past the game's (192-line SMS)
 end
 always @(*) begin
-    if (in_g_d)      {r, g, b} = gq;
+    if (in_g_d)      {r, g, b} = g_show ? gq : 24'd0;
     else if (in_m_d) {r, g, b} = {{4{mq[5:4]}}, {4{mq[3:2]}}, {4{mq[1:0]}}};
     else             {r, g, b} = 24'd0;
 end
