@@ -1,7 +1,8 @@
-name: Build Mega-Tech (TomSVR_megatech)
+name: Build Mega-Tech / Mega Play (TomSVR_megatech, TomSVR_megaplay)
 
 # Dispatch only: pushing never builds.
 #   gh workflow run megatech.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f project=megatech/MegaDrive [-f seeds=1,2,3]
+#   (Mega Play: -f project=megatech/MegaPlay, branches builds-megaplay-...)
 # seeds: one parallel fit per Quartus fitter seed; each lands on builds-megatech-<sha7>-s<seed> (seed 1 also on
 # builds-megatech-<sha7>), with the 40 worst setup paths in logs/worst_paths.txt.
 on:
@@ -89,5 +90,6 @@ jobs:
           find ../$d -name '*.fit.summary' -o -name '*.sta.summary' -o -name 'worst_paths.txt' | while read f; do cp "$f" logs/; done
           git add -A && git commit -q -m "build ${GITHUB_SHA::7} seed ${{ matrix.seed }} (${{ inputs.project }})"
           url="https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
-          git push -q -f "$url" HEAD:builds-megatech-${GITHUB_SHA::7}-s${{ matrix.seed }}
-          if [ "${{ matrix.seed }}" = "1" ]; then git push -q -f "$url" HEAD:builds-megatech-${GITHUB_SHA::7}; fi
+          B=megatech; [ "$(basename ${{ inputs.project }})" = "MegaPlay" ] && B=megaplay
+          git push -q -f "$url" HEAD:builds-$B-${GITHUB_SHA::7}-s${{ matrix.seed }}
+          if [ "${{ matrix.seed }}" = "1" ]; then git push -q -f "$url" HEAD:builds-$B-${GITHUB_SHA::7}; fi

@@ -40,7 +40,9 @@ module mt_vdp4 #(parameter SMALL = 0) (   // SMALL = 1: 12 kB VRAM for the BIOS 
     output reg        vblank,
     output      [8:0] hpos,
     output      [8:0] vpos,
-    output            disp_on      // register 1 bit 6
+    output            disp_on,     // register 1 bit 6
+    output reg        y1           // YS (overlay on the game screen, Mega Play): colour index bits 3-0 != 0, as MAME
+
 );
 
 // ---------------------------------------------------------------- registers and CPU interface
@@ -352,10 +354,13 @@ end
 // ---------------------------------------------------------------- output
 reg [5:0] pix;
 always @(posedge clk) if (ce_pix) begin
-    if (!disp || v >= lines || h >= 9'd256 || (R[0][5] && h < 9'd8))
+    if (!disp || v >= lines || h >= 9'd256 || (R[0][5] && h < 9'd8)) begin
         pix <= cram[{1'b1, R[7][3:0]}];
-    else
+        y1  <= |R[7][3:0];
+    end else begin
         pix <= cram[out_q[4:0]];
+        y1  <= |out_q[3:0];
+    end
 end
 assign r = pix[1:0];
 assign g = pix[3:2];

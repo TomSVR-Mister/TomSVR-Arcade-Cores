@@ -17,7 +17,10 @@
 //  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //============================================================================
 
+// MEGAPLAY (Quartus project MegaPlay.qsf): the Sega Mega Play core (rtl/mp_bios.sv) from the same source
+`ifndef MEGAPLAY
 `define MT_SBS   // Mega-Tech side by side output (OSD), see rtl/mt_sbs.sv
+`endif
 
 module emu
 (
@@ -78,12 +81,18 @@ video_freak video_freak
 
 `include "build_id.v"
 localparam CONF_STR = {
+`ifdef MEGAPLAY
+	"Mega Play;;",
+	"-;",
+`else
 	"Mega-Tech;;",
 	"-;",
 	"O[64],Screen,Game,Menu;",
+`endif
 `ifdef MT_SBS
 	"O[68],Side by Side,Off,On;",
 `endif
+`ifndef MEGAPLAY
 	"O[69],Menu on VGA (15kHz),Off,On;",
 	"O[65],Coin Sound,Off,On;",
 	"O[66],Time Up Background,Black,Blue;",
@@ -96,6 +105,7 @@ localparam CONF_STR = {
 	"P3FC6,MTC,Slot 6;",
 	"P3FC7,MTC,Slot 7;",
 	"P3FC8,MTC,Slot 8;",
+`endif
 	"DIP;",
 	"-;",
 	"O[7:6],Region,JP,US,EU;",
@@ -337,12 +347,24 @@ wire       gun_btn_mode = status[42];
 // the MRA image (the BIOS part is ignored). NVRAM is index 9.
 wire [5:0] mt_idx     = ioctl_index[5:0];
 wire mt_download   = ioctl_download & (ioctl_index == 0);
+`ifdef MEGAPLAY
+// Mega Play: 0x000000 BIOS 128 kB, 0x020000 instruction ROM 32 kB, 0x028000 header, 0x030000 game ROM; the BIOS
+// and the instruction ROM go to SDRAM at 16 MB (the BIOS side reads them through its window), the game to slot 0
+wire mt_slot_dl    = 1'b0;
+wire [2:0] mt_dl_slot = 3'd0;
+wire mt_cart_part  = ioctl_addr >= 25'h030000;
+wire mt_ins_part   = ioctl_addr < 25'h028000;
+localparam MT_HDR  = 25'h028000;
+wire [24:0] cart_addr_dl = mt_ins_part ? (25'h1000000 | {7'd0, ioctl_addr[17:0]}) : ioctl_addr - 25'h030000;
+`else
 wire mt_slot_dl    = ioctl_download & (mt_idx >= 6'd2) & (mt_idx <= 6'd8);
 wire [2:0] mt_dl_slot = mt_slot_dl ? mt_idx[2:0] - 3'd1 : 3'd0;
 wire mt_cart_part  = ioctl_addr >= 25'h020000;
 wire mt_ins_part   = ioctl_addr[24:15] == 10'd1;     // 0x8000-0xffff
-wire cart_download = mt_download | mt_slot_dl;
+localparam MT_HDR  = 25'h010000;
 wire [24:0] cart_addr_dl = mt_ins_part ? (25'h1000000 | {10'd0, ioctl_addr[14:0]}) : ioctl_addr - 25'h020000;
+`endif
+wire cart_download = mt_download | mt_slot_dl;
 wire cart_wr_dl    = ioctl_wr & (mt_cart_part | mt_ins_part);
 wire code_download = ioctl_download & &ioctl_index;
 wire tmss_download = 1'b0;
@@ -355,8 +377,9 @@ wire        mt_ins_req, mt_ins_ack;
 wire [14:1] mt_ins_a;
 wire [15:0] mt_ins_data;
 wire  [2:0] mt_ins_slot = mt_cart_sel;
+wire [23:0] mt_ins_wa;                   // SDRAM word address of the BIOS side's read
 always @(posedge clk_sys) begin
-	if(cart_download & ioctl_wr & (ioctl_addr == 25'h010000)) begin
+	if(cart_download & ioctl_wr & (ioctl_addr == MT_HDR)) begin
 		mt_ms[mt_dl_slot] <= ioctl_data[0];
 		mt_present[mt_dl_slot] <= 1;
 	end
@@ -394,6 +417,11 @@ wire [3:0] mt_porte;                     // io2 port E outputs (mt_bios)
 wire [7:0] mt_portd;                     // io2 port D outputs (mt_bios)
 wire [1:0] mt_r, mt_g, mt_b;           // Mega-Tech menu screen (mt_bios)
 wire       mt_hs, mt_vs, mt_hbl, mt_vbl, mt_ce_pix;
+wire [7:0] mp_ic36_q;                    // Mega Play (mp_bios): shared RAM IC36 read on the game Z80 bus
+wire [7:3] mp_exp_hi;                    //   I/O port C bits from the BIOS
+wire [1:0] mp_start_n;                   //   Start lines to the game pads
+wire [1:0] mp_r, mp_g, mp_b;             //   overlay picture, y1 = overlay pixel shown
+wire       mp_y1, mp_sync;
 
 // Menu monitor on the analog port (OSD "Menu on VGA"): game on HDMI, menu screen as 15 kHz RGB on VGA.
 // Untested on hardware: needs a 15 kHz-capable monitor; not with the HDMI direct-video adapter.
@@ -555,6 +583,8 @@ wire [12:0] ram_z80_address;
 wire  [7:0] ram_z80_data;
 wire        ram_z80_wren;
 wire  [7:0] ram_z80_o;
+wire        ram_z80_a13;                  // Mega Play: 2000-3fff is IC36, the RAM shared with the BIOS
+wire  [7:0] ram_z80_q;
 wire [15:0] tmss_data;
 wire  [9:0] tmss_address;
 
@@ -596,6 +626,7 @@ md_board md_board
 	.ram_z80_data(ram_z80_data),
 	.ram_z80_wren(ram_z80_wren),
 	.ram_z80_o(ram_z80_o),
+	.ram_z80_a13(ram_z80_a13),
 
 	// cheat engine
 	.m68k_addr(m68k_addr),
@@ -695,14 +726,25 @@ dpram #(15,16) ram_68k
 	.wren_b(md_reset)
 );
 
+`ifdef MEGAPLAY
+reg mp_a13_d;
+always @(posedge clk_md) mp_a13_d <= ram_z80_a13;
+assign ram_z80_o = mp_a13_d ? mp_ic36_q : ram_z80_q;
+`else
+assign ram_z80_o = ram_z80_q;
+`endif
 dpram #(13,8) ram_z80k
 (
 	.clock(clk_md),
 
 	.address_a(ram_z80_address),
 	.data_a(ram_z80_data),
+`ifdef MEGAPLAY
+	.wren_a(ram_z80_wren & ~ram_z80_a13),
+`else
 	.wren_a(ram_z80_wren),
-	.q_a(ram_z80_o),
+`endif
+	.q_a(ram_z80_q),
 
 	.address_b(ram_rst_a),
 	.wren_b(md_reset),
@@ -763,7 +805,7 @@ cartridge cartridge
 	.cart_ms(cart_ms),
 	.cart_slot(mt_cart_sel),
 	.cart_addr(cart_addr),
-	.ins_slot(mt_ins_slot), .ins_a(mt_ins_a), .ins_req(mt_ins_req), .ins_ack(mt_ins_ack), .ins_data(mt_ins_data),
+	.ins_wa(mt_ins_wa), .ins_req(mt_ins_req), .ins_ack(mt_ins_ack), .ins_data(mt_ins_data),
 	.cart_data(cart_data_rom),
 	.cart_data_en(cart_data_en_rom),
 	.cart_data_wr(cart_data_wr),
@@ -1068,6 +1110,25 @@ wire [7:0] mt_tu_b = mt_tu_px ? 8'hff : status[66] ? 8'hff : 8'h00;
 wire [7:0] mt_gr = mt_tu_on ? mt_tu_r : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,r_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[0]}} : r_c;
 wire [7:0] mt_gg = mt_tu_on ? mt_tu_g : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,g_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[1]}} : g_c;
 wire [7:0] mt_gb = mt_tu_on ? mt_tu_b : mt_blk_on ? 8'h00 : mt_flash ? {1'b0,b_c[7:1]} : (lg_target && gun_mode && (~&status[44:43])) ? {8{lg_target[2]}} : b_c;
+`ifdef MEGAPLAY
+// Mega Play overlay: the BIOS VDP is phase-locked to the game picture (mp_sync toggles at the game's first active
+// pixel; same line and frame length), so its 256 pixels of 10 master clocks span the game's 2560-clock active line
+// (stretched 5:4 over H40, as MAME notes). Its pixel goes over the game where its colour index bits 3-0 are not 0.
+reg       mp_gvb, mp_sync_r;
+reg [6:0] mp_o1, mp_o2, mp_ov;
+always @(posedge CLK_VIDEO) begin
+	if (ce_pix) begin mp_gvb <= vblank_c; if (mp_gvb & ~vblank_c) mp_sync_r <= ~mp_sync_r; end
+	mp_o1 <= {mp_y1, mp_r, mp_g, mp_b};    // other clock (same frequency): take a value only once it is stable
+	mp_o2 <= mp_o1;
+	if (mp_o1 == mp_o2) mp_ov <= mp_o2;
+end
+assign mp_sync = mp_sync_r;
+wire [7:0] vo_r = mp_ov[6] ? {4{mp_ov[5:4]}} : mt_gr;
+wire [7:0] vo_g = mp_ov[6] ? {4{mp_ov[3:2]}} : mt_gg;
+wire [7:0] vo_b = mp_ov[6] ? {4{mp_ov[1:0]}} : mt_gb;
+`else
+wire [7:0] vo_r = mt_gr, vo_g = mt_gg, vo_b = mt_gb;
+`endif
 
 // Side by side (OSD): game screen left, menu screen right, as the cabinet's two monitors (TEST MODE keeps the
 // full screen)
@@ -1105,9 +1166,9 @@ video_mixer #(.LINE_LENGTH(400), .GAMMA(1)) video_mixer
 	.freeze_sync(),
 
 	.VGA_DE(vga_de),
-	.R(sbs_vid ? sbs_r : mt_menu_vid ? {4{mt_r}} : bios_vid ? {4{mt_t_r}} : mt_gr),
-	.G(sbs_vid ? sbs_g : mt_menu_vid ? {4{mt_g}} : bios_vid ? {4{mt_t_g}} : mt_gg),
-	.B(sbs_vid ? sbs_b : mt_menu_vid ? {4{mt_b}} : bios_vid ? {4{mt_t_b}} : mt_gb),
+	.R(sbs_vid ? sbs_r : mt_menu_vid ? {4{mt_r}} : bios_vid ? {4{mt_t_r}} : vo_r),
+	.G(sbs_vid ? sbs_g : mt_menu_vid ? {4{mt_g}} : bios_vid ? {4{mt_t_g}} : vo_g),
+	.B(sbs_vid ? sbs_b : mt_menu_vid ? {4{mt_b}} : bios_vid ? {4{mt_t_b}} : vo_b),
 
 	// Positive pulses.
 	.HSync(sbs_vid ? sbs_hs : mt_menu_vid ? mt_hs : bios_vid ? mt_t_hs : hs_c),
@@ -1206,6 +1267,76 @@ always @(posedge clk_sys) begin
 end
 wire mt_sel_pulse = |mt_sel_out;
 
+`ifdef MEGAPLAY
+// Mega Play: one BIOS board (mp_bios) next to the game. The game's pads stay connected; the BIOS hands the
+// Start buttons to the game (io1 port D bits 4/5) and talks to the 68000 through I/O port C and the shared RAM IC36.
+reg  [2:0] mp_exp_lo_s1, mp_exp_lo_s2;
+always @(posedge clk_sys) begin
+	mp_exp_lo_s1 <= PC_o[2:0] | PC_d[2:0];       // 68000 outputs (inputs read high)
+	mp_exp_lo_s2 <= mp_exp_lo_s1;
+end
+mp_bios mp_bios
+(
+	.clk(clk_sys),
+	.reset(mt_bios_rst),
+
+	.dl(mt_download & ~|ioctl_addr[24:14]),
+	.dl_addr(ioctl_addr),
+	.dl_data(ioctl_data),
+	.dl_wr(ioctl_wr),
+	.nv_dl(mt_nv_dl),
+	.nv_wr(ioctl_wr),
+	.nv_addr(ioctl_addr[12:0]),
+	.nv_din(ioctl_data),
+	.nv_dout(mt_nv_dout),
+	.nv_chg(mt_nv_chg),
+
+	.rom_wa(mt_ins_wa), .rom_req(mt_ins_req), .rom_ack(mt_ins_ack), .rom_data(mt_ins_data),
+
+	.coin1(joystick_0[12] | mt_kb[0]),
+	.coin2(joystick_1[12] | mt_kb[1]),
+	.service_coin(mt_kb[4]),
+	.start1(joystick_0[7] | mt_kb[2]),
+	.start2(joystick_1[7] | mt_kb[3]),
+	.sel_btn(joystick_0[13] | joystick_1[13] | mt_kb[5]),
+	.service(joystick_0[15] | mt_kb[7]),
+	.dsw0(mt_dsw0),
+	.dsw1(mt_dsw1),
+
+	.start_n(mp_start_n),
+	.game_reset(mt_game_reset),
+	.exp_lo(mp_exp_lo_s2),
+	.exp_hi(mp_exp_hi),
+
+	.zb_clk(clk_md), .zb_a(ram_z80_address), .zb_d(ram_z80_data), .zb_we(ram_z80_wren & ram_z80_a13), .zb_q(mp_ic36_q),
+
+	.r(mp_r), .g(mp_g), .b(mp_b), .y1(mp_y1),
+	.hs(), .vs(), .hblank(), .vblank(),
+	.ce_pix(mt_ce_pix),
+	.sync_tgl(mp_sync),
+	.snd(mt_snd)
+);
+assign mt_cart_sel = 3'd0;
+assign mt_portd = 8'h30;                 // Mega-Tech-only controls idle: pads on, no CPU hold, no TIME UP
+assign mt_porte = 4'b1000;
+assign mt_timeup = 0;
+assign mt_test_on = 0;
+assign {mt_r, mt_g, mt_b, mt_hs, mt_vs, mt_hbl, mt_vbl} = 0;
+assign {mt_t_r, mt_t_g, mt_t_b, mt_t_hs, mt_t_vs, mt_t_hbl, mt_t_vbl} = 0;
+assign mt_tu_px = 0;
+wire mt_pad_en = 1'b1;
+// 68000 reset from the BIOS (io2 port E bits 3-2 00 -> 11, MAME pulse_input_line): hold it ~1.2 ms
+reg [15:0] mt_hold_cnt = 0;
+always @(posedge clk_sys) begin
+	if (mt_game_reset) mt_hold_cnt <= 16'hffff;
+	else if (mt_hold_cnt) mt_hold_cnt <= mt_hold_cnt - 1'd1;
+end
+assign mt_sel_rst = 1'b0;
+reg [1:0] mt_h68_s;
+always @(posedge clk_md) mt_h68_s <= {mt_h68_s[0], |mt_hold_cnt};
+assign mt_hold_68k = mt_h68_s[1];
+assign mt_hold_z80 = 1'b0;
+`else
 mt_bios mt_bios
 (
 	.clk(clk_sys),
@@ -1258,6 +1389,7 @@ mt_bios mt_bios
 	.t_hs(mt_t_hs), .t_vs(mt_t_vs), .t_hblank(mt_t_hbl), .t_vblank(mt_t_vbl)
 );
 
+assign mt_ins_wa = {1'b1, 6'd0, mt_ins_slot, mt_ins_a};
 // RetroSix "Coin Meter": io2 port D2 (no credits) or D3 high disables the Mega Drive controller buffers
 wire mt_pad_en = ~(mt_portd[2] | mt_portd[3]);
 
@@ -1281,6 +1413,7 @@ always @(posedge clk_md) begin
 end
 assign mt_hold_68k = mt_h68_s[1];
 assign mt_hold_z80 = mt_hz_s[1];
+`endif
 
 ///////////////////////////////////////////////////
 
@@ -1379,7 +1512,11 @@ md_io md_io
 	.P1_A(joy0[4]),
 	.P1_B(joy0[5] | (cart_ms & (joy0[4] | joy0[7]))), // SMS carts: A and Start also = button 1 ("PUSH START BUTTON")
 	.P1_C(joy0[6]),
+`ifdef MEGAPLAY
+	.P1_START(~mp_start_n[0]),           // Mega Play: Start reaches the game through the BIOS (io1 port D bit 4)
+`else
 	.P1_START(joy0[7]),
+`endif
 	.P1_MODE(joy0[8]),
 	.P1_X(joy0[9]),
 	.P1_Y(joy0[10]),
@@ -1392,7 +1529,11 @@ md_io md_io
 	.P2_A(joy1[4]),
 	.P2_B(joy1[5] | (cart_ms & (joy1[4] | joy1[7]))), // SMS carts: A and Start also = button 1
 	.P2_C(joy1[6]),
+`ifdef MEGAPLAY
+	.P2_START(~mp_start_n[1]),
+`else
 	.P2_START(joy1[7]),
+`endif
 	.P2_MODE(joy1[8]),
 	.P2_X(joy1[9]),
 	.P2_Y(joy1[10]),
@@ -1528,7 +1669,11 @@ wire snac_port2 = (status[63:62] == 2);
 assign PB_i = snac_port2 ? SNAC_IN : md_io_port2;
 
 wire snac_port3 = (status[63:62] == 3);
+`ifdef MEGAPLAY
+assign PC_i = snac_port3 ? SNAC_IN : {mp_exp_hi[6:3], PC_d[2:0] | PC_o[2:0]};   // Mega Play: bits 6-3 from the BIOS
+`else
 assign PC_i = snac_port3 ? SNAC_IN : (PC_d | PC_o);
+`endif
 
 assign SNAC_OUT = snac_port1 ? (PA_d | PA_o) : snac_port2 ? (PB_d | PB_o) : snac_port3 ? (PC_d | PC_o) : 7'h7F;
 

@@ -27,6 +27,7 @@ set_global_assignment -name SDC_FILE MegaDrive.sdc
 set_global_assignment -name SYSTEMVERILOG_FILE MegaDrive.sv
 set_global_assignment -name QIP_FILE rtl/T80/T80.qip
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/mt_bios.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/mp_bios.sv
 set_global_assignment -name VERILOG_FILE rtl/mt_vdp4.v
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/mt_sbs.sv
 set_global_assignment -name VERILOG_FILE rtl/jt89/jt89.v

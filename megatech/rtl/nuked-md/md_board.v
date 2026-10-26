@@ -41,6 +41,7 @@ module md_board
 	output ram_68k_wren,
 	input [15:0] ram_68k_o,
 	output [12:0] ram_z80_address,
+	output ram_z80_a13, // TomSVR Mega Play: Z80 bus A13 (2000-3fff = the BIOS-shared RAM IC36)
 	output [7:0] ram_z80_data,
 	output ram_z80_wren,
 	input [7:0] ram_z80_o,
@@ -688,6 +689,7 @@ module md_board
 	assign ram_68k_wren = (~UWR | ~LWR) & ~RAS0;
 	
 	assign ram_z80_address = ZA[12:0];
+	assign ram_z80_a13 = ZA[13];
 	assign ram_z80_data = ZD;
 	assign ram_z80_wren = ~ZRAM & ~ZWR;
 	

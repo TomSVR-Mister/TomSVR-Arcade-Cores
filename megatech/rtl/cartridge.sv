@@ -48,9 +48,8 @@ module cartridge
 	input       [2:0] cart_slot,     // Mega-Tech: slot the game side runs (BIOS cart select)
 	input      [23:1] cart_addr,
 
-	// Mega-Tech: instruction ROM reads for the BIOS (req toggles, ack follows)
-	input       [2:0] ins_slot,
-	input      [14:1] ins_a,
+	// Mega-Tech / Mega Play: BIOS reads (SDRAM word address; req toggles, ack follows)
+	input      [23:0] ins_wa,
 	input             ins_req,
 	output            ins_ack,
 	output     [15:0] ins_data,
@@ -111,7 +110,7 @@ sdram sdram
 	.req1(rom_req),
 	.ack1(rom_ack),
 
-	.addr2({1'b1, 6'd0, ins_slot, ins_a}),
+	.addr2(ins_wa),
 	.din2(0),
 	.dout2(ins_dout),
 	.wrl2(0),
@@ -167,7 +166,7 @@ always @(posedge clk) begin
 		cart_dl_wait <= 1;
 		cart_wr_addr0 <= 0;
 		rom_wr <= ~rom_wr;
-		cart_wr_addr <= {1'b1, 6'd0, cart_dl_slot, cart_dl_addr[14:1]};
+		cart_wr_addr <= {1'b1, 6'd0, cart_dl_slot | cart_dl_addr[17:15], cart_dl_addr[14:1]}; // Mega Play: BIOS + instructions 0x00000-0x27fff
 	end
 	else if (cart_dl & cart_dl_wr) begin
 		cart_dl_wait <= 1;
