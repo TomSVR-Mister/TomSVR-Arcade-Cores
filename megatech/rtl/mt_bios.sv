@@ -32,6 +32,7 @@ module mt_bios (
     input      [12:0] nv_addr,
     input      [15:0] nv_din,
     output     [15:0] nv_dout,    // bytes at {nv_addr[12:1], 1} / {nv_addr[12:1], 0}
+    output            nv_chg,     // Z80 write to 5000-5dff (settings, bookkeeping; not the stack below 5fff): asks MiSTer to save
 
     // instruction ROM of the selected cart, in SDRAM (word = {byte 2n, byte 2n+1}); req toggles, ack follows
     output reg [14:1] ins_a,
@@ -115,6 +116,7 @@ reg  wr_d;
 always @(posedge clk) wr_d <= ~wr_n;
 wire wr_edge = ~wr_n & ~wr_d;
 wire mem_we  = ~mreq_n & wr_edge;
+assign nv_chg = mem_we && A[15:12] == 4'h5 && A[11:9] != 3'b111;
 wire io_we   = ~iorq_n & wr_edge;
 reg  rd_d;
 always @(posedge clk) rd_d <= ~rd_n;

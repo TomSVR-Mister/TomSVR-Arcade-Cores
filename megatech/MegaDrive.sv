@@ -245,6 +245,7 @@ wire  [7:0] ioctl_index;
 wire        ioctl_wait;
 wire        ioctl_upload;
 wire [15:0] mt_nv_dout;                  // Mega-Tech BIOS NVRAM save (MRA <nvram index="4">)
+wire        mt_nv_chg;                   // BIOS wrote settings/bookkeeping: MiSTer saves the NVRAM when the OSD opens
 
 reg  [31:0] sd_lba;
 reg         sd_rd = 0;
@@ -299,6 +300,8 @@ hps_io #(.CONF_STR(CONF_STR), .WIDE(1)) hps_io
 	.ioctl_wait(ioctl_wait),
 	.ioctl_upload(ioctl_upload),
 	.ioctl_din(mt_nv_dout),
+	.ioctl_upload_req(mt_nv_chg),
+	.ioctl_upload_index(8'd9),
 	.ioctl_rd(),
 
 	.sd_lba('{sd_lba}),
@@ -1217,6 +1220,7 @@ mt_bios mt_bios
 	.nv_addr(ioctl_addr[12:0]),
 	.nv_din(ioctl_data),
 	.nv_dout(mt_nv_dout),
+	.nv_chg(mt_nv_chg),
 
 	.coin1(joystick_0[12] | mt_kb[0]),
 	.coin2(joystick_1[12] | mt_kb[1]),
