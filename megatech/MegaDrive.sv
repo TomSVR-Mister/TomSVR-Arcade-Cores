@@ -1319,7 +1319,7 @@ mp_bios mp_bios
 	.dsw1(mt_dsw1),
 	.four_slot(mp_four),
 	.present(mt_present[3:0]),
-	.dsw_x({mp_dsw_s[3], mp_dsw_s[2], mp_dsw_s[1]}),
+	.dsw_x({mt_present[3] ? mp_dsw_s[3] : 4'hf, mt_present[2] ? mp_dsw_s[2] : 4'hf, mt_present[1] ? mp_dsw_s[1] : 4'hf}),
 	.slot(mp_slot),
 
 	.start_n(mp_start_n),
@@ -1335,7 +1335,9 @@ mp_bios mp_bios
 	.sync_tgl(mp_sync),
 	.snd(mt_snd)
 );
-assign mt_cart_sel = {1'b0, mp_slot};
+reg [1:0] mp_slot_q = 0;                 // registered: keeps the BIOS register out of the cart read path's timing
+always @(posedge clk_sys) mp_slot_q <= mp_slot;
+assign mt_cart_sel = {1'b0, mp_slot_q};
 assign mt_portd = 8'h30;                 // Mega-Tech-only controls idle: pads on, no CPU hold, no TIME UP
 assign mt_porte = 4'b1000;
 assign mt_timeup = 0;
