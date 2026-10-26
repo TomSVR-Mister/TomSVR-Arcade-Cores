@@ -45,7 +45,7 @@ still marked "not working" (MAME never stops the game when the time runs out).
 ## Up to 8 games at once (cartridge slots)
 
 The real Mega-Tech board holds up to 8 cartridges, and players pick between them on the menu screen. The core does
-the same. This feature is in testing and arrives with the next core update.
+the same.
 
 - **Slot 1** is always the game of the MRA you start.
 - **Slots 2-8** are filled from the core's OSD menu with cartridge files (`.mtc`). MiSTer remembers your choice for
@@ -97,6 +97,10 @@ Master System games: button 1 also starts the game.
 ## OSD extras
 
 Screen (Game/Menu monitor), Side by Side, Coin Sound, Time Up Background (Black/Blue), Flash Warning (Dim/Shadow).
+
+**Menu on VGA (15kHz), untested:** the game stays on HDMI and the menu screen goes to the analog VGA output as
+15 kHz RGB, like the cabinet's second monitor. It needs a 15 kHz monitor on the VGA / IO board output (not the
+HDMI direct-video adapter). Nobody has tried it on real hardware yet; feedback is welcome.
 
 ## Credits
 
