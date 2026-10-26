@@ -1,0 +1,31 @@
+<!-- Grand Slam (Mega Play) on TomSVR_megaplay, a personal MiSTer core for the Sega Mega Play (MAME megaplay.cpp "mp_gslam"),
+     built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by Alexey Melnikov / Sorgelig).
+     The ROM is assembled from your own MAME zips, unmodified. Requires TomSVR_megaplay.rbf. -->
+<misterromdescription>
+    <name>Grand Slam (Mega Play) [TomSVR]</name>
+    <setname same_dir="1">mp_gslam</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1993</year>
+    <manufacturer>Sega</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_megaplay</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FC">
+        <dip bits="0,3" name="Coin Slot 1" ids="Free Play,1C/1C 2C/3C,1C/1C 4C/5C,1C/1C 5C/6C,2C/1C 4C/3C,2C/1C 5C/3C 6C/4C,2C/3C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip bits="4,7" name="Coin Slot 2" ids="1C/1C,1C/1C 2C/3C,1C/1C 4C/5C,1C/1C 5C/6C,2C/1C 4C/3C,2C/1C 5C/3C 6C/4C,2C/3C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip bits="8,10" name="Game Time" ids="5:00,4:30,4:00,3:30,3:00,2:30,2:00,1:30"/>
+        <dip bits="11" name="2P-Play Continue" ids="1 Credit,2 Credits"/>
+    </switches>
+    <rom index="0" zip="mp_gslam.zip|megaplay.zip" md5="None">
+        <part name="ep15294.ic2" crc="aa8dc2d8"/>
+        <part name="epr-15175-03.ic3" crc="70ea1aec"/>
+        <part>00 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0x7FF0">00</part>
+        <interleave output="16">
+            <part name="epr-15181.ic2" crc="642437c1" map="01"/>
+            <part name="epr-15180.ic1" crc="73bb48f1" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,-,Test" default="A,B,X,Start,-,-,-,-,Select,R,-,-"/>
+</misterromdescription>

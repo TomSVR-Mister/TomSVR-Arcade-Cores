@@ -1,0 +1,31 @@
+<!-- Tecmo World Cup (Mega Play) on TomSVR_megaplay, a personal MiSTer core for the Sega Mega Play (MAME megaplay.cpp "mp_twcup"),
+     built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by Alexey Melnikov / Sorgelig).
+     The ROM is assembled from your own MAME zips, unmodified. Requires TomSVR_megaplay.rbf. -->
+<misterromdescription>
+    <name>Tecmo World Cup (Mega Play) [TomSVR]</name>
+    <setname same_dir="1">mp_twcup</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1993</year>
+    <manufacturer>Sega</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_megaplay</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,F9">
+        <dip bits="0,3" name="Coin Slot 1" ids="Free Play,1C/1C 2C/3C,1C/1C 4C/5C,1C/1C 5C/6C,2C/1C 4C/3C,2C/1C 5C/3C 6C/4C,2C/3C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip bits="4,7" name="Coin Slot 2" ids="1C/1C,1C/1C 2C/3C,1C/1C 4C/5C,1C/1C 5C/6C,2C/1C 4C/3C,2C/1C 5C/3C 6C/4C,2C/3C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip bits="8" name="Time" ids="Short,Normal"/>
+        <dip bits="9,11" name="Level" ids="0 (duplicate 1),0 (duplicate 2),5,4,3,2,1,0"/>
+    </switches>
+    <rom index="0" zip="mp_twcup.zip|megaplay.zip" md5="None">
+        <part name="ep15294.ic2" crc="aa8dc2d8"/>
+        <part name="ep15175-04.ic3" crc="faf7c030"/>
+        <part>00 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0x7FF0">00</part>
+        <interleave output="16">
+            <part name="ep15183.ic2" crc="8b79b861" map="01"/>
+            <part name="ep15182.ic1" crc="eb8325c3" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,-,Test" default="A,B,X,Start,-,-,-,-,Select,R,-,-"/>
+</misterromdescription>
