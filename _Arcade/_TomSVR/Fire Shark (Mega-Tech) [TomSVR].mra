@@ -3,7 +3,7 @@
      The ROM is assembled from your own MAME zips, unmodified. Requires TomSVR_megatech.rbf. -->
 <misterromdescription>
     <name>Fire Shark (Mega-Tech) [TomSVR]</name>
-    <setname>mt_fshrk</setname>
+    <setname same_dir="1">mt_fshrk</setname>
     <rotation>horizontal</rotation>
     <mameversion>0288</mameversion>
     <year>1990</year>
@@ -28,6 +28,6 @@
             <part name="mp14341.ic1" crc="04d65ebc" map="12"/>
         </interleave>
     </rom>
-    <nvram index="4" size="8192"/>
+    <nvram index="9" size="8192"/>
     <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>
 </misterromdescription>

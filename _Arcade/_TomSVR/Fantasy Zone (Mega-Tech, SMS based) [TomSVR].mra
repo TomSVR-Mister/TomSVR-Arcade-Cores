@@ -3,7 +3,7 @@
      SMS cart (runs in the VDP Master System mode). The ROM is assembled from your own MAME zips, unmodified. Requires TomSVR_megatech.rbf. -->
 <misterromdescription>
     <name>Fantasy Zone (Mega-Tech, SMS based) [TomSVR]</name>
-    <setname>mt_fz</setname>
+    <setname same_dir="1">mt_fz</setname>
     <rotation>horizontal</rotation>
     <mameversion>0288</mameversion>
     <year>1987</year>
@@ -26,6 +26,6 @@
         <part repeat="0xFFF0">00</part>
         <part name="mpr-10118.ic1" crc="65d7e4e0"/>
     </rom>
-    <nvram index="4" size="8192"/>
+    <nvram index="9" size="8192"/>
     <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>
 </misterromdescription>
