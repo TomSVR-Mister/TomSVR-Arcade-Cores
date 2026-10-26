@@ -105,6 +105,11 @@ localparam CONF_STR = {
 	"P3FC6,MTC,Slot 6;",
 	"P3FC7,MTC,Slot 7;",
 	"P3FC8,MTC,Slot 8;",
+`else
+	"P3,Cartridge Slots 2-4;",
+	"P3FC2,MPC,Slot 2;",
+	"P3FC3,MPC,Slot 3;",
+	"P3FC4,MPC,Slot 4;",
 `endif
 	"DIP;",
 	"-;",
@@ -349,11 +354,14 @@ wire [5:0] mt_idx     = ioctl_index[5:0];
 wire mt_download   = ioctl_download & (ioctl_index == 0);
 `ifdef MEGAPLAY
 // Mega Play: 0x000000 BIOS 128 kB, 0x020000 instruction ROM 32 kB, 0x028000 header, 0x030000 game ROM; the BIOS
-// and the instruction ROM go to SDRAM at 16 MB (the BIOS side reads them through its window), the game to slot 0
-wire mt_slot_dl    = 1'b0;
-wire [2:0] mt_dl_slot = 3'd0;
+// and the instruction ROM go to SDRAM at 16 MB (the BIOS side reads them through its window), the game to slot 0.
+// Slots 2-4 (OSD "FC2".."FC4"): index n = slot n, a .mpc file with the MRA image layout (the BIOS part is ignored,
+// header byte 2 = the game's DSW nibble); its instruction ROM goes to word 0x810000 + slot * 0x4000, the game to
+// slot * 2 MB. Any loaded slot 2-4 turns the board into the 4-slot one (mp_bios four_slot).
+wire mt_slot_dl    = ioctl_download & (mt_idx >= 6'd2) & (mt_idx <= 6'd4);
+wire [2:0] mt_dl_slot = mt_slot_dl ? mt_idx[2:0] - 3'd1 : 3'd0;
 wire mt_cart_part  = ioctl_addr >= 25'h030000;
-wire mt_ins_part   = ioctl_addr < 25'h028000;
+wire mt_ins_part   = (ioctl_addr < 25'h028000) & (~mt_slot_dl | (ioctl_addr >= 25'h020000));
 localparam MT_HDR  = 25'h028000;
 wire [24:0] cart_addr_dl = mt_ins_part ? (25'h1000000 | {7'd0, ioctl_addr[17:0]}) : ioctl_addr - 25'h030000;
 `else
@@ -385,6 +393,13 @@ always @(posedge clk_sys) begin
 	end
 end
 wire cart_ms = mt_ms[cart_download ? mt_dl_slot : mt_cart_sel];
+`ifdef MEGAPLAY
+reg [3:0] mp_dsw_s [1:3];               // Mega Play: DSW nibble of the games in slots 2-4 (.mpc header byte 2)
+always @(posedge clk_sys)
+	if (mt_slot_dl & ioctl_wr & (ioctl_addr == MT_HDR + 25'd2)) mp_dsw_s[mt_dl_slot[1:0]] <= ioctl_data[3:0];
+wire mp_four = |mt_present[3:1];
+wire [1:0] mp_slot;
+`endif
 
 reg osd_btn = 0;
 always @(posedge clk_sys) begin
@@ -1298,10 +1313,14 @@ mp_bios mp_bios
 	.service_coin(mt_kb[4]),
 	.start1(joystick_0[7] | mt_kb[2]),
 	.start2(joystick_1[7] | mt_kb[3]),
-	.sel_btn(joystick_0[13] | joystick_1[13] | mt_kb[5]),
+	.sel_btn(mt_sel_pulse | mt_kb[5]),     // pad Select after the ~1 s hold above (as Mega-Tech), key at once
 	.service(joystick_0[15] | mt_kb[7]),
 	.dsw0(mt_dsw0),
 	.dsw1(mt_dsw1),
+	.four_slot(mp_four),
+	.present(mt_present[3:0]),
+	.dsw_x({mp_dsw_s[3], mp_dsw_s[2], mp_dsw_s[1]}),
+	.slot(mp_slot),
 
 	.start_n(mp_start_n),
 	.game_reset(mt_game_reset),
@@ -1316,7 +1335,7 @@ mp_bios mp_bios
 	.sync_tgl(mp_sync),
 	.snd(mt_snd)
 );
-assign mt_cart_sel = 3'd0;
+assign mt_cart_sel = {1'b0, mp_slot};
 assign mt_portd = 8'h30;                 // Mega-Tech-only controls idle: pads on, no CPU hold, no TIME UP
 assign mt_porte = 4'b1000;
 assign mt_timeup = 0;

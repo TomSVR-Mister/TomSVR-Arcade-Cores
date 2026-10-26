@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Make Mega-Tech cartridge files (.mtc) for the TomSVR_megatech core's OSD slots 2-8, from your own MAME zips.
+"""Make Mega-Tech cartridge files (.mtc) for the TomSVR_megatech core's OSD slots 2-8, and Mega Play cartridge files
+(.mpc) for the TomSVR_megaplay core's OSD slots 2-4, from your own MAME zips.
 
 Runs on the MiSTer (Scripts menu, or ssh) or on a PC. For every TomSVR Mega-Tech MRA it assembles the cartridge exactly
 as MiSTer Main does for the MRA (same parts, same order), from the zips named in the MRA, and writes
 "<game>.mtc". A .mtc has the MRA image layout with the BIOS part left empty (the BIOS comes from the MRA you start):
   0x00000 32 kB zero, 0x08000 instruction ROM 32 kB, 0x10000 header 64 kB, 0x20000 game ROM.
+A .mpc is the same for Mega Play: 0x000000 128 kB zero, 0x020000 instruction ROM 32 kB, 0x028000 header 32 kB
+(byte 2 = the game's DIP switch nibble, the MRA's default), 0x030000 game ROM.
 
 usage: megatech_mtc.py [mra_dir] [zip_dir] [out_dir]
 defaults (MiSTer): /media/fat/_Arcade (searched with its subfolders)  /media/fat/games/mame  /media/fat/games/Mega-Tech
+The .mpc files go to the folder "Mega Play" next to out_dir (/media/fat/games/Mega Play).
 """
 import sys, os, re, zipfile
 import xml.etree.ElementTree as ET
@@ -15,7 +19,7 @@ import xml.etree.ElementTree as ET
 def hexbytes(t):
     return bytes(int(x, 16) for x in re.findall(r'[0-9a-fA-F]{2}', t or ''))
 
-def assemble(rom, zipdir):
+def assemble(rom, zipdir, bios_size=0x8000):
     """MiSTer Main mra_loader.cpp rom index 0 assembly (parts, repeat, offset/length, interleave + map)."""
     zips = rom.get('zip').split('|')
     data = bytearray(); romlen = [0] * 8; unit = [1]
@@ -67,7 +71,7 @@ def assemble(rom, zipdir):
         if el.tag == 'part':
             unit[0] = 1
             if first and el.get('name'):      # the BIOS: left empty, saves needing megatech.zip
-                rom_data(b'\0' * 0x8000, 0)
+                rom_data(b'\0' * bios_size, 0)
             else:
                 do_part(el, 0)
             first = False
@@ -90,7 +94,7 @@ def find_mras(top):
             try:
                 with open(path, 'rb') as f: head = f.read(4096)
             except OSError: continue
-            if b'tomsvr_megatech' in head.lower(): yield path
+            if b'tomsvr_megatech' in head.lower() or b'tomsvr_megaplay' in head.lower(): yield path
 
 def main():
     a = sys.argv[1:]
@@ -108,21 +112,29 @@ def main():
         except Exception as e:
             if 'mega-tech' in path.lower(): print('cannot read %s: %s' % (path, e))
             continue
-        if not (root.findtext('rbf') or '').strip().lower().startswith('tomsvr_megatech'): continue
+        rbf = (root.findtext('rbf') or '').strip().lower()
+        mp = rbf.startswith('tomsvr_megaplay')
+        if not (mp or rbf.startswith('tomsvr_megatech')): continue
         mt += 1
         name = (root.findtext('name') or os.path.basename(path)[:-4]).replace(' [TomSVR]', '').strip()
         if name in done: continue
         roms = [r for r in root.findall('rom') if r.get('index') == '0']
         if not roms: continue
         try:
-            img = assemble(roms[0], zipdir)
+            img = assemble(roms[0], zipdir, 0x20000 if mp else 0x8000)
+            if mp:     # header byte 2 = the game's DSW nibble (MRA switches default, second byte, low nibble)
+                sw = root.find('switches'); d = (sw.get('default') if sw is not None else '') or ''
+                d = [int(x, 16) for x in d.split(',') if x.strip()]
+                img = bytearray(img); img[0x28002] = (d[1] & 0xf) if len(d) > 1 else 0xf; img = bytes(img)
         except Exception as e:
             print('skip %s: %s' % (name, e)); bad += 1; continue
         safe = re.sub(r'[\\/:*?"<>|]', '_', name)
-        with open(os.path.join(outdir, safe + '.mtc'), 'wb') as f: f.write(img)
+        od = os.path.join(os.path.dirname(os.path.abspath(outdir)), 'Mega Play') if mp else outdir
+        os.makedirs(od, exist_ok=True)
+        with open(os.path.join(od, safe + ('.mpc' if mp else '.mtc')), 'wb') as f: f.write(img)
         print('ok   %s (%d kB)' % (name, len(img) // 1024)); ok += 1; done.add(name)
-    print('%d Mega-Tech MRAs found' % mt)
-    print('%d cartridges written to %s, %d skipped' % (ok, outdir, bad))
+    print('%d Mega-Tech / Mega Play MRAs found' % mt)
+    print('%d cartridges written, %d skipped' % (ok, bad))
 
 if __name__ == '__main__':
     main()

@@ -50,6 +50,15 @@ module mp_bios (
     input             sel_btn, service,
     input       [7:0] dsw0, dsw1,
 
+    // 4-slot board (any of slots 2-4 loaded): slot select io1 port D bits 1-0 picks the cart for the game side and
+    // the window, 6600 bit 0 reads back port D bit 0 (the BIOS's board check at 0366), 6402 bits 3-0 = cart present
+    // per slot, active low (read at 06df and 207b), DSW nibbles: 6201 = slots 2|1, 6202 = slots 4|3 (BIOS 1444).
+    // These are taken from what the BIOS code expects; MAME only has the 1-slot board.
+    input             four_slot,
+    input       [3:0] present,
+    input      [11:0] dsw_x,      // DSW nibbles of slots 4, 3, 2
+    output      [1:0] slot,       // cart the game side runs
+
     // game side
     output      [1:0] start_n,    // P1/P2 Start lines of the game pads (io1 port D bits 4/5, (MAME))
     output reg        game_reset, // one clk pulse: 68000 reset (io2 port E bits 3-2 00 -> 11, (MAME))
@@ -159,12 +168,15 @@ wire        w_game = win & win_lo & ~bios_mode & ~bios_width[3];         // 6800
 wire        w_ins  = w_game & (full_a[23:16] == 8'h30);
 
 assign start_n = bios_bank[5:4];
+wire [1:0] sl = four_slot ? bios_bank[1:0] : 2'd0;
+assign slot = sl;
 assign exp_hi  = io_exp[7:3];
 
 // ------------------------------------------------------------- SDRAM reads (BIOS ROM banks, cart, instructions)
 // SDRAM word = {byte 2n, byte 2n+1}: an odd byte is the low half
 wire [23:0] want_wa = w_rom ? (24'h800000 | {8'd0, bios_bank[7:6], A[14:1]}) :  // BIOS byte bank*32k + A[14:0]
-                      w_ins ? (24'h810000 | {10'd0, full_a[15:2]}) :           // instruction byte (a - 300000) / 2
+                      w_ins ? (24'h810000 | {8'd0, sl, full_a[15:2]}) :       // instruction byte (a - 300000) / 2
+                      four_slot ? {2'd0, sl, full_a[20:1]} :                  // cart, 2 MB per slot
                               {3'd0, full_a[21:1]};                            // cart (slot 0)
 wire        want_lo = w_rom ? A[0] : w_ins ? full_a[1] : full_a[0];
 wire        rom_rd  = mem_rd & (w_rom | w_game);
@@ -253,12 +265,14 @@ reg [7:0] dir1   [0:4], dir2   [0:4];   // 1 = input
 wire [7:0] in1 [0:4];
 wire [7:0] in2 [0:4];
 // io1: A = DSW0 (coin slots), B = DSW1 (game settings), E = io_exp (MAME bios_6204_r)
-assign in1[0] = dsw0;  assign in1[1] = dsw1;  assign in1[2] = 8'h00; assign in1[3] = 8'h00; assign in1[4] = io_exp;
+assign in1[0] = dsw0;
+assign in1[1] = four_slot ? {dsw_x[3:0], dsw1[3:0]} : dsw1;
+assign in1[2] = four_slot ? dsw_x[11:4] : 8'h00; assign in1[3] = 8'h00; assign in1[4] = io_exp;
 // io2: A = TEST (0 Select, 7 service, both active low; 4-5 unknown active low = 1), B = COIN (0/1 coins, 4 service
 // coin, 6/7 starts, active low; 5 unknown active low = 1), C = io_exp (6402), E bit 0 = io2 port D bit 4 (6404_r)
 assign in2[0] = {~service, 1'b0, 2'b11, 3'b000, ~sel_btn};                       // idle b1 (MAME trace)
 assign in2[1] = {~start2, ~start1, 1'b1, ~service_coin, 2'b00, ~coin2, ~coin1};   // idle f3
-assign in2[2] = io_exp; assign in2[3] = 8'h00; assign in2[4] = {7'd0, r6403[4]};
+assign in2[2] = four_slot ? {io_exp[7:4], ~present} : io_exp; assign in2[3] = 8'h00; assign in2[4] = {7'd0, r6403[4]};
 
 wire       io1_cs = (A[15:3] == 13'h0c40);   // 6200-6207
 wire       io2_cs = (A[15:3] == 13'h0c80);   // 6400-6407
@@ -332,7 +346,7 @@ always @(*) begin
             16'b010?_????_????_????: zdi = ram_q;                                   // 4000-5fff
             16'b0110_0010_0000_0???: zdi = io_rd_data;                              // 6200-6207
             16'b0110_0100_0000_0???: zdi = io_rd_data;                              // 6400-6407
-            16'b0110_0110_0000_0000: zdi = r6600;
+            16'b0110_0110_0000_0000: zdi = four_slot ? {r6600[7:1], bios_bank[0]} : r6600;
             16'b0110_1???_????_????,
             16'b0111_0???_????_????: zdi = ram3_q;                                 // 6800-77ff
             16'b1???_????_????_????: zdi = w_ic36 ? ic36_q : w_ram ? ic37_q : (w_rom | w_game) ? rom_q : 8'h00;
