@@ -176,9 +176,10 @@ def mra(name, st, body):
     else:
         pic = ['        <part repeat="0x1000">00</part>']
     six = flags & 1
-    # coin = core button 5 (joystick bit 8) on the pad's Select; this tag overrides the core's own J1 names
+    # coin = core button 5 (joystick bit 8) on the pad's Select; this tag overrides the core's own J1 names.
+    # 6-button sets use the MiSTer Genesis core's name map (C = R, Z = L), which suits 6-button pads such as the 8BitDo M30
     names = 'A,B,C,Start,Coin,X,Y,Z' if six else 'A,B,C,Start,Coin'
-    dflt_btn = 'A,B,X,Start,Select,L,Y,R' if six else 'A,B,X,Start,Select'
+    dflt_btn = 'A,B,R,Start,Select,X,Y,L' if six else 'A,B,X,Start,Select'
     zips = f'{name}.zip' if st['parent'] == '0' else f'{name}.zip|{st["parent"]}.zip'
     out = [
         f'<!-- {title} on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards',
