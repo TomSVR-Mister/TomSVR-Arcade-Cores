@@ -138,7 +138,7 @@ def mra(name, st, bios, dipinfo):
         '        <part repeat="0x7FF0">00</part>',
         *glines,
         '    </rom>',
-        '    <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,-,Test" default="A,B,X,Start,-,-,-,-,Select,R,-,-"/>',
+        '    <buttons names="A,B,C,Start,Mode,X,Y,Z,Coin,Select,Service,Test" default="A,B,X,Start,-,-,-,-,Select,R,L,-"/>',
         '</misterromdescription>', '']
     return '\n'.join(out), size
 

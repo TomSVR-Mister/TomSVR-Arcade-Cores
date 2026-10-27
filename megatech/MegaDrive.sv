@@ -1433,7 +1433,7 @@ mp_bios mp_bios
 
 	.coin1(joystick_0[12] | mt_kb[0]),
 	.coin2(joystick_1[12] | mt_kb[1]),
-	.service_coin(mt_kb[4]),
+	.service_coin(joystick_0[14] | joystick_1[14] | mt_kb[4]),   // pad "Service": also moves the TEST MODE cursor
 	.start1(joystick_0[7] | mt_kb[2]),
 	.start2(joystick_1[7] | mt_kb[3]),
 	.sel_btn(mt_sel_pulse | mt_kb[5]),     // pad Select after the ~1 s hold above (as Mega-Tech), key at once
