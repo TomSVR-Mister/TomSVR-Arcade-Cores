@@ -56,8 +56,8 @@ The OSD file loader can't open zips. A `.mtc` file is a cartridge assembled ahea
 MRA would build, in one file. It contains ROM data, so it is not distributed; you make them from your own zips.
 
 **Making the .mtc files (once):**
-1. Copy `tools/megatech_mtc.py` and `tools/megatech_make_mtc.sh` from this repository to `/media/fat/Scripts/` on
-   your MiSTer SD card.
+1. If you use update_all with this repository's db, the two scripts are already in `/media/fat/Scripts/`.
+   Otherwise copy `tools/megatech_mtc.py` and `tools/megatech_make_mtc.sh` from this repository there.
 2. On the MiSTer, open the Scripts menu and run **megatech_make_mtc**. It reads the Mega-Tech MRAs in
    `_Arcade` and its subfolders and your zips in `games/mame` (megatech.zip is not needed), and writes one file
    per game to `games/Mega-Tech/` (48 files, about 29 MB in total). Games whose zips are missing are skipped.

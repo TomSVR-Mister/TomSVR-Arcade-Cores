@@ -18,7 +18,8 @@ on MegaDrive_MiSTer (Nuked-MD) and the Mega Play BIOS board around it.
 
 An MRA can only build its own cartridge from your MAME zips, so slots 2-4 use ready-made cartridge files:
 
-1. Copy `tools/megatech_mtc.py` and `tools/megatech_make_mtc.sh` to `/media/fat/Scripts/` on your MiSTer.
+1. If you use update_all with this repository's db, the scripts are already in `/media/fat/Scripts/`. Otherwise
+   copy `tools/megatech_mtc.py` and `tools/megatech_make_mtc.sh` there.
 2. Run `megatech_make_mtc` from the Scripts menu. It reads the TomSVR Mega Play MRAs in `_Arcade` and your zips in
    `games/mame`, and writes `games/Mega Play/<game>.mpc` (and Mega-Tech `.mtc` files to `games/Mega-Tech`).
 
