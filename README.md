@@ -62,6 +62,7 @@ why); the patch is applied in memory by the MRA.
 | jpop | Jumping Pop (Nics) | tnzs.cpp |
 | madd | Mad Donna, Komo Como | oneshot.cpp |
 | megatech | Sega Mega-Tech: 48 MRAs (38 Mega Drive and 10 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen, coin timer, TIME UP and test menu; both monitors side by side; settings saved. Built from the board's schematics and decoded PAL chips, with timing measured from real cabinet footage (see [megatech/README_TomSVR.md](megatech/README_TomSVR.md)) | megatech.cpp |
+| megaplay | Sega Mega Play: all 12 MAME sets (Sonic 1 and 2, Streets of Rage II, Golden Axe II, Gunstar Heroes, Shinobi III, Bio-hazard Battle ...) with the real Mega Play BIOS drawing its screens over the game, and the 4-slot board: up to 4 games on one menu (see [megatech/README_MegaPlay.md](megatech/README_MegaPlay.md)). Built in `megatech/` (MegaPlay.qpf) | megaplay.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
@@ -106,7 +107,8 @@ used to compare against MAME.
   JTFRAME; `gaelco2/ORIGIN.md` lists exactly what comes from where and what was changed.
 - **nukeykt**: Nuked-MD, the die-level Mega Drive netlists, and **Alexey Melnikov (Sorgelig)**: the MiSTer port
   ([MegaDrive_MiSTer](https://github.com/MiSTer-devel/MegaDrive_MiSTer)), GPL-2.0-or-later, the base of megatech.
-  jt89 (jotego) is used for the Mega-Tech menu PSG and T80 for its BIOS Z80.
+  jt89 (jotego) is used for the Mega-Tech menu PSG and T80 for its BIOS Z80. megaplay is built from the same
+  source (Mega Play board after MAME megaplay.cpp, BSD-3-Clause, David Haywood).
 - **The MAME team**, whose drivers document these boards.
 
 GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,
