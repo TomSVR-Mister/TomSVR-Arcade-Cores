@@ -249,8 +249,10 @@ always @(posedge clk_ram) begin
 	rd_old <= sdram_rd & rom_data_req;
 	if((~rd_old & sdram_rd & rom_data_req) || (~we_old & rom_we)) begin
 `ifdef MDBOOT
-		// 3-in-1 Conny board: 000000-0fffff is a 1 MB bank of the 4 MB ROM (mdb_bank = 0 on other boards)
-		rom_addr <= {1'b0, {md_cart_addr[23:22], md_cart_addr[21:20] | (|md_cart_addr[23:20] ? 2'd0 : mdb_bank), md_cart_addr[19:1]} & rom_mask[23:1]};
+		// 3-in-1 Conny board: 000000-0fffff is a 1 MB bank of the 4 MB ROM (mdb_bank = 0 on other boards).
+		// The board only sees A21-A1 (A22/A23 never reach the cartridge), so the bank follows A21-A20 alone:
+		// Gunstar Heroes' VDP DMA puts A23 = 1 on the bus, and decoding A23 left its sprite DMA unbanked.
+		rom_addr <= {1'b0, {md_cart_addr[23:22], md_cart_addr[21:20] | (|md_cart_addr[21:20] ? 2'd0 : mdb_bank), md_cart_addr[19:1]} & rom_mask[23:1]};
 `else
 		rom_addr <= {1'b0, cart_slot, ((cart_ms ? ms_cart_addr[19:0] : md_cart_addr[20:1]) & rom_mask[20:1])}; // SMS: one byte per word
 `endif
