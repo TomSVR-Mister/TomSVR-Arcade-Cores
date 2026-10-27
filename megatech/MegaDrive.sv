@@ -170,7 +170,13 @@ localparam CONF_STR = {
 	"-;",
 	"O[61],Pause When OSD is Open,No,Yes;",
 	"R[0],Reset;",
+`ifdef MDBOOT
+	// MD bootlegs: the coin sits on button 8 named "Select", so MiSTer's default map puts it on the pad's Select
+	// ("Coin" would default to R). The boards have no Mode button.
+	"J1,A,B,C,Start,Select,X,Y,Z;",
+`else
 	"J1,A,B,C,Start,Mode,X,Y,Z,Coin,Select,Enter,Test;",
+`endif
 	"jn,A,B,R,Start,Select,X,Y,L;", // name map to SNES layout.
 	"jp,Y,B,A,Start,Select,L,X,R;", // positional map to SNES layout (3 button friendly)
 	"V,v",`BUILD_DATE
@@ -1382,8 +1388,8 @@ mdb_io mdb_io
 	.prot_hi(mdb_prot_hi),
 	.prot_val(mdb_prot_val),
 	.dsw(mdb_dsw),
-	.coin1(joystick_0[12] | mt_kb[0]),
-	.coin2(joystick_1[12] | mt_kb[1]),
+	.coin1(joystick_0[8] | mt_kb[0]),   // pad Select
+	.coin2(joystick_1[8] | mt_kb[1]),
 	.pic_wr(mdb_pic_wr),
 	.pic_wa(ioctl_addr[11:1]),
 	.pic_wd(ioctl_data[11:0]),
@@ -1659,7 +1665,11 @@ md_io md_io
 `else
 	.P1_START(joy0[7]),
 `endif
+`ifdef MDBOOT
+	.P1_MODE(1'b0),  // bit 8 is the coin here
+`else
 	.P1_MODE(joy0[8]),
+`endif
 	.P1_X(joy0[9]),
 	.P1_Y(joy0[10]),
 	.P1_Z(joy0[11]),
@@ -1676,7 +1686,11 @@ md_io md_io
 `else
 	.P2_START(joy1[7]),
 `endif
+`ifdef MDBOOT
+	.P2_MODE(1'b0),  // bit 8 is the coin here
+`else
 	.P2_MODE(joy1[8]),
+`endif
 	.P2_X(joy1[9]),
 	.P2_Y(joy1[10]),
 	.P2_Z(joy1[11]),
