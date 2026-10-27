@@ -213,10 +213,9 @@ always @(posedge clk) begin
 	if (reset) bank <= f_3in1 ? 2'd1 : 2'd0;
 	else if (bank_cs && (uwr | lwr)) bank <= uwr ? din[9:8] : din[1:0];
 
-	if (pic_wcs && (uwr | lwr)) begin
-		if (lwr) in_lsb <= din[7:0];
-		if (uwr) in_msb <= din[15:8];
-	end
+	// the latches take the whole data bus on any write strobe, as MAME's mcu_w (it ignores the byte mask): the games
+	// write bytes (aladmdb: AA to 220000), which the 68000 drives on both halves of the bus
+	if (pic_wcs && (uwr | lwr)) {in_msb, in_lsb} <= din;
 end
 
 assign dtack = den | wr_hit;
