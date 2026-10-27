@@ -1,8 +1,8 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-26 MiSTer arcade cores and 245 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+28 MiSTer arcade cores and 273 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
-**These are not jotego cores.** All but one are built on jotego's JTFRAME framework (megatech is built on
+**These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer, see below), but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
 naming. If an official or board-verified core for any of these games comes along, use that one instead; this
@@ -61,6 +61,7 @@ why); the patch is applied in memory by the MRA.
 | hotblk | Hot Blocks - Tetrix II | hotblock.cpp |
 | jpop | Jumping Pop (Nics) | tnzs.cpp |
 | madd | Mad Donna, Komo Como | oneshot.cpp |
+| mdboot | Mega Drive arcade bootlegs: all 16 working MAME sets (Aladdin, Bare Knuckle I/II/III, Sonic 2, Jurassic Park, Mortal Kombat 3, Super Street Fighter II, Sunset Riders, Contra, the Gunstar Heroes 3-in-1 ...) with each board's coin, DIP switch and protection hardware (see [megatech/README_MDBoot.md](megatech/README_MDBoot.md)). Built in `megatech/` (MDBoot.qpf) | megadriv_acbl.cpp |
 | megatech | Sega Mega-Tech: 48 MRAs (38 Mega Drive and 10 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen, coin timer, TIME UP and test menu; both monitors side by side; settings saved. Built from the board's schematics and decoded PAL chips, with timing measured from real cabinet footage (see [megatech/README_TomSVR.md](megatech/README_TomSVR.md)) | megatech.cpp |
 | megaplay | Sega Mega Play: all 12 MAME sets (Sonic 1 and 2, Streets of Rage II, Golden Axe II, Gunstar Heroes, Shinobi III, Bio-hazard Battle ...) with the real Mega Play BIOS drawing its screens over the game, and the 4-slot board: up to 4 games on one menu (see [megatech/README_MegaPlay.md](megatech/README_MegaPlay.md)). Built in `megatech/` (MegaPlay.qpf) | megaplay.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
@@ -108,7 +109,8 @@ used to compare against MAME.
 - **nukeykt**: Nuked-MD, the die-level Mega Drive netlists, and **Alexey Melnikov (Sorgelig)**: the MiSTer port
   ([MegaDrive_MiSTer](https://github.com/MiSTer-devel/MegaDrive_MiSTer)), GPL-2.0-or-later, the base of megatech.
   jt89 (jotego) is used for the Mega-Tech menu PSG and T80 for its BIOS Z80. megaplay is built from the same
-  source (Mega Play board after MAME megaplay.cpp, BSD-3-Clause, David Haywood).
+  source (Mega Play board after MAME megaplay.cpp, BSD-3-Clause, David Haywood), and so is mdboot (bootleg boards
+  after MAME megadriv_acbl.cpp, BSD-3-Clause, David Haywood, Stephane Humbert).
 - **The MAME team**, whose drivers document these boards.
 
 GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,
