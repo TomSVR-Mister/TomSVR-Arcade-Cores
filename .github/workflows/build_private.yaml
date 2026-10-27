@@ -1,0 +1,139 @@
+name: Build core from the private repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      core:
+        description: "core folder in TomSVR-Mister/SegaMega-Tech"
+        default: pipedrm
+        required: true
+      ref:
+        description: "branch or commit of the private repo"
+        default: main
+        required: false
+      trials:
+        description: "seed trials before giving up on timing"
+        default: "4"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  mister:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space for the Quartus image
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      # this repo, for the menu logo only
+      - uses: actions/checkout@v4
+        with:
+          path: pub_mine
+
+      # core source from the private repo (read-only token in the PRIVATE_SRC_TOKEN secret);
+      # only the core folder is checked out, never docs/ (ROMs)
+      - uses: actions/checkout@v4
+        with:
+          repository: TomSVR-Mister/SegaMega-Tech
+          ref: ${{ inputs.ref || 'main' }}
+          token: ${{ secrets.PRIVATE_SRC_TOKEN }}
+          path: mine
+          sparse-checkout: ${{ inputs.core }}
+          persist-credentials: false
+
+      - name: Private commit
+        id: priv
+        run: echo "sha=$(git -C mine rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Get JTFRAME and CPU/sound modules (jotego/jtcores, fixed commit)
+        run: |
+          git init -q jtcores
+          cd jtcores
+          git remote add origin https://github.com/jotego/jtcores.git
+          git fetch -q --depth 1 origin bfced64dad833daa3864e601e9c0e90614c56df8
+          git checkout -q FETCH_HEAD
+          git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51 modules/jtkcpu
+          git -C modules/jt12 submodule update --init
+          cp -r ../mine/${{ inputs.core }} cores/${{ inputs.core }}
+          # TomSVR menu background instead of the JT logo (jtcore links hdl/*.hex over jtframe's own)
+          cp ../pub_mine/logo/logodata.hex ../pub_mine/logo/logomap.hex cores/${{ inputs.core }}/hdl/
+
+      - name: Compile for MiSTer (Quartus 20.1 Lite in jotego/jtcore20)
+        shell: bash
+        run: |
+          set -o pipefail
+          cat > jtcores/build-core.sh <<'EOS'
+          #!/bin/bash
+          set -e
+          git config --global --add safe.directory "*"
+          cd /jtcores
+          export JTROOT=/jtcores JTFRAME=/jtcores/modules/jtframe JTUTIL=/jtutil
+          mkdir -p $JTUTIL
+          source $JTFRAME/bin/setprj.sh > /dev/null
+          export PATH=$PATH:/usr/local/go/bin
+          rc=0
+          jtutil seed --max-trials ${{ inputs.trials || 4 }} ${{ inputs.core }} -mister --nodbg --nolinter || rc=$?
+          # on a timing failure, list the worst setup paths of a remaining seed project
+          if [ $rc != 0 ]; then
+            qpf=$(find /jtcores/cores/${{ inputs.core }} -name '*.qpf' 2>/dev/null | head -1)
+            if [ -n "$qpf" ]; then
+              cd $(dirname $qpf)
+              printf 'project_open %s\ncreate_timing_netlist\nread_sdc\nupdate_timing_netlist\nreport_timing -setup -npaths 25 -detail summary -file /jtcores/paths.txt\n' $(basename $qpf .qpf) > /tmp/paths.tcl
+              quartus_sta -t /tmp/paths.tcl > /dev/null 2>&1 || true
+            fi
+          fi
+          exit $rc
+          EOS
+          sed -i 's/^          //' jtcores/build-core.sh
+          chmod +x jtcores/build-core.sh
+          # same invocation style as jotego's own workflow (image entrypoint runs the given script)
+          docker run --network host -v "$PWD/jtcores":/jtcores jotego/jtcore20 /jtcores/build-core.sh 2>&1 | tee build.log
+
+      - name: Report the end of the build log as annotations
+        if: always()
+        shell: bash
+        run: |
+          {
+            # GitHub keeps only 10 notices per step, so the useful lines go first
+            echo "== errors and timing"; grep -aiE "error \(|slack|timing|fail|pass|seed" build.log | grep -v "Verifying\|Download\|Waiting" | tail -n 25
+            # worst setup paths, so a timing failure can be traced
+            [ -f jtcores/paths.txt ] && { echo "== paths"; grep -v "^$" jtcores/paths.txt | cut -c1-200 | head -60; }
+            for f in $(find jtcores/cores/${{ inputs.core }} -name '*.sta.rpt' 2>/dev/null | head -1); do echo "== $f"; grep -A 16 "Setup: '" "$f" | grep -v -- "^--$" | head -90; done
+            echo "== end of build.log"; grep -av "Verifying\|Download complete\|Waiting\|Pull complete\|Extracting" build.log | tail -n 60
+            for f in $(find jtcores/log jtcores/cores/${{ inputs.core }} -name '*.log' 2>/dev/null | head -3); do echo "== $f"; tail -n 30 "$f"; done
+          } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
+          split -l 25 tail.txt part_ || true
+          for f in part_*; do
+            msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' "$f")
+            echo "::notice title=log $f::$msg"
+          done
+
+      - name: Upload the core
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jt${{ inputs.core }}-mister
+          path: |
+            jtcores/release
+            jtcores/log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Also keep the .rbf on the 'builds' branch
+        if: success()
+        shell: bash
+        run: |
+          rbf=$(find jtcores/release -name '*.rbf' | head -1)
+          [ -n "$rbf" ] || exit 0
+          mkdir pub && cd pub
+          git init -q
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          cp "../$rbf" .
+          # keep the Quartus warnings and timing summary next to the core for hardware debugging
+          mkdir -p logs
+          find ../jtcores/cores/${{ inputs.core }} -name '*.map.rpt' -o -name '*.fit.rpt' -o -name 'jtcore.log' -o -name '*.sta.summary' | while read f; do
+            grep -i "warning\|critical\|slack\|error" "$f" | grep -v "truncated value\|never read" > "logs/$(basename "$f").txt" || true
+          done
+          git add -A && git commit -q -m "jt${{ inputs.core }} build of private ${{ steps.priv.outputs.sha }}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:builds-${{ inputs.core }}-${{ steps.priv.outputs.sha }}
