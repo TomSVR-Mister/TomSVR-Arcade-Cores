@@ -1,0 +1,30 @@
+<!-- Contra (Conny bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "contrambc"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Contra (Conny bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>contrambc</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1995</year>
+    <manufacturer>bootleg (Conny / Chuangyi)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <rom index="0" zip="contrambc.zip" md5="None">
+        <part>08 00 86 40 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="rom.m3" crc="990f824d" length="0x80000" map="01"/>
+            <part name="rom.m6" crc="ab83e795" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom.m2" crc="28b9d1a9" length="0x80000" map="01"/>
+            <part name="rom.m5" crc="1c92ebf1" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

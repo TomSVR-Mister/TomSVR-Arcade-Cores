@@ -1,0 +1,39 @@
+<!-- Bare Knuckle III (scrambled bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "barek3mb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Bare Knuckle III (scrambled bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>barek3mb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1994</year>
+    <manufacturer>bootleg / Sega</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FF,FF">
+        <dip bits="0,2" name="Coinage" ids="4C 1C,3C 1C,2C 1C,1C 5C,1C 4C,1C 3C,1C 2C,1C 1C"/>
+        <dip bits="3,4" name="Lives" ids="4,3,2,1"/>
+        <dip bits="5,7" name="Difficulty" ids="Very Hard,Hard,Easy,Very Easy,-,-,-,Normal"/>
+    </switches>
+    <rom index="0" zip="barek3mb.zip" md5="None">
+        <part>04 05 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="6.u19" crc="2de19519" length="0x80000" map="01"/>
+            <part name="3.u18" crc="db900e82" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="4.u15" crc="6353b4b1" length="0x80000" map="01"/>
+            <part name="1.u14" crc="24d31e12" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="5.u17" crc="0feb974f" length="0x80000" map="01"/>
+            <part name="2.u16" crc="bba4a585" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

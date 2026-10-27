@@ -1,0 +1,34 @@
+<!-- Aladdin (bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "aladmdb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Aladdin (bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>aladmdb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1993</year>
+    <manufacturer>bootleg / Sega</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FF,FF">
+        <dip bits="0,3" name="Coinage" ids="-,8C 3C,5C 3C,3C 2C,2C 3C,6C 1C,5C 1C,4C 1C,3C 1C,2C 1C,1C 6C,1C 5C,1C 4C,1C 3C,1C 2C,1C 1C"/>
+        <dip bits="4,5" name="Difficulty" ids="-,Easy,Hard,Normal"/>
+    </switches>
+    <rom index="0" zip="aladmdb.zip" md5="None">
+        <part>06 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part name="pic16c57.bin" crc="f35ded67" length="0x1000"/>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="m2.bin" crc="142a0366" length="0x80000" map="01"/>
+            <part name="m1.bin" crc="5e2671e4" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="m4.bin" crc="bc712661" length="0x80000" map="01"/>
+            <part name="m3.bin" crc="0feeeb19" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

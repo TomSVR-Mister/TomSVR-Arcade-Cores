@@ -1,0 +1,68 @@
+<!-- Mortal Kombat 3 (scrambled bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "mk3mdb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Mortal Kombat 3 (scrambled bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>mk3mdb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>bootleg / Midway</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FF,FF">
+        <dip bits="0,2" name="Coinage" ids="-,4C 1C,3C 1C,2C 1C,1C 4C,1C 3C,1C 2C,1C 1C"/>
+        <dip bits="8,10" name="Difficulty" ids="-,-,-,Hardest,Hard,Medium,Easy,Easiest"/>
+        <dip bits="14" name="Demo Sounds" ids="Off,On"/>
+        <dip bits="15" name="Blood" ids="Off,On"/>
+    </switches>
+    <rom index="0" zip="mk3mdb.zip" md5="None">
+        <part>01 01 00 00 03 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="6.u2" crc="9852fd6f" offset="0x20000" length="0x20000" map="01"/>
+            <part name="1.u1" crc="0dc01b23" offset="0x20000" length="0x20000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6.u2" crc="9852fd6f" offset="0x60000" length="0x20000" map="01"/>
+            <part name="1.u1" crc="0dc01b23" offset="0x60000" length="0x20000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6.u2" crc="9852fd6f" length="0x20000" map="01"/>
+            <part name="1.u1" crc="0dc01b23" length="0x20000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6.u2" crc="9852fd6f" offset="0x40000" length="0x20000" map="01"/>
+            <part name="1.u1" crc="0dc01b23" offset="0x40000" length="0x20000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="5.u4" crc="ed6a6d13" offset="0x40000" length="0x40000" map="01"/>
+            <part name="2.u3" crc="50250235" offset="0x40000" length="0x40000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="5.u4" crc="ed6a6d13" length="0x40000" map="01"/>
+            <part name="2.u3" crc="50250235" length="0x40000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="7.u10" crc="a124d8d1" offset="0x40000" length="0x40000" map="01"/>
+            <part name="3.u9" crc="493404c1" offset="0x40000" length="0x40000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="7.u10" crc="a124d8d1" length="0x40000" map="01"/>
+            <part name="3.u9" crc="493404c1" length="0x40000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="8.u12" crc="8176f7cc" offset="0x40000" length="0x40000" map="01"/>
+            <part name="4.u11" crc="a52156b8" offset="0x40000" length="0x40000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="8.u12" crc="8176f7cc" length="0x40000" map="01"/>
+            <part name="4.u11" crc="a52156b8" length="0x40000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin,X,Y,Z" default="A,B,R,Start,Select,X,Y,L"/>
+</misterromdescription>

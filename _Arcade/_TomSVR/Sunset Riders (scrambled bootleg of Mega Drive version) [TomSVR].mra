@@ -1,0 +1,35 @@
+<!-- Sunset Riders (scrambled bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "srmdb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Sunset Riders (scrambled bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>srmdb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1993</year>
+    <manufacturer>bootleg / Konami</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="F8,FF,FF">
+        <dip bits="0,2" name="Coinage" ids="1C 1C,4C 1C,3C 1C,2C 1C,1C 5C,1C 4C,1C 3C,1C 2C"/>
+        <dip bits="8,9" name="Difficulty" ids="Hardest,Hard,Medium,Easy"/>
+        <dip bits="16,17" name="Lives" ids="6,5,4,3"/>
+    </switches>
+    <rom index="0" zip="srmdb.zip" md5="None">
+        <part>01 02 00 00 02 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="u2" crc="9125c054" length="0x20000" map="01"/>
+            <part name="u1" crc="c59f33bd" length="0x20000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="u4" crc="fc2aed41" length="0x20000" map="01"/>
+            <part name="u3" crc="0fee0fbe" length="0x20000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

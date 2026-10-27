@@ -1,0 +1,33 @@
+<!-- Bare Knuckle (scrambled bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "barekch"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Bare Knuckle (scrambled bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>barekch</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1994</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FF,FF">
+        <dip bits="22,23" name="Lives" ids="6,4,5,3"/>
+    </switches>
+    <rom index="0" zip="barekch.zip" md5="None">
+        <part>01 03 00 00 01 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="2.u2" crc="7d4ad276" length="0x20000" map="01"/>
+            <part name="1.u1" crc="a119b5ef" length="0x20000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="4.u4" crc="98245384" length="0x20000" map="01"/>
+            <part name="3.u3" crc="af6a9122" length="0x20000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin,X,Y,Z" default="A,B,R,Start,Select,X,Y,L"/>
+</misterromdescription>

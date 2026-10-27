@@ -1,0 +1,30 @@
+<!-- Jurassic Park (bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "jparkmb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Jurassic Park (bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>jparkmb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1993</year>
+    <manufacturer>bootleg / Sega</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <rom index="0" zip="jparkmb.zip" md5="None">
+        <part>07 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part name="pic16c57.bin" crc="4101ff42" length="0x1000"/>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="f24.bin" crc="bdd851d2" length="0x80000" map="01"/>
+            <part name="f23.bin" crc="8dc66c71" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="f22.bin" crc="36337d06" length="0x80000" map="01"/>
+            <part name="f21.bin" crc="6ede6b6b" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

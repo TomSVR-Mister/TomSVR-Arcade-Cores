@@ -1,0 +1,34 @@
+<!-- The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "mickeycmb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>The Great Hongyun Shu 1996 (Conny bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>mickeycmb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>bootleg (Conny)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <rom index="0" zip="mickeycmb.zip" md5="None">
+        <part>08 00 8C 80 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="rom6.bin" crc="7baaf248" length="0x80000" map="01"/>
+            <part name="rom3.bin" crc="929b37ab" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom5.bin" crc="12cea2a1" length="0x80000" map="01"/>
+            <part name="rom2.bin" crc="98d40da0" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom4.bin" crc="4e674e04" length="0x80000" map="01"/>
+            <part name="rom1.bin" crc="444c1236" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

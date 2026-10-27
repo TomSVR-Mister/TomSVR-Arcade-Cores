@@ -1,0 +1,35 @@
+<!-- Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "ssf2mdb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Super Street Fighter II - The New Challengers (scrambled bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>ssf2mdb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1994</year>
+    <manufacturer>bootleg / Capcom</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FB,FB">
+        <dip bits="0,2" name="Coinage" ids="-,4C 1C,3C 1C,2C 1C,1C 4C,1C 3C,1C 2C,1C 1C"/>
+        <dip bits="8,10" name="Difficulty" ids="7 (Hardest),6,5,4,3,2,1,0 (Easiest)"/>
+        <dip bits="16,19" name="Speed" ids="-,-,-,-,-,10 (Fastest),9,8,7,6,5,4,3,2,1,0 (Slowest)"/>
+    </switches>
+    <rom index="0" zip="ssf2mdb.zip" md5="None">
+        <part>01 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="rom_a" crc="59726521" length="0x200000" map="01"/>
+            <part name="rom_b" crc="7dad5540" length="0x200000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom_c" crc="deb48624" length="0x80000" map="01"/>
+            <part name="rom_d" crc="b99f6a5b" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin,X,Y,Z" default="A,B,R,Start,Select,X,Y,L"/>
+</misterromdescription>

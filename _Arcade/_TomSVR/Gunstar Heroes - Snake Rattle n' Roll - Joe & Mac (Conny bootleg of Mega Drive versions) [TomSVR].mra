@@ -1,0 +1,35 @@
+<!-- Gunstar Heroes / Snake Rattle n' Roll / Joe &amp; Mac (Conny bootleg of Mega Drive versions) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "3in1mbc"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Gunstar Heroes / Snake Rattle n' Roll / Joe &amp; Mac (Conny bootleg of Mega Drive versions) [TomSVR]</name>
+    <setname>3in1mbc</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1995</year>
+    <manufacturer>bootleg (Conny)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <rom index="0" zip="3in1mbc.zip" md5="None">
+        <part>09 00 88 80 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <part repeat="0x100000">FF</part>
+        <interleave output="16">
+            <part name="rom6.bin" crc="7e333c36" length="0x80000" map="01"/>
+            <part name="rom3.bin" crc="7e3bded6" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom4.bin" crc="6faf99cd" length="0x80000" map="01"/>
+            <part name="rom1.bin" crc="a7d2adb9" length="0x80000" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="rom5.bin" crc="f869f746" length="0x80000" map="01"/>
+            <part name="rom2.bin" crc="de60da62" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

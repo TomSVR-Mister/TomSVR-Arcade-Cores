@@ -1,0 +1,29 @@
+<!-- Side Pocket (Conny bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "sidepmbc"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Side Pocket (Conny bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>sidepmbc</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1995</year>
+    <manufacturer>bootleg (Conny)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="FF,FF,FF">
+        <dip bits="0,1" name="Lives" ids="2,4,3 (duplicate),3"/>
+    </switches>
+    <rom index="0" zip="sidepmbc.zip" md5="None">
+        <part>08 00 8A 80 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="rom1.bin" crc="dcf02dc9" length="0x80000" map="01"/>
+            <part name="rom2.bin" crc="b0b14bf5" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>

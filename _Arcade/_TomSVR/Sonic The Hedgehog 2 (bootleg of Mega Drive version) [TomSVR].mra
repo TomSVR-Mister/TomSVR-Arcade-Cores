@@ -1,0 +1,30 @@
+<!-- Sonic The Hedgehog 2 (bootleg of Mega Drive version) on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards
+     (MAME sega/megadriv_acbl.cpp "sonic2mb"), built on MegaDrive_MiSTer (Nuked-MD by nukeykt, MiSTer port by
+     Alexey Melnikov / Sorgelig). The ROM is assembled from your own MAME zips, unmodified.
+     Requires TomSVR_mdboot.rbf. -->
+<misterromdescription>
+    <name>Sonic The Hedgehog 2 (bootleg of Mega Drive version) [TomSVR]</name>
+    <setname>sonic2mb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1993</year>
+    <manufacturer>bootleg / Sega</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_mdboot</rbf>
+    <joystick>8</joystick>
+    <switches default="E2,FF,FF">
+        <dip bits="0,1" name="Lives" ids="1,2,3,4"/>
+        <dip bits="2,5" name="Timer Speed" ids="15 (Fastest),14,13,12,11,10,9,8,7,6,5,4,3,2,1,0 (Slowest)"/>
+    </switches>
+    <rom index="0" zip="sonic2mb.zip" md5="None">
+        <part>05 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0xFF0">00</part>
+        <part repeat="0x1000">00</part>
+        <part repeat="0xE000">00</part>
+        <interleave output="16">
+            <part name="m2" crc="84b3f758" length="0x80000" map="01"/>
+            <part name="m1" crc="7b40aa24" length="0x80000" map="10"/>
+        </interleave>
+    </rom>
+    <buttons names="A,B,C,Start,Coin" default="A,B,X,Start,Select"/>
+</misterromdescription>
