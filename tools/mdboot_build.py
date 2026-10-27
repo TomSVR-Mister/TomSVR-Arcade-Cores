@@ -176,8 +176,9 @@ def mra(name, st, body):
     else:
         pic = ['        <part repeat="0x1000">00</part>']
     six = flags & 1
-    names = 'A,B,C,Start,Mode,X,Y,Z,Coin' if six else 'A,B,C,Start,-,-,-,-,Coin'
-    dflt_btn = 'A,B,X,Start,Select,L,Y,R,-' if six else 'A,B,X,Start,-,-,-,-,R'
+    # coin = core button 5 (joystick bit 8) on the pad's Select; this tag overrides the core's own J1 names
+    names = 'A,B,C,Start,Coin,X,Y,Z' if six else 'A,B,C,Start,Coin'
+    dflt_btn = 'A,B,X,Start,Select,L,Y,R' if six else 'A,B,X,Start,Select'
     zips = f'{name}.zip' if st['parent'] == '0' else f'{name}.zip|{st["parent"]}.zip'
     out = [
         f'<!-- {title} on TomSVR_mdboot, a personal MiSTer core for the Mega Drive based arcade bootleg boards',
