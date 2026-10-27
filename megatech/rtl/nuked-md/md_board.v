@@ -31,6 +31,7 @@ module md_board
 	input MCLK2,
 	input ext_reset,
 	input reset_button,
+	input ext_nmi, // TomSVR MD bootlegs: Conny boards' coin NMI (68000 IPL level 7)
 	input ext_vres,
 	input ext_zres,
 	
@@ -853,9 +854,9 @@ module md_board
 	assign FC0 = FC_z | FC[0];
 	assign FC1 = FC_z | FC[1];
 	
-	assign IPL[0] = 1'h1;
-	assign IPL[1] = ~ym_IPL1_pull;
-	assign IPL[2] = ~ym_IPL2_pull;
+	assign IPL[0] = ~ext_nmi;
+	assign IPL[1] = ~ym_IPL1_pull & ~ext_nmi;
+	assign IPL[2] = ~ym_IPL2_pull & ~ext_nmi;
 	
 	assign BERR = 1'h1;
 	

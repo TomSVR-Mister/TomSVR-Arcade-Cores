@@ -35,3 +35,5 @@ set_global_assignment -name VERILOG_FILE rtl/jt89/jt89_mixer.v
 set_global_assignment -name VERILOG_FILE rtl/jt89/jt89_noise.v
 set_global_assignment -name VERILOG_FILE rtl/jt89/jt89_tone.v
 set_global_assignment -name VERILOG_FILE rtl/jt89/jt89_vol.v
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/mdb_io.sv
+set_global_assignment -name VERILOG_FILE ../playmark/hdl/jtplaymark_pic.v

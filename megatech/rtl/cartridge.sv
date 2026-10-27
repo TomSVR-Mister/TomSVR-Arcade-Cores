@@ -46,6 +46,7 @@ module cartridge
 
 	input             cart_ms,
 	input       [2:0] cart_slot,     // Mega-Tech: slot the game side runs (BIOS cart select)
+	input       [1:0] mdb_bank,      // MD bootlegs (MDBOOT): Conny 3-in-1 bank of 000000-0fffff (1 MB pages)
 	input      [23:1] cart_addr,
 
 	// Mega-Tech / Mega Play: BIOS reads (SDRAM word address; req toggles, ack follows)
@@ -136,14 +137,26 @@ assign ins_data = ins_lat;
 reg        cart_wr_addr0;
 reg        rom_wr = 0;
 wire       rom_wrack;
+`ifdef MDBOOT
+// MD bootlegs: one game of up to 8 MB (ssf2mdb maps 6 MB linearly), no slots.
+reg [23:1] dl_mask;
+reg [24:1] dl_sz;
+reg [23:1] mask_s[0:0];
+reg [24:1] sz_s[0:0];
+wire [24:1] rom_mask = {1'd0, mask_s[0]};
+wire [25:1] rom_sz   = {1'd0, sz_s[0]};
+`define MDB_WA dl_sz[23:1]
+`else
 reg [20:1] dl_mask;
 reg [21:1] dl_sz;
-reg [24:1] cart_wr_addr;
 reg [20:1] mask_s[0:7];
 reg [21:1] sz_s[0:7];
-reg  [2:0] dl_slot;
 wire [24:1] rom_mask = {4'd0, mask_s[cart_slot]};
 wire [25:1] rom_sz   = {4'd0, sz_s[cart_slot]};
+`define MDB_WA dl_slot, dl_sz[20:1]
+`endif
+reg [24:1] cart_wr_addr;
+reg  [2:0] dl_slot;
 
 always @(posedge clk) begin
 	reg old_dl, old_reset;
@@ -158,8 +171,13 @@ always @(posedge clk) begin
 	end
 	if(cart_dl) dl_slot <= cart_dl_slot;     // cart_dl_slot is 0 again once the download has ended
 	if(old_dl & ~cart_dl) begin
+`ifdef MDBOOT
+		mask_s[0] <= dl_mask;
+		sz_s[0]   <= dl_sz;
+`else
 		mask_s[dl_slot] <= dl_mask;
 		sz_s[dl_slot]   <= dl_sz;
+`endif
 	end
 
 	if (cart_dl & cart_dl_wr & cart_dl_ins) begin
@@ -172,16 +190,21 @@ always @(posedge clk) begin
 		cart_dl_wait <= 1;
 		cart_wr_addr0 <= cart_ms;
 		rom_wr <= ~rom_wr;
+`ifdef MDBOOT
+		cart_wr_addr <= {1'b0, dl_sz[23:1]};
+		dl_mask <= dl_mask | dl_sz[23:1];
+`else
 		cart_wr_addr <= {1'b0, cart_dl_slot, dl_sz[20:1]};
 		dl_mask <= dl_mask | dl_sz[20:1];
+`endif
 		dl_sz <= dl_sz + 1'd1;
 	end
 	else if(rom_wr == rom_wrack) begin
 		if(cart_wr_addr0) begin
 			cart_wr_addr0 <= 0;
 			rom_wr <= ~rom_wr;
-			cart_wr_addr <= {1'b0, dl_slot, dl_sz[20:1]};
-			dl_mask <= dl_mask | dl_sz[20:1];
+			cart_wr_addr <= {1'b0, `MDB_WA};
+			dl_mask <= dl_mask | `MDB_WA;
 			dl_sz <= dl_sz + 1'd1;
 		end
 		else begin
@@ -225,7 +248,12 @@ always @(posedge clk_ram) begin
 	we_old <= rom_we;
 	rd_old <= sdram_rd & rom_data_req;
 	if((~rd_old & sdram_rd & rom_data_req) || (~we_old & rom_we)) begin
+`ifdef MDBOOT
+		// 3-in-1 Conny board: 000000-0fffff is a 1 MB bank of the 4 MB ROM (mdb_bank = 0 on other boards)
+		rom_addr <= {1'b0, {md_cart_addr[23:22], md_cart_addr[21:20] | (|md_cart_addr[23:20] ? 2'd0 : mdb_bank), md_cart_addr[19:1]} & rom_mask[23:1]};
+`else
 		rom_addr <= {1'b0, cart_slot, ((cart_ms ? ms_cart_addr[19:0] : md_cart_addr[20:1]) & rom_mask[20:1])}; // SMS: one byte per word
+`endif
 		rom_req <= ~rom_req;
 		rom_rd <= sdram_rd;
 	end
@@ -335,7 +363,11 @@ always @(posedge clk) begin
 		md_bank_sram <= 0;
 		md_bank_use <= 0;
 	end
+`ifdef MDBOOT
+	else if (1'b0) begin                     // MD bootlegs: no mapper (ssf2mdb: "custom banking is disabled")
+`else
 	else if (cart_lwr && cart_time) begin
+`endif
 		if(rom_mask[24:22]) begin
 			if(cart_addr[3:1]) begin
 				md_bank_use <= 1;
@@ -410,7 +442,11 @@ assign svp_dram_we = 1'b0;
 `endif
 
 // SRAM
+`ifdef MDBOOT
+wire md_sram_cs = 1'b0;                     // MD bootlegs: 200000-3fffff is board I/O (PIC latches), see mdb_io
+`else
 wire md_sram_cs = ~cart_ms && (cart_addr[23:21] == 1) && (md_bank_sram || (cart_addr >= rom_sz && ~&cart_addr[20:19])) && ~noram_quirk;
+`endif
 
 // EEPROM
 wire        md_eeprom_cs   = (eeprom_quirk[3:2] == 2'b01) ? (cart_addr[23:19] == 5'b00111) : (eeprom_quirk[2:0] && ((eeprom_bank & ~cart_addr[20]) || !eeprom_quirk[3]) && cart_addr[23:21] == 3'b001);

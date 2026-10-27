@@ -18,8 +18,11 @@
 //============================================================================
 
 // MEGAPLAY (Quartus project MegaPlay.qsf): the Sega Mega Play core (rtl/mp_bios.sv) from the same source
+// MDBOOT (Quartus project MDBoot.qsf): the Mega Drive arcade bootleg boards (rtl/mdb_io.sv), no BIOS
 `ifndef MEGAPLAY
+`ifndef MDBOOT
 `define MT_SBS   // Mega-Tech side by side output (OSD), see rtl/mt_sbs.sv
+`endif
 `endif
 
 module emu
@@ -81,7 +84,10 @@ video_freak video_freak
 
 `include "build_id.v"
 localparam CONF_STR = {
-`ifdef MEGAPLAY
+`ifdef MDBOOT
+	"MD Arcade Bootlegs;;",
+	"-;",
+`elsif MEGAPLAY
 	"Mega Play;;",
 	"-;",
 `else
@@ -92,7 +98,13 @@ localparam CONF_STR = {
 `ifdef MT_SBS
 	"O[68],Side by Side,Off,On;",
 `endif
-`ifndef MEGAPLAY
+`ifdef MDBOOT
+`elsif MEGAPLAY
+	"P3,Cartridge Slots 2-4;",
+	"P3FC2,MPC,Slot 2;",
+	"P3FC3,MPC,Slot 3;",
+	"P3FC4,MPC,Slot 4;",
+`else
 	"O[69],Menu on VGA (15kHz),Off,On;",
 	"O[65],Coin Sound,Off,On;",
 	"O[66],Time Up Background,Black,Blue;",
@@ -105,15 +117,12 @@ localparam CONF_STR = {
 	"P3FC6,MTC,Slot 6;",
 	"P3FC7,MTC,Slot 7;",
 	"P3FC8,MTC,Slot 8;",
-`else
-	"P3,Cartridge Slots 2-4;",
-	"P3FC2,MPC,Slot 2;",
-	"P3FC3,MPC,Slot 3;",
-	"P3FC4,MPC,Slot 4;",
 `endif
 	"DIP;",
 	"-;",
+`ifndef MDBOOT
 	"O[7:6],Region,JP,US,EU;",
+`endif
 	
 	"-;",
 	"C,Cheats;",
@@ -352,7 +361,18 @@ wire       gun_btn_mode = status[42];
 // the MRA image (the BIOS part is ignored). NVRAM is index 9.
 wire [5:0] mt_idx     = ioctl_index[5:0];
 wire mt_download   = ioctl_download & (ioctl_index == 0);
-`ifdef MEGAPLAY
+`ifdef MDBOOT
+// MD bootlegs: 0x000000 header (byte 0 board family, 1 descramble scheme, 2-3 Conny protection address/value,
+// 4 flags: bit 0 6-button pads, bit 1 US region), 0x001000 PIC16C57 program (2048 little-endian words),
+// 0x010000 the game ROM as MAME's maincpu region (68000 order). The game goes to SDRAM at 0, descrambled on the way
+// (mdb_descramble below), so the MRA assembles the zips unmodified.
+wire mt_slot_dl    = 1'b0;
+wire [2:0] mt_dl_slot = 3'd0;
+wire mt_cart_part  = ioctl_addr >= 25'h010000;
+wire mt_ins_part   = 1'b0;
+localparam MT_HDR  = 25'h1ffffff;     // no Mega-Tech header
+wire [24:0] cart_addr_dl = ioctl_addr - 25'h010000;
+`elsif MEGAPLAY
 // Mega Play: 0x000000 BIOS 128 kB, 0x020000 instruction ROM 32 kB, 0x028000 header, 0x030000 game ROM; the BIOS
 // and the instruction ROM go to SDRAM at 16 MB (the BIOS side reads them through its window), the game to slot 0.
 // Slots 2-4 (OSD "FC2".."FC4"): index n = slot n, a .mpc file with the MRA image layout (the BIOS part is ignored,
@@ -376,6 +396,39 @@ wire cart_download = mt_download | mt_slot_dl;
 wire cart_wr_dl    = ioctl_wr & (mt_cart_part | mt_ins_part);
 wire code_download = ioctl_download & &ioctl_index;
 wire tmss_download = 1'b0;
+
+`ifdef MDBOOT
+// MD bootlegs: header, DIP switches (MRA <switches>, ioctl index 254: bytes DSWA, DSWB, DSWC), PIC program
+reg  [7:0] mdb_family = 0, mdb_scheme = 0, mdb_prot_hi = 0, mdb_prot_val = 0, mdb_flags = 0;
+reg [23:0] mdb_dsw = 24'hffffff;
+always @(posedge clk_sys) begin
+	if (mt_download & ioctl_wr) begin
+		if (ioctl_addr == 25'd0) {mdb_scheme, mdb_family}   <= ioctl_data;
+		if (ioctl_addr == 25'd2) {mdb_prot_val, mdb_prot_hi} <= ioctl_data;
+		if (ioctl_addr == 25'd4) mdb_flags <= ioctl_data[7:0];
+	end
+	if (ioctl_wr && ioctl_index == 8'd254) begin
+		if (ioctl_addr == 25'd0) mdb_dsw[15:0]  <= ioctl_data;
+		if (ioctl_addr == 25'd2) mdb_dsw[23:16] <= ioctl_data[7:0];
+	end
+end
+wire mdb_pic_wr = mt_download & ioctl_wr & (ioctl_addr[24:12] == 13'd1);
+
+// Data descrambling of the Actel boards on the way to SDRAM (mdb_io.sv)
+wire [15:0] mdb_dl_data;
+mdb_descramble mdb_descramble(.scheme(mdb_scheme), .addr(cart_addr_dl[23:0]), .din(ioctl_data), .dout(mdb_dl_data));
+
+wire [15:0] mdb_dout;
+wire        mdb_den, mdb_dtack, mdb_nmi;
+wire  [1:0] mdb_bank;
+wire  [1:0] mdb_exp_coin_n;
+reg   [1:0] mdb_nmi_s;
+always @(posedge clk_md) mdb_nmi_s <= {mdb_nmi_s[0], mdb_nmi};
+wire        mdb_nmi_md = mdb_nmi_s[1];
+`else
+wire  [1:0] mdb_bank = 2'd0;
+wire        mdb_nmi_md = 1'b0;
+`endif
 
 // per slot: present, SMS flag (header byte 0 bit 0)
 reg  [7:0] mt_present = 0, mt_ms = 0;
@@ -539,8 +592,13 @@ end
 
 ///////////////////////////////////////////////////
 
+`ifdef MDBOOT
+wire        PAL = 1'b0;                   // MD bootlegs: NTSC, Japan or US console as MAME's init (header flag)
+wire        JAP = ~mdb_flags[1];
+`else
 wire        PAL = status[7];
 wire        JAP = !status[7:6];
+`endif
 
 wire [23:1] cart_addr;
 wire        cart_cs, cart_oe, cart_lwr, cart_uwr, cart_time, cart_dma;
@@ -567,9 +625,16 @@ wire  [7:0] mdp_volume;
 wire        mdp_volume_request;
 
 // Muxed cart signals: MD+ overlay takes priority when active
+`ifdef MDBOOT
+// MD bootlegs: the board I/O (mdb_io) answers instead of MD+ (whose registers sit inside the bootlegs' ROM space)
+wire [15:0] cart_data    = mdb_den ? mdb_dout : cart_data_rom;
+wire        cart_data_en = mdb_den | cart_data_en_rom;
+wire        cart_dtack   = mdb_dtack | cart_dtack_rom;
+`else
 wire [15:0] cart_data    = mdp_data_en ? mdp_data_out : cart_data_rom;
 wire        cart_data_en = mdp_data_en | cart_data_en_rom;
 wire        cart_dtack   = mdp_dtack   | cart_dtack_rom;
+`endif
 
 wire        vdp_hclk1;
 wire        vdp_de_h;
@@ -630,6 +695,7 @@ md_board md_board
 	.ext_zres(mt_hold_z80), // Mega-Tech: Z80 reset from the BIOS (io2 port D5)
 	.ext_ste(mt_ste_md), // Mega-Tech FLASH = forced shadow (HUD stays bright, as on the cabinet)
 	.reset_button(btn_reset), // edge triggered, requires some activity time to get detected.
+	.ext_nmi(mdb_nmi_md),     // MD bootlegs: Conny boards' coin NMI
 
 	// ram
 	.ram_68k_address(ram_68k_address),
@@ -813,12 +879,17 @@ cartridge cartridge
 	.cart_dl_slot(mt_dl_slot),
 	.cart_dl_ins(mt_ins_part),
 	.cart_dl_addr(cart_addr_dl),
+`ifdef MDBOOT
+	.cart_dl_data(mdb_dl_data),
+`else
 	.cart_dl_data(ioctl_data),
+`endif
 	.cart_dl_wr(cart_wr_dl),
 	.cart_dl_wait(ioctl_wait),
 
 	.cart_ms(cart_ms),
 	.cart_slot(mt_cart_sel),
+	.mdb_bank(mdb_bank),
 	.cart_addr(cart_addr),
 	.ins_wa(mt_ins_wa), .ins_req(mt_ins_req), .ins_ack(mt_ins_ack), .ins_data(mt_ins_data),
 	.cart_data(cart_data_rom),
@@ -1282,7 +1353,53 @@ always @(posedge clk_sys) begin
 end
 wire mt_sel_pulse = |mt_sel_out;
 
-`ifdef MEGAPLAY
+`ifdef MDBOOT
+// MD bootlegs: no BIOS, one game; the board I/O sits on the cartridge bus (mdb_io)
+assign mt_cart_sel = 3'd0;
+assign mt_game_reset = 1'b0;
+assign mt_portd = 8'h30;
+assign mt_porte = 4'b1000;
+assign mt_timeup = 0;
+assign mt_test_on = 0;
+assign {mt_r, mt_g, mt_b, mt_hs, mt_vs, mt_hbl, mt_vbl, mt_ce_pix} = 0;
+assign {mt_t_r, mt_t_g, mt_t_b, mt_t_hs, mt_t_vs, mt_t_hbl, mt_t_vbl} = 0;
+assign mt_tu_px = 0;
+assign mt_snd = 0;
+assign mt_ins_req = 1'b0;
+assign mt_ins_wa = 24'd0;
+assign mt_nv_dout = 16'd0;
+assign mt_nv_chg = 1'b0;
+wire mt_pad_en = 1'b1;
+assign mt_sel_rst = 1'b0;
+assign mt_hold_68k = 1'b0;
+assign mt_hold_z80 = 1'b0;
+
+mdb_io mdb_io
+(
+	.clk(clk_sys),
+	.reset(sys_reset),
+	.family(mdb_family),
+	.prot_hi(mdb_prot_hi),
+	.prot_val(mdb_prot_val),
+	.dsw(mdb_dsw),
+	.coin1(joystick_0[12] | mt_kb[0]),
+	.coin2(joystick_1[12] | mt_kb[1]),
+	.pic_wr(mdb_pic_wr),
+	.pic_wa(ioctl_addr[11:1]),
+	.pic_wd(ioctl_data[11:0]),
+	.addr(cart_addr),
+	.oe(cart_oe),
+	.lwr(cart_lwr),
+	.uwr(cart_uwr),
+	.din(cart_data_wr),
+	.dout(mdb_dout),
+	.den(mdb_den),
+	.dtack(mdb_dtack),
+	.bank(mdb_bank),
+	.nmi(mdb_nmi),
+	.exp_coin_n(mdb_exp_coin_n)
+);
+`elsif MEGAPLAY
 // Mega Play: one BIOS board (mp_bios) next to the game. The game's pads stay connected; the BIOS hands the
 // Start buttons to the game (io1 port D bits 4/5) and talks to the 68000 through I/O port C and the shared RAM IC36.
 reg  [2:0] mp_exp_lo_s1, mp_exp_lo_s2;
@@ -1522,7 +1639,11 @@ md_io md_io
 	.clk(clk_sys),
 	.reset(sys_reset),
 
+`ifdef MDBOOT
+	.MODE(mdb_flags[0]), // MD bootlegs: 6-button pads on the Actel 6-button boards (MAME ctrl1_6button)
+`else
 	.MODE(1'b0),        // Mega-Tech: integrated 3-button pads (MAME ctrl1_3button); some carts misread a 6-button pad
+`endif
 	.SMS(cart_ms),
 	.MULTITAP(cart_ms ? {|status[39:37], 1'b0} : status[38:37]),
 
@@ -1690,7 +1811,9 @@ wire snac_port2 = (status[63:62] == 2);
 assign PB_i = snac_port2 ? SNAC_IN : md_io_port2;
 
 wire snac_port3 = (status[63:62] == 3);
-`ifdef MEGAPLAY
+`ifdef MDBOOT
+assign PC_i = snac_port3 ? SNAC_IN : {PC_d[6:2] | PC_o[6:2], mdb_exp_coin_n & (PC_d[1:0] | PC_o[1:0])};   // coins (MAME "EXP")
+`elsif MEGAPLAY
 assign PC_i = snac_port3 ? SNAC_IN : {mp_exp_hi[6:3], PC_d[2:0] | PC_o[2:0]};   // Mega Play: bits 6-3 from the BIOS
 `else
 assign PC_i = snac_port3 ? SNAC_IN : (PC_d | PC_o);
