@@ -39,7 +39,9 @@ jobs:
           ref: ${{ inputs.ref || 'main' }}
           token: ${{ secrets.PRIVATE_SRC_TOKEN }}
           path: mine
-          sparse-checkout: ${{ inputs.core }}
+          sparse-checkout: |
+            ${{ inputs.core }}/cfg
+            ${{ inputs.core }}/hdl
           persist-credentials: false
 
       - name: Private commit
