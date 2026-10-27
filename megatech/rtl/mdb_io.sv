@@ -90,13 +90,18 @@ end
 assign nmi = |nmi_cnt;
 
 // ---------------------------------------------------------------- PIC16C57 (aladmdb, barek2mb, jparkmb)
-reg  [11:0] pic_rom[0:2047];
-reg  [11:0] pic_q;
+wire [15:0] pic_q16;
+wire [11:0] pic_q = pic_q16[11:0];
 wire [10:0] pic_pa;
-always @(posedge clk) begin
-	if (pic_wr) pic_rom[pic_wa] <= pic_wd;
-	pic_q <= pic_rom[pic_pa];
-end
+dpram #(11,16) pic_rom
+(
+	.clock(clk),
+	.address_a(pic_wr ? pic_wa : pic_pa),
+	.data_a({4'd0, pic_wd}),
+	.wren_a(pic_wr),
+	.byteena_a(2'b11),
+	.q_a(pic_q16)
+);
 
 reg  [5:0] pic_div;
 reg        pic_cen;
@@ -160,14 +165,16 @@ end
 
 // ---------------------------------------------------------------- sonic2mb RAM 200000-2023ff (MAME md_bootleg_map)
 wire       ram_cs = f_son2 && ba >= 24'h200000 && ba < 24'h202400;
-reg [15:0] ram[0:4607];
-reg [15:0] ram_q;
-wire [12:0] ram_a = ba[13:1];
-always @(posedge clk) begin
-	if (ram_cs && uwr) ram[ram_a][15:8] <= din[15:8];
-	if (ram_cs && lwr) ram[ram_a][7:0]  <= din[7:0];
-	ram_q <= ram[ram_a];
-end
+wire [15:0] ram_q;
+dpram #(13,16) ram                       // M10K blocks (an inferred array of this shape ended up in logic)
+(
+	.clock(clk),
+	.address_a(ba[13:1]),
+	.data_a(din),
+	.wren_a(ram_cs & (uwr | lwr)),
+	.byteena_a({uwr, lwr}),
+	.q_a(ram_q)
+);
 
 // ---------------------------------------------------------------- 68000 side
 wire pic_wcs = (f_pica && ba == 24'h220000) || (f_picb && ba == 24'h200000);
