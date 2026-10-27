@@ -33,6 +33,12 @@ for f in sorted(os.listdir(os.path.join(root, MRA_DIR))):
     rbf = re.search(r'<rbf>\s*([^<\s]+)\s*</rbf>', xml).group(1)
     add(f'{MRA_DIR}/{f}', [tag('arcadecores'), tag('mra'), core_tag(rbf)])
 
+# Scripts/ (installed to /media/fat/Scripts): the Mega-Tech / Mega Play cartridge file maker
+SCRIPT_DIR = 'Scripts'
+if os.path.isdir(os.path.join(root, SCRIPT_DIR)):
+    for f in sorted(os.listdir(os.path.join(root, SCRIPT_DIR))):
+        add(f'{SCRIPT_DIR}/{f}', [tag('arcadecores'), tag('scripts'), core_tag('TomSVR_megatech'), core_tag('TomSVR_megaplay')])
+
 db = {
     'db_id': REPO,
     'db_url': f'https://raw.githubusercontent.com/{REPO}/db/db.json.zip',
@@ -40,7 +46,8 @@ db = {
     'files': files,
     'folders': {'_Arcade': {'tags': [tag('arcadecores')]},
                 MRA_DIR: {'tags': [tag('arcadecores'), tag('mra')]},
-                CORE_DIR: {'tags': [tag('arcadecores'), tag('cores')]}},
+                CORE_DIR: {'tags': [tag('arcadecores'), tag('cores')]},
+                **({SCRIPT_DIR: {'tags': [tag('arcadecores'), tag('scripts')]}} if os.path.isdir(os.path.join(root, SCRIPT_DIR)) else {})},
     'tag_dictionary': tags,
     'timestamp': int(time.time()),
     'v': 1,
