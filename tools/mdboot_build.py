@@ -13,6 +13,7 @@ DIP switches: MRA <switches> bytes 0-2 = what the board reads as DSWA, DSWB, DSW
 DSW port).
 """
 import os, re, sys
+from xml.sax.saxutils import escape
 
 MAMEVERSION = '0288'  # set list checked against mamedev master on 2026-10-27
 # set: (family, scheme, prot_hi, prot_val, flags)   flags bit 0 = 6-button pads, bit 1 = US console (init_megadriv)
@@ -37,7 +38,7 @@ BOARDS = {
 # which input port the board reads as switch byte 0/1/2 (family -> port names; sonic2mb: high byte of "DSW")
 DSWPORTS = {1: ['DSWA', 'DSWB', 'DSWC'], 2: ['DSWA', 'DSWB', 'DSWC'], 3: ['DSWA', 'DSWB'], 4: ['DSW'],
             5: ['DSW'], 6: ['DSW'], 7: [], 8: ['DSW'], 9: ['DSW']}
-ROMRE = re.compile(r'(ROM_LOAD16_WORD_SWAP|ROM_LOAD16_BYTE|ROM_LOAD)\s*\((.*?)\)\s*(?://.*)?$', re.M)
+ROMRE = re.compile(r'(ROM_LOAD16_WORD_SWAP|ROM_LOAD16_BYTE|ROM_LOAD|ROM_CONTINUE)\s*\((.*?)\)\s*(?://.*)?$', re.M)
 
 
 def ports(s):
@@ -98,15 +99,20 @@ def parse(src):
         ops, mcu = [], None
         for r in regions:
             rname = re.match(r'[^,]*,\s*"(\w+)"', r).group(1)
+            last = None
             for k, a in ROMRE.findall(r):
                 a = [x.strip() for x in a.split(',')]
-                j = ','.join(a)
-                crc = re.search(r'CRC\((\w+)\)', j)
-                op = dict(kind=k, name=a[0].strip('"'), off=int(a[1], 0), len=int(a[2], 0),
-                          crc=crc.group(1) if crc else None)
+                if k == 'ROM_CONTINUE':        # the next part of the previous file (mk3mdb)
+                    op = dict(last, off=int(a[0], 0), len=int(a[1], 0), foff=last['foff'] + last['len'])
+                else:
+                    j = ','.join(a)
+                    crc = re.search(r'CRC\((\w+)\)', j)
+                    op = dict(kind=k, name=a[0].strip('"'), off=int(a[1], 0), len=int(a[2], 0),
+                              crc=crc.group(1) if crc else None, foff=0)
+                last = op
                 if rname == 'maincpu':
                     ops.append(op)
-                elif rname == 'mcu' and crc:
+                elif rname == 'mcu' and op['crc']:
                     mcu = op
         sets[name] = dict(ops=ops, mcu=mcu, erase_ff='ROMREGION_ERASEFF' in body.split('"maincpu"')[1][:40])
     game = re.compile(r'GAME\(\s*(\d+),\s*(\w+),\s*(\w+),\s*\w+,\s*(\w+),\s*\w+,\s*[\w<>]+,\s*\w+,\s*"([^"]+)",'
@@ -118,8 +124,12 @@ def parse(src):
     return sets, ports(s)
 
 
-def P(op):
-    return f'name="{op["name"]}" crc="{op["crc"]}"'
+def P(op, full=False):
+    """part attributes; a part of a file (ROM_CONTINUE, or a file longer than MAME loads) gets offset/length"""
+    t = f'name="{op["name"]}" crc="{op["crc"]}"'
+    if not full:
+        t += (f' offset="0x{op["foff"]:X}"' if op['foff'] else '') + f' length="0x{op["len"]:X}"'
+    return t
 
 
 def game_lines(name, st):
@@ -159,10 +169,10 @@ def mra(name, st, body):
     fam, scheme, phi, pval, flags = BOARDS[name]
     glines, size = game_lines(name, st)
     dl, dflt = dips(body, fam)
-    title = st['title'].replace(' - ', ': ', 1) if False else st['title']
+    title = escape(st['title'])
     hdr = ' '.join(f'{b:02X}' for b in [fam, scheme, phi, pval, flags] + [0] * 11)
     if st['mcu']:
-        pic = [f'        <part {P(st["mcu"])} length="0x1000"/>']
+        pic = [f'        <part {P(dict(st["mcu"], len=0x1000))}/>']
     else:
         pic = ['        <part repeat="0x1000">00</part>']
     six = flags & 1
@@ -180,7 +190,7 @@ def mra(name, st, body):
         '    <rotation>horizontal</rotation>',
         f'    <mameversion>{MAMEVERSION}</mameversion>',
         f'    <year>{st["year"]}</year>',
-        f'    <manufacturer>{st["manufacturer"]}</manufacturer>',
+        f'    <manufacturer>{escape(st["manufacturer"])}</manufacturer>',
         '    <players>2</players>',
         '    <rbf>TomSVR_mdboot</rbf>',
         '    <joystick>8</joystick>',
