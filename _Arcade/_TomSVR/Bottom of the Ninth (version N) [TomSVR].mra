@@ -1,0 +1,77 @@
+<!-- Bottom of the Ninth (version N) on the TomSVR Bottom of the Ninth core (MAME bottom9.cpp, Konami GX891), built on JTFRAME
+     and jotego's Konami chip models. Unofficial, MAME-based. The ROM is assembled from your own MAME zip, unmodified. -->
+<misterromdescription>
+    <name>Bottom of the Ninth (version N) [TomSVR]</name>
+    <setname>bottom9n</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1989</year>
+    <manufacturer>Konami</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_bottom9</rbf>
+    <joystick>8-way</joystick>
+    <region>World</region>
+    <rom index="0" zip="bottom9.zip" md5="f37cabd40c4da052a7feb0ff1e9aae46">
+        <part name="891n03.k17" crc="8b083ff3"/>
+        <part name="891n02.k15" crc="d44d9ed4"/>
+        <part name="891j01.g8" crc="31b0a0a8"/>
+        <part name="891e08a" crc="cef667bf"/>
+        <part name="891e08b" crc="f7c14a7a"/>
+        <part name="891e08c" crc="756b7f3c"/>
+        <part name="891e08d" crc="cd0d7305"/>
+        <part name="891e04a" crc="daebbc74"/>
+        <part name="891e04b" crc="5ffb9ad1"/>
+        <part name="891e04c" crc="2dbbf16b"/>
+        <part name="891e04d" crc="8b0cd2cc"/>
+        <part name="891e07a" crc="b8d8b939"/>
+        <part name="891e07b" crc="83b2f92d"/>
+        <interleave output="32">
+            <part name="891e10c" crc="209b0431" map="0001"/>
+            <part name="891e10a" crc="8020a9e8" map="0010"/>
+            <part name="891e09c" crc="9dcaefbf" map="0100"/>
+            <part name="891e09a" crc="56b0ead9" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="891e10d" crc="16d5fd7a" map="0001"/>
+            <part name="891e10b" crc="30121cc0" map="0010"/>
+            <part name="891e09d" crc="4e1335e6" map="0100"/>
+            <part name="891e09b" crc="b6f914fb" map="1000"/>
+        </interleave>
+        <interleave output="32">
+            <part name="891e06e" crc="0b04db1c" map="1000"/>
+            <part name="891e06a" crc="5ee37327" map="0100"/>
+            <part name="891e05e" crc="b356e729" map="0010"/>
+            <part name="891e05a" crc="bfd5487e" map="0001"/>
+        </interleave>
+        <interleave output="32">
+            <part name="891e06f" crc="f9ada524" map="1000"/>
+            <part name="891e06b" crc="2295dfaa" map="0100"/>
+            <part name="891e05f" crc="ecdd11c5" map="0010"/>
+            <part name="891e05b" crc="aba18d24" map="0001"/>
+        </interleave>
+        <interleave output="32">
+            <part name="891e06g" crc="04abf78f" map="1000"/>
+            <part name="891e06c" crc="dbdb0d55" map="0100"/>
+            <part name="891e05g" crc="c315f9ae" map="0010"/>
+            <part name="891e05c" crc="21fcbc6f" map="0001"/>
+        </interleave>
+        <interleave output="32">
+            <part name="891e06h" crc="5d5ded8c" map="1000"/>
+            <part name="891e06d" crc="f9ecbd71" map="0100"/>
+            <part name="891e05h" crc="b0aba53b" map="0010"/>
+            <part name="891e05d" crc="f6d3f886" map="0001"/>
+        </interleave>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,4c,0f">
+        <dip name="Coin A" bits="0,3" ids="4C/5C,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/7C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="4,7" ids="4C/5C,4C/3C,4C/1C,3C/4C,3C/2C,3C/1C,2C/5C,2C/3C,2C/1C,1C/7C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Play Time" bits="8,10" ids="2:10,2:00,1:50,1:40,1:30,1:20,1:10,1:00"/>
+        <dip name="Bonus Time" bits="11,12" ids="40 sec,30 sec,20 sec,None"/>
+        <dip name="Difficulty" bits="13,14" ids="Very Difficult,Difficult,Normal,Easy"/>
+        <dip name="Demo Sounds" bits="15" ids="On,Off"/>
+        <dip name="Flip Screen" bits="16" ids="On,Off"/>
+        <dip name="Service Mode" bits="18" ids="On,Off"/>
+        <dip name="Fielder Control" bits="19" ids="Auto,Normal"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Unused,Start,Coin,Core credits" default="A,B,-,Start,Select,-" count="3"/>
+</misterromdescription>
