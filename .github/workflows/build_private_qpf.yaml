@@ -5,7 +5,9 @@ name: Build a plain Quartus core from the private repo
 # builds-megatech-<sha7>), with the 40 worst setup paths in logs/worst_paths.txt.
 # Dispatch only. Source comes from the PRIVATE repo (PRIVATE_SRC_TOKEN, read-only), only the <core>/ folder;
 #   gh workflow run build_private_qpf.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f core=nss -f qpf=SNES [-f ref=main] [-f seeds=1,2]
-# rbf + reports land on branch builds-<core>-<private sha7>[-s<seed>].
+# Nothing about the core is published here: the build log stays in the runner (only pass/fail is printed), and the
+# rbf + reports are pushed to the PRIVATE repo, branch builds-<core>-<private sha7>[-s<seed>], with PRIVATE_PUSH_TOKEN
+# (fine-grained token, Contents read/write on TomSVR-Mister/SegaMega-Tech only). Without that secret nothing is kept.
 on:
   workflow_dispatch:
     inputs:
@@ -53,7 +55,7 @@ jobs:
       - name: Keep only the core folder (never docs/)
         run: |
           echo "sha=$(git -C src rev-parse --short=7 HEAD)" >> "$GITHUB_ENV"
-          ls src; test ! -e src/docs
+          test ! -e src/docs
 
       - name: Compile for MiSTer (Quartus Lite in jotego/jtcore20)
         shell: bash
@@ -76,39 +78,22 @@ jobs:
           EOS
           sed -i 's/^          //' src/build.sh
           chmod +x src/build.sh
-          docker run --network host -v "$PWD/src":/src jotego/jtcore20 /src/build.sh 2>&1 | tee build.log
+          docker run --network host -v "$PWD/src":/src jotego/jtcore20 /src/build.sh > build.log 2>&1 && echo "build OK" || { echo "build FAILED"; exit 1; }
 
-      - name: Report resources, timing and errors as annotations
+      - name: Push rbf + reports to the private repo
         if: always()
         shell: bash
+        env:
+          TOKEN: ${{ secrets.PRIVATE_PUSH_TOKEN }}
         run: |
+          [ -n "$TOKEN" ] || { echo "no PRIVATE_PUSH_TOKEN: nothing kept"; exit 0; }
           d=src/${{ inputs.core }}
-          {
-            echo "== errors"; grep -aiE "^error|critical warning" build.log | head -20
-            for f in $(find $d -name '*.fit.summary' | head -1); do echo "== $f"; cat "$f"; done
-            for f in $(find $d -name '*.sta.summary' | head -1); do echo "== $f"; grep -B1 -A2 "Slack" "$f" | head -60; done
-            echo "== end of build.log"; tail -n 40 build.log
-          } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
-          split -l 25 tail.txt part_ || true
-          for f in part_*; do
-            msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' "$f")
-            echo "::notice title=log $f::$msg"
-          done
-
-      - name: Keep the .rbf and reports on branch builds-<core>-<private sha>
-        if: success()
-        shell: bash
-        run: |
-          d=src/${{ inputs.core }}
-          rbf=$(find $d -name '*.rbf' | head -1)
-          [ -n "$rbf" ] || exit 0
-          mkdir pub && cd pub
+          mkdir out && cd out
           git init -q
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
-          cp "../$rbf" .
-          mkdir -p logs
+          rbf=$(find ../$d -name '*.rbf' | head -1); [ -n "$rbf" ] && cp "$rbf" .
+          mkdir -p logs; cp ../build.log logs/ 2>/dev/null || true
           find ../$d -name '*.fit.summary' -o -name '*.sta.summary' -o -name 'worst_paths.txt' | while read f; do cp "$f" logs/; done
-          git add -A && git commit -q -m "build private ${sha} seed ${{ matrix.seed }} (${{ inputs.core }}/${{ inputs.qpf }})"
-          url="https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
-          git push -q -f "$url" HEAD:builds-${{ inputs.core }}-${sha}-s${{ matrix.seed }}
-          if [ "${{ matrix.seed }}" = "1" ]; then git push -q -f "$url" HEAD:builds-${{ inputs.core }}-${sha}; fi
+          git add -A && git commit -q -m "build ${sha} seed ${{ matrix.seed }}"
+          url="https://x-access-token:${TOKEN}@github.com/TomSVR-Mister/SegaMega-Tech.git"
+          git push -q -f "$url" HEAD:builds-${{ inputs.core }}-${sha}-s${{ matrix.seed }} > /dev/null 2>&1 && echo "kept" || echo "push failed"
