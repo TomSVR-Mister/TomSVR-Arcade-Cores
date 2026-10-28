@@ -1,0 +1,64 @@
+params:
+  - { name: PCM1_OFFSET, value: "(`PCM1_START-`JTFRAME_BA1_START) >> 1" }
+  - { name: PCM2_OFFSET, value: "(`PCM2_START-`JTFRAME_BA1_START) >> 1" }
+  - { name: ROZ_OFFSET,  value: "(`ROZ_START-`JTFRAME_BA1_START) >> 1" }
+clocks:
+  clk48:
+    - freq: 24M
+      outputs:
+        - cen24
+        - cen12
+    - freq: 3579545
+      outputs:
+        - cen_fm
+        - cen_fm2
+audio:
+  rsum: 10k
+  channels:
+    # MAME bottom9: both K007232 (channels A and B) to mono at 0.40
+    - {name: pcm1, rsum: 10k, rc: [{ r: 33k, c: 470p }], module: jt007232 }
+    - {name: pcm2, rsum: 10k, rc: [{ r: 33k, c: 470p }], module: jt007232 }
+sdram:
+  banks:
+    - buses:
+        - name: main
+          addr_width: 17
+          data_width: 8
+    - buses:
+        - name: snd
+          addr_width: 15
+          data_width: 8
+        - name: pcm1a
+          addr_width: 18
+          data_width: 8
+          offset: PCM1_OFFSET
+        - name: pcm1b
+          addr_width: 18
+          data_width: 8
+          offset: PCM1_OFFSET
+        - name: pcm2a
+          addr_width: 18
+          data_width: 8
+          offset: PCM2_OFFSET
+        - name: pcm2b
+          addr_width: 18
+          data_width: 8
+          offset: PCM2_OFFSET
+        - name: roz
+          addr_width: 17
+          data_width: 8
+          offset: ROZ_OFFSET
+    - buses:
+        - name: lyrf
+          addr_width: 19
+          data_width: 32
+        - name: lyra
+          addr_width: 19
+          data_width: 32
+        - name: lyrb
+          addr_width: 19
+          data_width: 32
+    - buses:
+        - name: lyro
+          addr_width: 20
+          data_width: 32

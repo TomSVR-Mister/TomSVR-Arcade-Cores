@@ -1,0 +1,146 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+   JTBOTTOM9: Konami Bottom of the Ninth / Main Stadium (GX891), from MAME bottom9.cpp. Built on JTFRAME and
+   jotego's Konami chip models (K052109/K051962 and K051960 from jtaliens, K051316 from jtajax, jt007232) */
+
+module jtbottom9_game(
+    `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
+);
+
+wire        cpu_we, tilesys_cs, objsys_cs, pal_cs, roz_vr, roz_io, roz_cok, rmrd, rst8,
+            irq_n, snd_irq, tile_dtack, video_en, nmi_tick, roz_romrd;
+wire [ 7:0] main_dout, tilesys_dout, objsys_dout, pal_dout, roz_dout, snd_latch, st_main, st_snd;
+wire [15:0] cpu_addr;
+
+assign debug_view = debug_bus[7] ? st_snd : st_main;
+assign dip_flip   = 0;
+
+jtbottom9_main u_main(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cen12      ( cen12         ),
+    .cpu_addr   ( cpu_addr      ),
+    .cpu_dout   ( main_dout     ),
+    .cpu_we     ( cpu_we        ),
+    .rom_addr   ( main_addr     ),
+    .rom_data   ( main_data     ),
+    .rom_cs     ( main_cs       ),
+    .rom_ok     ( main_ok       ),
+    .cab_1p     ( cab_1p[1:0]   ),
+    .coin       ( coin[1:0]     ),
+    .joystick1  ( joystick1     ),
+    .joystick2  ( joystick2     ),
+    .service    ( service       ),
+    .dip_test   ( dip_test      ),
+    .dip_pause  ( dip_pause     ),
+    .dipsw      ( dipsw[19:0]   ),
+    .rst8       ( rst8          ),
+    .irq_n      ( irq_n         ),
+    .tilesys_cs ( tilesys_cs    ),
+    .objsys_cs  ( objsys_cs     ),
+    .pal_cs     ( pal_cs        ),
+    .roz_vr     ( roz_vr        ),
+    .roz_io     ( roz_io        ),
+    .rmrd       ( rmrd          ),
+    .video_en   ( video_en      ),
+    .roz_romrd  ( roz_romrd     ),
+    .tilesys_dout( tilesys_dout ),
+    .tile_dtack ( tile_dtack    ),
+    .objsys_dout( objsys_dout   ),
+    .pal_dout   ( pal_dout      ),
+    .roz_dout   ( roz_dout      ),
+    .roz_ok     ( roz_cok       ),
+    .snd_latch  ( snd_latch     ),
+    .snd_irq    ( snd_irq       ),
+    .debug_bus  ( debug_bus     ),
+    .st_dout    ( st_main       )
+);
+
+jtbottom9_video u_video(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .pxl_cen    ( pxl_cen       ),
+    .pxl2_cen   ( pxl2_cen      ),
+    .cen24      ( cen24         ),
+    .lhbl       ( LHBL          ),
+    .lvbl       ( LVBL          ),
+    .hs         ( HS            ),
+    .vs         ( VS            ),
+    .cpu_addr   ( cpu_addr      ),
+    .cpu_dout   ( main_dout     ),
+    .cpu_we     ( cpu_we        ),
+    .tilesys_cs ( tilesys_cs    ),
+    .objsys_cs  ( objsys_cs     ),
+    .pal_cs     ( pal_cs        ),
+    .roz_vr     ( roz_vr        ),
+    .roz_io     ( roz_io        ),
+    .rmrd       ( rmrd          ),
+    .video_en   ( video_en      ),
+    .roz_romrd  ( roz_romrd     ),
+    .rst8       ( rst8          ),
+    .tilesys_dout( tilesys_dout ),
+    .tile_dtack ( tile_dtack    ),
+    .objsys_dout( objsys_dout   ),
+    .pal_dout   ( pal_dout      ),
+    .roz_dout   ( roz_dout      ),
+    .roz_cok    ( roz_cok       ),
+    .nmi_tick   ( nmi_tick      ),
+    .irq_n      ( irq_n         ),
+    .lyrf_addr  ( lyrf_addr     ),
+    .lyra_addr  ( lyra_addr     ),
+    .lyrb_addr  ( lyrb_addr     ),
+    .lyro_addr  ( lyro_addr     ),
+    .lyrf_cs    ( lyrf_cs       ),
+    .lyra_cs    ( lyra_cs       ),
+    .lyrb_cs    ( lyrb_cs       ),
+    .lyro_cs    ( lyro_cs       ),
+    .lyra_ok    ( lyra_ok       ),
+    .lyro_ok    ( lyro_ok       ),
+    .lyrf_data  ( lyrf_data     ),
+    .lyra_data  ( lyra_data     ),
+    .lyrb_data  ( lyrb_data     ),
+    .lyro_data  ( lyro_data     ),
+    .roz_addr   ( roz_addr      ),
+    .roz_cs     ( roz_cs        ),
+    .roz_rok    ( roz_ok        ),
+    .roz_data   ( roz_data      ),
+    .red        ( red           ),
+    .green      ( green         ),
+    .blue       ( blue          ),
+    .gfx_en     ( gfx_en        ),
+    .debug_bus  ( debug_bus     )
+);
+
+jtbottom9_sound u_sound(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cen_fm     ( cen_fm        ),
+    .nmi_tick   ( nmi_tick      ),
+    .snd_latch  ( snd_latch     ),
+    .snd_irq    ( snd_irq       ),
+    .rom_addr   ( snd_addr      ),
+    .rom_cs     ( snd_cs        ),
+    .rom_data   ( snd_data      ),
+    .rom_ok     ( snd_ok        ),
+    .pcm1a_addr ( pcm1a_addr    ),
+    .pcm1a_dout ( pcm1a_data    ),
+    .pcm1a_cs   ( pcm1a_cs      ),
+    .pcm1a_ok   ( pcm1a_ok      ),
+    .pcm1b_addr ( pcm1b_addr    ),
+    .pcm1b_dout ( pcm1b_data    ),
+    .pcm1b_cs   ( pcm1b_cs      ),
+    .pcm1b_ok   ( pcm1b_ok      ),
+    .pcm2a_addr ( pcm2a_addr    ),
+    .pcm2a_dout ( pcm2a_data    ),
+    .pcm2a_cs   ( pcm2a_cs      ),
+    .pcm2a_ok   ( pcm2a_ok      ),
+    .pcm2b_addr ( pcm2b_addr    ),
+    .pcm2b_dout ( pcm2b_data    ),
+    .pcm2b_cs   ( pcm2b_cs      ),
+    .pcm2b_ok   ( pcm2b_ok      ),
+    .pcm1       ( pcm1          ),
+    .pcm2       ( pcm2          ),
+    .debug_bus  ( debug_bus     ),
+    .st_dout    ( st_snd        )
+);
+
+endmodule

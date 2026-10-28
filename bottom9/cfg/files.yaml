@@ -1,0 +1,25 @@
+bottom9:
+  - get:
+    - "*.v"
+aliens:
+  - get:
+    - jtaliens_scroll.v
+    - jtaliens_obj.v
+    - jt052109.v
+    - jt051962.v
+    - jt051960.v
+jtframe:
+  - get:
+    - jtframe_edge.v
+  - from: video
+    get:
+      - jtframe_vtimer.v
+      - jtframe_obj.yaml
+      - jtframe_linebuf.v
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+      - jtframe_z80wait.v
+      - mc6809i.v
+      - jtframe_sys6809.v
+jt007232:

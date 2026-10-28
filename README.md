@@ -49,6 +49,7 @@ why); the patch is applied in memory by the MRA.
 
 | Core | Games | MAME driver |
 |---|---|---|
+| bottom9 | Bottom of the Ninth (Konami, 1989; versions T and N) and Main Stadium (Konami, 1989; Japan), with the K051316 zoom layer and two K007232 sample chips | bottom9.cpp |
 | chqflag | Chequered Flag (Konami, 1988; steering by joystick or analog stick) | chqflag.cpp |
 | comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Super Miss World, Super Model I/II, WOW New Fantasia, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.). Fantasia (940803 PCB), WOW New Fantasia, Super Model I/II and Super Miss World are also published elsewhere; we added them because in our testing that other core shows visual bugs in these games | expro02.cpp |
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
@@ -97,7 +98,8 @@ used to compare against MAME.
 
 - **Jose Tejada (jotego)**: JTFRAME, jtcores and the chip modules. Three cores are forks of his game cores
   (comad from JTGALS, jpop from JTKIWI, missb from JTBUBL). galpin reuses parts of JTGAIDEN, dynduke the Seibu
-  sound from JTTOKI, and xexex the Konami sprite and sound latch models from JTSIMSON / JTRIDERS.
+  sound from JTTOKI, and xexex the Konami sprite and sound latch models from JTSIMSON / JTRIDERS. bottom9 uses his Konami
+  K052109/K051962/K051960 tile and sprite models (JTALIENS), the K051316 register map (JTAJAX) and jt007232.
 - **Jorge Cwik**: fx68k. **T80** authors: Z80.
 - **Ted Fried (MicroCore Labs)**: MCL86 8088, packaged by Marcus Andrade (openGateware); **Kitune-san**: KF8288.
   Both MIT licensed, used in hotblk.
