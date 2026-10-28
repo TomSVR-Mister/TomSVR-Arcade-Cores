@@ -1,0 +1,46 @@
+<!-- Pipe Dream (Japan) on TomSVR_pipedrm, an unofficial MiSTer core for the Video System Pipe Dream board
+     (MAME vsystem/pipedrm.cpp "pipedrmj"), built on JTFRAME by Jose Tejada (jotego), with the sprite chip and GGA
+     timing from Andrea Bogazzi's jtpspike. The ROM is assembled from your own MAME zip, unmodified. -->
+<misterromdescription>
+    <name>Pipe Dream (Japan) [TomSVR]</name>
+    <setname>pipedrmj</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1990</year>
+    <manufacturer>Video System Co.</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_pipedrm</rbf>
+    <joystick>8</joystick>
+    <region>Japan</region>
+    <rom index="0" zip="pipedrm.zip" md5="None">
+        <part> 00 00 00 00 00 00 00 00</part>
+        <part name="1.u129" crc="dbfac46b"/>
+        <part repeat="0x8000"> FF</part>
+        <part name="2.u110" crc="b7adb99a"/>
+        <part name="u4.u86" crc="497fad4c"/>
+        <part repeat="0x8000"> FF</part>
+        <part name="u3.u99" crc="4800322a"/>
+        <part repeat="0xc0000"> FF</part>
+        <part name="s73" crc="63f4e10c"/>
+        <part name="s72" crc="4e669e97"/>
+        <part name="s71" crc="431485ee"/>
+        <part name="s72" crc="4e669e97"/>
+        <interleave output="16">
+            <part name="a30.u12" crc="50bc5e98" map="01"/>
+            <part name="a29.u2" crc="a240a448" map="10"/>
+        </interleave>
+        <part name="g71.u118" crc="488e2fd1"/>
+        <part name="g72.u83" crc="dc3d14be"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Coin A" bits="0,3" ids="2C/3C,4C/5C,5C/6C,4C/3C,6C/4C,2C/3C,5C/1C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="4,7" ids="2C/3C,4C/5C,5C/6C,4C/3C,6C/4C,2C/3C,5C/1C,4C/1C,3C/1C,2C/1C,1C/6C,1C/5C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Super,Hard,Easy,Normal"/>
+        <dip name="Lives" bits="10,11" ids="4,3,2,1"/>
+        <dip name="Demo Sounds" bits="12" ids="Off,On"/>
+        <dip name="Flip Screen" bits="13" ids="On,Off"/>
+        <dip name="Training Mode" bits="14" ids="Off,On"/>
+        <dip name="Service Mode" bits="15" ids="On,Off"/>
+    </switches>
+    <buttons names="Place,Fast,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
