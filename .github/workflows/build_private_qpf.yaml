@@ -1,8 +1,6 @@
 name: Build a plain Quartus core from the private repo
 
 # Dispatch only: pushing never builds.
-# seeds: one parallel fit per Quartus fitter seed; each lands on builds-megatech-<sha7>-s<seed> (seed 1 also on
-# builds-megatech-<sha7>), with the 40 worst setup paths in logs/worst_paths.txt.
 # Dispatch only. Source comes from the PRIVATE repo (PRIVATE_SRC_TOKEN, read-only), only the <core>/ folder;
 #   gh workflow run build_private_qpf.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f core=nss -f qpf=SNES [-f ref=main] [-f seeds=1,2]
 # Nothing about the core is published here: the build log stays in the runner (only pass/fail is printed), and the
