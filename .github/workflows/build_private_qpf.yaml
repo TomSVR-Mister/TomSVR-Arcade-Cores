@@ -82,7 +82,7 @@ jobs:
         if: always()
         shell: bash
         env:
-          TOKEN: ${{ secrets.PRIVATE_PUSH_TOKEN }}
+          TOKEN: ${{ secrets.PRIVATE_PUSH_TOKEN || secrets.PRIVATE_SRC_TOKEN }}
         run: |
           [ -n "$TOKEN" ] || { echo "no PRIVATE_PUSH_TOKEN: nothing kept"; exit 0; }
           d=src/${{ inputs.core }}
