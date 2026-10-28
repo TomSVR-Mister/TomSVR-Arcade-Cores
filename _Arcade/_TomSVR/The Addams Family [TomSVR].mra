@@ -1,0 +1,37 @@
+<!-- TomSVR NSS core (TomSVR_nss). Game PRG ROM, INST ROM and security PROM from MAME nss_adam.zip, BIOS from nss.zip, OSD font from m50458.zip, all unmodified. -->
+<misterromdescription>
+    <name>The Addams Family [TomSVR]</name>
+    <setname>nss_adam</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1992</year>
+    <manufacturer>Ocean</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_nss</rbf>
+    <joystick>8</joystick>
+    <switches default="00">
+        <dip bits="0" name="Cart DIP 1" ids="Off,On"/>
+        <dip bits="1" name="Cart DIP 2" ids="Off,On"/>
+        <dip bits="2" name="Cart DIP 3" ids="Off,On"/>
+        <dip bits="3" name="Cart DIP 4" ids="Off,On"/>
+        <dip bits="4" name="Cart DIP 5" ids="Off,On"/>
+        <dip bits="5" name="Cart DIP 6" ids="Off,On"/>
+        <dip bits="6" name="Cart DIP 7" ids="Off,On"/>
+        <dip bits="7" name="Cart DIP 8" ids="Off,On"/>
+    </switches>
+    <rom index="0" zip="nss_adam.zip|nss.zip" md5="None">
+        <part>0A 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part repeat="0x1F0">00</part>
+        <part name="addams.ic3" crc="44643930"/>
+        <part name="addams.ic2" crc="6196adcf"/>
+    </rom>
+    <rom index="5" zip="nss_adam.zip|nss.zip|m50458.zip" md5="None">
+        <part name="nss-ic14.02.ic14"/>
+        <part name="addams.ic8" crc="57c7f72c" offset="0x6000" length="0x2000"/>
+        <part name="security.prm" crc="154d10c2"/>
+        <part repeat="0x1FF0">FF</part>
+        <part name="m50458_char.bin" crc="011cc342"/>
+    </rom>
+    <nvram index="9" size="256"/>
+    <buttons names="A,B,X,Y,L,R,Select,Start,Coin,Instructions,Page Up,Page Down,Game 1,Game 2,Game 3,Service,Restart" default="A,B,X,Y,L,R,R2,Start,Select,L2,-,-,-,-,-,-,-"/>
+</misterromdescription>
