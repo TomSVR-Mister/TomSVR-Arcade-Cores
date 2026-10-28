@@ -55,7 +55,7 @@ jobs:
           git remote add origin https://github.com/jotego/jtcores.git
           git fetch -q --depth 1 origin bfced64dad833daa3864e601e9c0e90614c56df8
           git checkout -q FETCH_HEAD
-          git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51 modules/jtkcpu
+          git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51 modules/jtkcpu modules/jt007232
           git -C modules/jt12 submodule update --init
           cp -r ../mine/${{ inputs.core }} cores/${{ inputs.core }}
           # TomSVR menu background instead of the JT logo (jtcore links hdl/*.hex over jtframe's own)
@@ -111,24 +111,15 @@ jobs:
             echo "::notice title=log $f::$msg"
           done
 
-      - name: Upload the core
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jt${{ inputs.core }}-mister
-          path: |
-            jtcores/release
-            jtcores/log
-          if-no-files-found: warn
-          retention-days: 3
-
-      - name: Also keep the .rbf on the 'builds' branch
+      - name: Keep the .rbf in the private repo (nothing is published here)
         if: success()
         shell: bash
+        env:
+          TOKEN: ${{ secrets.PRIVATE_PUSH_TOKEN || secrets.PRIVATE_SRC_TOKEN }}
         run: |
           rbf=$(find jtcores/release -name '*.rbf' | head -1)
           [ -n "$rbf" ] || exit 0
-          mkdir pub && cd pub
+          mkdir out && cd out
           git init -q
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           cp "../$rbf" .
@@ -138,4 +129,5 @@ jobs:
             grep -i "warning\|critical\|slack\|error" "$f" | grep -v "truncated value\|never read" > "logs/$(basename "$f").txt" || true
           done
           git add -A && git commit -q -m "jt${{ inputs.core }} build of private ${{ steps.priv.outputs.sha }}"
-          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:builds-${{ inputs.core }}-${{ steps.priv.outputs.sha }}
+          url="https://x-access-token:${TOKEN}@github.com/TomSVR-Mister/SegaMega-Tech.git"
+          git push -q -f "$url" HEAD:builds-${{ inputs.core }}-${{ steps.priv.outputs.sha }} > /dev/null 2>&1 && echo "kept" || { echo "push failed"; exit 1; }
