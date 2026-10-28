@@ -1,0 +1,1 @@
+Imported from MiSTer-devel/SNES_MiSTer bdcd33c (2026-10-23), GPL-3.0. Base for the TomSVR Nintendo Super System core.

@@ -3,16 +3,17 @@
 30 MiSTer arcade cores and 283 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
-MegaDrive_MiSTer, see below), but they are not part of jtcores and
+MegaDrive_MiSTer and nss on SNES_MiSTer, see below), but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
 naming. If an official or board-verified core for any of these games comes along, use that one instead; this
 project will drop its version.
 
 ## How accurate they are
 
-- Each core except megatech is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295,
+- Each core except megatech and nss is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295,
   jtopl, jt12, jt51, jt5205, jteeprom, jt5911, jt8051), all unchanged. megatech runs the cartridges on
-  **MegaDrive_MiSTer** (Nuked-MD) and adds the Mega-Tech arcade board around it.
+  **MegaDrive_MiSTer** (Nuked-MD) and adds the Mega-Tech arcade board around it. nss runs the games on **SNES_MiSTer** and adds the NSS
+  board (BIOS Z80, security PROM, EEPROM, clock and the M50458 OSD chip) around it.
 - The board logic on top of that (memory maps, video, sprites, how the chips are wired) was written from the
   **MAME drivers**. No PCBs or schematics were used.
 - They were checked by comparing simulation frames against MAME and by playing them on MiSTer hardware. So they
@@ -67,6 +68,7 @@ why); the patch is applied in memory by the MRA.
 | megaplay | Sega Mega Play: all 12 MAME sets (Sonic 1 and 2, Streets of Rage II, Golden Axe II, Gunstar Heroes, Shinobi III, Bio-hazard Battle ...) with the real Mega Play BIOS drawing its screens over the game, and the 4-slot board: up to 4 games on one menu (see [megatech/README_MegaPlay.md](megatech/README_MegaPlay.md)). Built in `megatech/` (MegaPlay.qpf) | megaplay.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
+| nss | Nintendo Super System: 12 MRAs (Super Mario World, F-Zero, Contra III, ActRaiser, Super Tennis, The Addams Family, Lethal Weapon, Robocop 3 ...), one cartridge per MRA, with the real NSS BIOS running the cabinet (attract mode, game menu, credits, time limit) and its on-screen display drawn over the game (see [nss/README_TomSVR.md](nss/README_TomSVR.md)) | nss.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
 | pipedrm | Pipe Dream (Video System, 1990; World, US, Japan and Taiwan sets) and Hatris (Video System, 1990; US, Japan and show version), with the YM2608 sound chip built on jt12. Hatris also needs MAME's `ym2608.zip` (the chip's internal drum samples) | pipedrm.cpp |
@@ -117,6 +119,8 @@ used to compare against MAME.
   jt89 (jotego) is used for the Mega-Tech menu PSG and T80 for its BIOS Z80. megaplay is built from the same
   source (Mega Play board after MAME megaplay.cpp, BSD-3-Clause, David Haywood), and so is mdboot (bootleg boards
   after MAME megadriv_acbl.cpp, BSD-3-Clause, David Haywood, Stephane Humbert).
+- **srg320 and the MiSTer-devel contributors**: [SNES_MiSTer](https://github.com/MiSTer-devel/SNES_MiSTer), GPL-3,
+  the base of nss. **nocash (Martin Korth)**: the fullsnes NSS documentation; **DogP**: his NSS research.
 - **The MAME team**, whose drivers document these boards.
 
 GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,

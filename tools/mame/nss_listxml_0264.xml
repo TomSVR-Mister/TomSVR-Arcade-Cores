@@ -1,0 +1,1243 @@
+<mame><machine name="nss" sourcefile="nintendo/nss.cpp" isbios="yes" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Nintendo Super System BIOS</description>
+		<year>199?</year>
+		<manufacturer>Nintendo</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="good" emulation="good" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+	</machine>
+	<machine name="nss_actr" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Act Raiser (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Enix</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="act-rais.ic3" size="524288" crc="c9f788c2" sha1="fba2331fd5bcbe51d74115528fd3a9becf072e8d" region="user3" offset="0" status="good" optional="no" />
+		<rom name="act-rais.ic2" size="524288" crc="4df9cc63" sha1="3e98d9693d60d125a1257ba79701f27bda688261" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="act-rais.ic8" size="32768" crc="08b38ce6" sha1="4cbb7fd28d98ffef0f17747201625883af954e3a" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="4b74ac55" sha1="51ea71b06367b4956a4b737385e2d4d15bd43980" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_adam" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>The Addams Family (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Ocean</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="addams.ic3" size="524288" crc="44643930" sha1="a45204b2eb13c6befca30d130061b5b8ba054270" region="user3" offset="0" status="good" optional="no" />
+		<rom name="addams.ic2" size="524288" crc="6196adcf" sha1="a450f278a37d5822f607aa3631831a461e8b147e" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="addams.ic8" size="32768" crc="57c7f72c" sha1="2e3642b4b5438f6c535d6d1eb668e1663062cf78" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="154d10c2" sha1="6829e149c341b753ee9bc72055c0634db4e81884" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_aten" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>David Crane's Amazing Tennis (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Absolute Entertainment Inc.</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="amtennis.ic3" size="524288" crc="aeabaf2a" sha1="b355e0a322b57454e767785a49c14d4c7f492488" region="user3" offset="0" status="good" optional="no" />
+		<rom name="amtennis.ic2" size="524288" crc="7738c5f2" sha1="eb0089e9724c7b3834d9f6c47b92f5a1bb26fc77" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="amtennis.ic8" size="32768" crc="d2cd3926" sha1="49fc253b1b9497ef1374c7db0bd72c163ffb07e7" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="3e640fa2" sha1="ac530610a9d4979f070d5f57dfd4886c530aa20f" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_con3" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Contra 3: The Alien Wars (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Konami</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="contra3.ic3" size="524288" crc="33b03501" sha1="c7f4835d5ec4983e487b00f0b4c49fede2f03b9c" region="user3" offset="0" status="good" optional="no" />
+		<rom name="contra3.ic2" size="524288" crc="2f3e3b5b" sha1="0186b92f022701f6ae29984252e6d346acf6550b" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="contra3.ic8" size="32768" crc="0fbfa23b" sha1="e7a1a78a58c64297e7b9623350ec57aed8035a4f" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="e97e4b00" sha1="70e8382a93137353f5d0b905db2e9af50c52ce0b" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_fzer" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>F-Zero (Nintendo Super System)</description>
+		<year>1991</year>
+		<manufacturer>Nintendo</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-fz-0.ic2" size="1048576" crc="e9b3cdf1" sha1="ab616eecd292b94ca74c55446bddd23e9dc3e3bb" region="user3" offset="0" status="good" optional="no" />
+		<rom name="fz.ic7" size="32768" crc="48ae570d" sha1="934f9fec47dcf9e49936388968d2db50c69950da" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="9650a7d0" sha1="59d57ab2720cff3a24105a7250560c41def45acc" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_lwep" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Lethal Weapon (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Ocean</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-lw.ic3" size="524288" crc="32564666" sha1="bf371218fa303ce95eab09fb6017a522071dcd7e" region="user3" offset="0" status="good" optional="no" />
+		<rom name="nss-lw.ic2" size="524288" crc="86365042" sha1="f818024c6f858fd2780396b6c83d3a37a97fa08a" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="nss-lw.ic8" size="32768" crc="1acc1d5d" sha1="4c8b100ac5847915aaf3b5bfbcb4f632606c97de" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="e9755c14" sha1="d8dbebf3536dcbd18c50ba11a6b729dc7085f74b" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_ncaa" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>NCAA Basketball (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Sculptured Software Inc.</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="ncaa.ic3" size="524288" crc="ef49ad8c" sha1="4c40f3746b995b53f006434b9ccec06d8fe16e1f" region="user3" offset="0" status="good" optional="no" />
+		<rom name="ncaa.ic2" size="524288" crc="83ef6936" sha1="8e0f38c763861e33684c6ddb742385b0522af78a" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="ncaa.ic8" size="32768" crc="b9fa28d5" sha1="bc538bcff5c19eae4becc6582b5c111d287b76fa" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="a2e9ad5b" sha1="a41f82451fc185f8e989a0d4f38700dc7813bb50" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_rob3" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Robocop 3 (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Ocean</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="robocop3.ic3" size="524288" crc="60916c42" sha1="462d9645210a58bfd5204bd209eae2cdadb4493e" region="user3" offset="0" status="good" optional="no" />
+		<rom name="robocop3.ic2" size="524288" crc="a94e1b56" sha1="7403d70504310ad5949a3b45b4a1e71e7d2bce77" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="robocop3.ic8" size="32768" crc="90d13c51" sha1="6751dab14b7d178350ac333f07dd2c3852e4ae23" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="eb9a75de" sha1="58f028c3f28eb4155215f4e154323e01e0fd4297" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_skin" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Skins Game (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Irem</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="skins.ic3" size="524288" crc="ee1bb84d" sha1="549ad9319e94a5d75cd4af017e63ea93ab407c87" region="user3" offset="0" status="good" optional="no" />
+		<rom name="skins.ic2" size="524288" crc="365fd19e" sha1="f60d7ac39fe83fb98730e73fbef410c90a4ff35b" region="user3" offset="80000" status="good" optional="no" />
+		<rom name="skins.ic8" size="32768" crc="9f33d5ce" sha1="4d279ad3665bd94c7ca9cb2778572bed42c5b298" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="86f8cd1d" sha1="d567d194058568f4ae32b7726e433918b06bca54" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_smas" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Super Mario All-Stars (Nintendo Super System)</description>
+		<year>1993</year>
+		<manufacturer>Nintendo</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-r ic3 4m.ic3" size="1048576" crc="e071405a" sha1="e2a4b849c225a637d1f7481f24d9162da29c4905" status="baddump" region="user3" offset="0" optional="no" />
+		<rom name="nss-r ic3 4m.ic2" size="1048576" crc="a46eed6e" sha1="b9ac1f1d1f8aa5276238a65003c25a3916a4a0c2" status="baddump" region="user3" offset="100000" optional="no" />
+		<rom name="nss-r ic3 4m.ic8" size="32768" crc="bb46c507" sha1="e753043b70541a4298d0af21781ecc2640a4d554" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" status="nodump" region="rp5h01" offset="0" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_smw" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Super Mario World (Nintendo Super System)</description>
+		<year>1991</year>
+		<manufacturer>Nintendo</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-mw-0_prg.ic1" size="524288" crc="c46766f2" sha1="06a6efc246c6fdb83efab1d402d61d2179a84494" region="user3" offset="0" status="good" optional="no" />
+		<rom name="nss-r__ic3__mw.ic3" size="32768" crc="f2c5466e" sha1="e116f01342fcf359498ed8750741c139093b1fb2" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="fd700dca" sha1="6805cefb1856c3498b7a7a049c0d09858afac47c" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_ssoc" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Super Soccer (Nintendo Super System)</description>
+		<year>1992</year>
+		<manufacturer>Human Inc.</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="s-soccer.ic1" size="524288" crc="70b7f50e" sha1="92856118528995e3a0b7d22340d440bef5fd61ac" region="user3" offset="0" status="good" optional="no" />
+		<rom name="s-soccer.ic3" size="32768" crc="c09211c3" sha1="b274a57f93ae0a8774664df3d3615fb7dbecfa2e" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="e41c4204" sha1="529ca7df78ecf154a095dc1b627783c43c817a45" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="nss_sten" sourcefile="nintendo/nss.cpp" romof="nss" isbios="no" isdevice="no" ismechanical="no" runnable="yes">
+		<description>Super Tennis (Nintendo Super System)</description>
+		<year>1991</year>
+		<manufacturer>Nintendo</manufacturer>
+		<biosset name="single" description="Nintendo Super System (Single Cart BIOS)" default="no" />
+		<biosset name="multi" description="Nintendo Super System (Multi Cart BIOS)" default="no" />
+		<biosset name="single3" description="Nintendo Super System (Single Cart BIOS v3, hack?)" default="no" />
+		<rom name="nss-ic14.02.ic14" merge="nss-ic14.02.ic14" bios="single" size="32768" crc="e06cb58f" sha1="62f507e91a2797919a78d627af53f029c7d81477" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-c.ic14" merge="nss-c.ic14" bios="multi" size="32768" crc="a8e202b3" sha1="b7afcfe4f5cf15df53452dc04be81929ced1efb2" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-v3.ic14" merge="nss-v3.ic14" bios="single3" size="32768" crc="ac385b53" sha1="e3942f9d508c3c8074c3c3941376c37ca68b8e54" region="bios" offset="0" status="good" optional="no" />
+		<rom name="nss-st-0.ic1" size="1048576" crc="f131611f" sha1="0797936e1fc9e705cd7e029097fc013a58e69002" region="user3" offset="0" status="good" optional="no" />
+		<rom name="st.ic3" size="32768" crc="8880596e" sha1="ec6d68fc2f51f7d94f496cd72cf898db65324542" region="ibios_rom" offset="0" status="good" optional="no" />
+		<rom name="security.prm" size="16" crc="2fd8475b" sha1="38af97734649b90e0ea74cb1daeaa431e4295eb9" region="rp5h01" offset="0" status="good" optional="no" />
+		<device_ref name="5a22" />
+		<device_ref name="s_smp" />
+		<device_ref name="z80" />
+		<device_ref name="m50458" />
+		<device_ref name="s3520cf" />
+		<device_ref name="rp5h01" />
+		<device_ref name="m6m80011ap" />
+		<device_ref name="speaker" />
+		<device_ref name="speaker" />
+		<device_ref name="s_dsp" />
+		<device_ref name="screen" />
+		<device_ref name="snes_ppu" />
+		<device_ref name="screen" />
+		<chip type="cpu" tag="maincpu" name="Ricoh 5A22" clock="21477272" />
+		<chip type="cpu" tag="soundcpu" name="Nintendo/Sony S-SMP" clock="2048000" />
+		<chip type="cpu" tag="bios" name="Zilog Z80" clock="4000000" />
+		<chip type="audio" tag="lspeaker" name="Speaker" />
+		<chip type="audio" tag="rspeaker" name="Speaker" />
+		<chip type="audio" tag="s_dsp" name="Nintendo/Sony S-DSP" clock="2048000" />
+		<display tag="screen" type="raster" rotate="0" width="512" height="225" refresh="60.098476" pixclock="10738636" htotal="682" hbend="0" hbstart="512" vtotal="262" vbend="0" vbstart="225" flipx="no" />
+		<display tag="osd" type="raster" rotate="0" width="288" height="216" refresh="60.000000" flipx="no" />
+		<sound channels="2" />
+		<input players="2" coins="2" service="no" tilt="no">
+			<control type="joy" player="1" buttons="13" ways="8" reverse="no" />
+			<control type="joy" player="2" buttons="6" ways="8" reverse="no" />
+		</input>
+		<dipswitch name="Difficulty" tag="DSW" mask="3">
+			<dipvalue name="Normal" value="0" default="yes" />
+			<dipvalue name="Hard" value="3" default="no" />
+		</dipswitch>
+		<dipswitch name="Lives" tag="DSW" mask="12">
+			<dipvalue name="2" value="12" default="yes" />
+			<dipvalue name="3" value="8" default="no" />
+			<dipvalue name="4" value="4" default="no" />
+			<dipvalue name="5" value="0" default="no" />
+		</dipswitch>
+		<dipswitch name="Time limit per level?" tag="DSW" mask="48">
+			<dipvalue name="104 sec." value="16" default="no" />
+			<dipvalue name="112 sec." value="32" default="no" />
+			<dipvalue name="120 sec." value="0" default="yes" />
+			<dipvalue name="? sec." value="48" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="64">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="64" default="no" />
+		</dipswitch>
+		<dipswitch name="Unknown" tag="DSW" mask="128">
+			<dipvalue name="Off" value="0" default="yes" />
+			<dipvalue name="On" value="128" default="no" />
+		</dipswitch>
+		<port tag=":DSW">
+		</port>
+		<port tag=":EEPROMIN">
+		</port>
+		<port tag=":EEPROMOUT">
+		</port>
+		<port tag=":FP">
+		</port>
+		<port tag=":RTC">
+		</port>
+		<port tag=":RTC_OSD">
+		</port>
+		<port tag=":SERIAL1_DATA1">
+		</port>
+		<port tag=":SERIAL1_DATA2">
+		</port>
+		<port tag=":SERIAL2_DATA1">
+		</port>
+		<port tag=":SERIAL2_DATA2">
+		</port>
+		<port tag=":SYSTEM">
+		</port>
+		<driver status="preliminary" emulation="preliminary" savestate="unsupported" requiresartwork="no" unofficial="no" nosoundhardware="no" incomplete="no" />
+		<feature type="sound" status="imperfect" />
+	</machine>
+	<machine name="m50458" sourcefile="devices/video/m50458.cpp" isdevice="yes" runnable="no" isbios="no" ismechanical="no">
+		<description>Mitsubishi M50458 OSD</description>
+		<rom name="m50458-001sp" size="4608" crc="444f597d" sha1="96beda6aba3d9f7bb781a3cd0352ed6ae45e2ebe" status="baddump" region="m50458" offset="0" optional="no" />
+		<rom name="m50458_char.bin" size="4608" crc="011cc342" sha1="d5b9f32d6e251b4b25945267d7c68c099bd83e96" status="baddump" region="m50458" offset="0" optional="no" />
+	</machine>
+	</mame>
