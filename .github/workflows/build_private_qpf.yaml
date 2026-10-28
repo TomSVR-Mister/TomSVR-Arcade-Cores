@@ -1,0 +1,114 @@
+name: Build a plain Quartus core from the private repo
+
+# Dispatch only: pushing never builds.
+# seeds: one parallel fit per Quartus fitter seed; each lands on builds-megatech-<sha7>-s<seed> (seed 1 also on
+# builds-megatech-<sha7>), with the 40 worst setup paths in logs/worst_paths.txt.
+# Dispatch only. Source comes from the PRIVATE repo (PRIVATE_SRC_TOKEN, read-only), only the <core>/ folder;
+#   gh workflow run build_private_qpf.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f core=nss -f qpf=SNES [-f ref=main] [-f seeds=1,2]
+# rbf + reports land on branch builds-<core>-<private sha7>[-s<seed>].
+on:
+  workflow_dispatch:
+    inputs:
+      core:
+        description: "core folder in the private repo (e.g. nss)"
+        default: nss
+        required: true
+      qpf:
+        description: "Quartus project name in that folder, without .qpf (e.g. SNES)"
+        default: SNES
+        required: true
+      ref:
+        description: "branch or commit of the private repo"
+        default: main
+        required: false
+      seeds:
+        description: "Comma-separated fitter seeds, one parallel build each (e.g. 1,2,3)"
+        default: "1"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  mister:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: ${{ fromJSON(format('[{0}]', inputs.seeds)) }}
+    steps:
+      - name: Free disk space for the Quartus image
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/checkout@v4
+        with:
+          repository: TomSVR-Mister/SegaMega-Tech
+          ref: ${{ inputs.ref || 'main' }}
+          token: ${{ secrets.PRIVATE_SRC_TOKEN }}
+          path: src
+          sparse-checkout: |
+            ${{ inputs.core }}
+          persist-credentials: false
+
+      - name: Keep only the core folder (never docs/)
+        run: |
+          echo "sha=$(git -C src rev-parse --short=7 HEAD)" >> "$GITHUB_ENV"
+          ls src; test ! -e src/docs
+
+      - name: Compile for MiSTer (Quartus Lite in jotego/jtcore20)
+        shell: bash
+        run: |
+          set -o pipefail
+          cat > src/build.sh <<'EOS'
+          #!/bin/bash
+          set -e
+          # the wrapper in quartus/bin sets the library paths; linux64/quartus_sh alone fails to start
+          Q=$(dirname $(ls -d /opt/intelFPGA*/*/quartus/bin/quartus_sh 2>/dev/null | head -1))
+          echo "quartus at $Q"
+          export PATH=$Q:$PATH
+          cd /src/${{ inputs.core }}
+          P=${{ inputs.qpf }}
+          sed -i 's/^set_global_assignment -name SEED .*/set_global_assignment -name SEED ${{ matrix.seed }}/' $P.qsf
+          grep -n "name SEED" $P.qsf
+          quartus_sh --flow compile $P
+          printf 'project_open %s\ncreate_timing_netlist\nread_sdc\nupdate_timing_netlist\nreport_timing -setup -npaths 40 -detail summary -file worst_paths.txt\nproject_close\n' $P > wp.tcl
+          quartus_sta -t wp.tcl || true
+          EOS
+          sed -i 's/^          //' src/build.sh
+          chmod +x src/build.sh
+          docker run --network host -v "$PWD/src":/src jotego/jtcore20 /src/build.sh 2>&1 | tee build.log
+
+      - name: Report resources, timing and errors as annotations
+        if: always()
+        shell: bash
+        run: |
+          d=src/${{ inputs.core }}
+          {
+            echo "== errors"; grep -aiE "^error|critical warning" build.log | head -20
+            for f in $(find $d -name '*.fit.summary' | head -1); do echo "== $f"; cat "$f"; done
+            for f in $(find $d -name '*.sta.summary' | head -1); do echo "== $f"; grep -B1 -A2 "Slack" "$f" | head -60; done
+            echo "== end of build.log"; tail -n 40 build.log
+          } | sed 's/\x1b\[[0-9;]*m//g' > tail.txt || true
+          split -l 25 tail.txt part_ || true
+          for f in part_*; do
+            msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' "$f")
+            echo "::notice title=log $f::$msg"
+          done
+
+      - name: Keep the .rbf and reports on branch builds-<core>-<private sha>
+        if: success()
+        shell: bash
+        run: |
+          d=src/${{ inputs.core }}
+          rbf=$(find $d -name '*.rbf' | head -1)
+          [ -n "$rbf" ] || exit 0
+          mkdir pub && cd pub
+          git init -q
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          cp "../$rbf" .
+          mkdir -p logs
+          find ../$d -name '*.fit.summary' -o -name '*.sta.summary' -o -name 'worst_paths.txt' | while read f; do cp "$f" logs/; done
+          git add -A && git commit -q -m "build private ${sha} seed ${{ matrix.seed }} (${{ inputs.core }}/${{ inputs.qpf }})"
+          url="https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git"
+          git push -q -f "$url" HEAD:builds-${{ inputs.core }}-${sha}-s${{ matrix.seed }}
+          if [ "${{ matrix.seed }}" = "1" ]; then git push -q -f "$url" HEAD:builds-${{ inputs.core }}-${sha}; fi
