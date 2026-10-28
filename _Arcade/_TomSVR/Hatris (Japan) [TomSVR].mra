@@ -1,0 +1,54 @@
+<!-- Hatris (Japan) on TomSVR_pipedrm, an unofficial MiSTer core for the Video System Pipe Dream / Hatris boards
+     (MAME vsystem/pipedrm.cpp "hatrisj"), built on JTFRAME by Jose Tejada (jotego), with the sprite chip and GGA
+     timing from Andrea Bogazzi's jtpspike. The ROM is assembled from your own MAME zip, unmodified. -->
+<misterromdescription>
+    <name>Hatris (Japan) [TomSVR]</name>
+    <setname>hatrisj</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1990</year>
+    <manufacturer>Video System Co.</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_pipedrm</rbf>
+    <joystick>8</joystick>
+    <region>Japan</region>
+    <rom index="0" zip="hatris.zip|ym2608.zip" md5="None">
+        <part> 01 00 00 00 00 00 00 00</part>
+        <part name="2-ic79.bin" crc="bbcaddbf"/>
+        <part repeat="0x18000"> 00</part>
+        <part name="1.ic81" crc="db25e166"/>
+        <part repeat="0xd8000"> 00</part>
+        <part name="b0.ic56" crc="34f337a4"/>
+        <part repeat="0x20000"> 00</part>
+        <part name="b1.ic73" crc="6351d0ba" offset="0x0" length="0x8000"/>
+        <part repeat="0xb8000"> 00</part>
+        <part name="a0.ic55" crc="7b7bc619"/>
+        <part name="a1.ic60" crc="f74d4168"/>
+        <part repeat="0x140000"> FF</part>
+        <part name="ym2608_adpcm_rom.bin" crc="23c9e0d8" offset="0x0" length="0x1c0"/>
+        <part repeat="0x40"> 80</part>
+        <part name="ym2608_adpcm_rom.bin" crc="23c9e0d8" offset="0x1c0" length="0x280"/>
+        <part repeat="0x80"> 80</part>
+        <part name="ym2608_adpcm_rom.bin" crc="23c9e0d8" offset="0x440" length="0x1740"/>
+        <part repeat="0xc0"> 80</part>
+        <part name="ym2608_adpcm_rom.bin" crc="23c9e0d8" offset="0x1b80" length="0x180"/>
+        <part repeat="0x80"> 80</part>
+        <part name="ym2608_adpcm_rom.bin" crc="23c9e0d8" offset="0x1d00" length="0x280"/>
+        <part repeat="0x80"> 80</part>
+        <part name="ym2608_adpcm_rom.bin" crc="23c9e0d8" offset="0x1f80" length="0x80"/>
+        <part repeat="0x80"> 80</part>
+        <part repeat="0x7dd00"> FF</part>
+        <part name="pc.ic53" crc="07147712"/>
+        <part repeat="0x60000"> FF</part>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="00,00">
+        <dip name="Coin A" bits="0,3" ids="1C/1C,1C/2C,1C/3C,1C/4C,1C/5C,1C/6C,2C/1C,3C/1C,4C/1C,5C/1C,2C/3C,6C/4C,4C/3C,5C/6C,4C/5C,2C/3C"/>
+        <dip name="Coin B" bits="4,7" ids="1C/1C,1C/2C,1C/3C,1C/4C,1C/5C,1C/6C,2C/1C,3C/1C,4C/1C,5C/1C,2C/3C,6C/4C,4C/3C,5C/6C,4C/5C,2C/3C"/>
+        <dip name="Hat Fall Velocity" bits="8,9" ids="Normal,Easy,Hard,Super"/>
+        <dip name="End Line Position" bits="10,11" ids="Normal,Easy,Hard,Super"/>
+        <dip name="Service Mode" bits="12" ids="Off,On"/>
+        <dip name="Flip Screen" bits="13" ids="Off,On"/>
+        <dip name="Demo Sounds" bits="14" ids="On,Off"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Button 3,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
