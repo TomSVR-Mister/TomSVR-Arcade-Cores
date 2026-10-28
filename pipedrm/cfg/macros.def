@@ -1,0 +1,23 @@
+CORENAME=JTPIPEDRM
+
+JTFRAME_COLORW=5
+JTFRAME_WIDTH=352
+JTFRAME_HEIGHT=240
+JTFRAME_RATE=61.31
+JTFRAME_BUTTONS=3
+JTFRAME_CREDITS
+JTFRAME_HEADER=8
+
+# SDRAM layout (download offsets, after the 8-byte header)
+#   bank0 main 000000 (128 kB)  sound 020000 (128 kB)
+#   bank1 gfx1 (background tiles)   bank2 gfx2 (foreground tiles)
+#   bank3 gfx3 (sprites, pipedrm)   ADPCM-A / YM2608 rhythm   ADPCM-B
+SND_START=0x020000
+JTFRAME_BA1_START=0x100000
+JTFRAME_BA2_START=0x200000
+JTFRAME_BA3_START=0x300000
+PCMA_START=0x380000
+PCMB_START=0x400000
+
+[mist|sidi]
+JTFRAME_SKIP

@@ -1,0 +1,79 @@
+params:
+  - { name: SND_OFFSET,  value: "`SND_START>>1" }
+  - { name: PCMA_OFFSET, value: "(`PCMA_START-`JTFRAME_BA3_START)>>1" }
+  - { name: PCMB_OFFSET, value: "(`PCMB_START-`JTFRAME_BA3_START)>>1" }
+
+clocks:
+  clk:
+    - freq: 6000000
+      outputs:
+        - cen_main
+    - freq: 3579545
+      outputs:
+        - cen_snd
+    - freq: 8000000
+      gate: [ pcma, pcmb ]
+      outputs:
+        - fm_cen
+
+audio:
+  rsum: 10k
+  channels:
+    # MAME pipedrm: YM2610 output 0 (SSG) at 0.75, outputs 1/2 (FM+ADPCM L/R) at 0.5 each, mono
+    - { name: fm,  data_width: 16, rsum: 10k }
+    - { name: psg, data_width: 10, rsum: 13.3k, unsigned: true, dcrm: true }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 17, data_width: 8 }
+      - { name: snd,  addr_width: 17, data_width: 8, offset: SND_OFFSET }
+    - buses:
+      - { name: scr0, addr_width: 20, data_width: 32 }
+    - buses:
+      - { name: scr1, addr_width: 20, data_width: 32 }
+    - buses:
+      - { name: obj,  addr_width: 19, data_width: 32 }
+      - { name: pcma, addr_width: 19, data_width: 8, offset: PCMA_OFFSET }
+      - { name: pcmb, addr_width: 19, data_width: 8, offset: PCMB_OFFSET }
+
+bram:
+  # tile maps: one 16 kB block per layer, d000-ffff = colour / code high / code low planes
+  - name: vram0
+    addr_width: 14
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: v0, addr: v0_addr, dout: v0_dout, rw: false }
+  - name: vram1
+    addr_width: 14
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: v1, addr: v1_addr, dout: v1_dout, rw: false }
+  # c000-cfff, even and odd bytes kept apart so the video reads a whole xRGB-555 word
+  - name: pall
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: pl, addr: pl_addr, dout: pl_dout, rw: false }
+  - name: palh
+    addr_width: 11
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: ph, addr: ph_addr, dout: ph_dout, rw: false }
+  # sprite RAM cc00-cfff (the top of palette RAM), a copy written in lockstep for the sprite walker
+  - name: objl
+    addr_width: 9
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: ol, addr: ol_addr, dout: ol_dout, rw: false }
+  - name: objh
+    addr_width: 9
+    data_width: 8
+    rw: true
+    din: cpu_dout
+    dual_port: { name: oh, addr: oh_addr, dout: oh_dout, rw: false }
