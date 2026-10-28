@@ -12,6 +12,9 @@ wire [15:0] cpu_addr;
 wire [ 8:0] scrx0, scry0, scrx1, scry1;
 wire        snd_wr, snd_pending, flip, gga_we, crtc_irq_en;
 reg         hatris = 0;
+`ifdef HATRIS
+initial hatris = 1;    // simulation without a ROM download: the header is not seen
+`endif
 wire [ 1:0] pcen;
 
 assign dip_flip   = flip;

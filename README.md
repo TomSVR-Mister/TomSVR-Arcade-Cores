@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-29 MiSTer arcade cores and 277 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+29 MiSTer arcade cores and 280 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer, see below), but they are not part of jtcores and
@@ -68,7 +68,7 @@ why); the patch is applied in memory by the MRA.
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
-| pipedrm | Pipe Dream (Video System, 1990; World, US, Japan and Taiwan sets). Hatris (same board, YM2608 sound) is not done yet | pipedrm.cpp |
+| pipedrm | Pipe Dream (Video System, 1990; World, US, Japan and Taiwan sets) and Hatris (Video System, 1990; US, Japan and show version), with the YM2608 sound chip built on jt12. Hatris also needs MAME's `ym2608.zip` (the chip's internal drum samples) | pipedrm.cpp |
 | playmark | Big Twin, Excelsior, Hot Mind, Hard Times, Lucky Boom | playmark.cpp |
 | semicom | SemiCom games: Hyper Pacman, Cookie & Bibi 2 and 3, Toppy & Rappy, Puzzle Break, Su Ho Seong, Twinkle, New HyperMan 3-in-1, Ma Cheon Ru, More More / More More Plus, Final Tetris | snowbros.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
@@ -105,7 +105,8 @@ used to compare against MAME.
   ([Arcade-IremM72_MiSTer](https://github.com/MiSTer-devel/Arcade-IremM72_MiSTer)), GPL-2, used in dynduke.
   It is used without asking the author first; if he objects, the dynduke core will be withdrawn.
 - **Andrea Bogazzi**: the Video System sprite chip (VS8904/8905), GGA video timing and YM2610 sound structure in
-  pipedrm, from his jtpspike core (jotego/jtcores, GPL-3).
+  pipedrm, from his jtpspike core (jotego/jtcores, GPL-3). The Hatris YM2608 is built on jotego's jt12 YM2610B; three of
+  its modules are copied and renamed (`pipedrm/hdl/jtpipedrm_opn_top.v`, `_adpcm_drvB.v`, `_adpcmb_cnt.v`).
 - **jlrh**: the Gaelco 2 video pipeline (tilemaps, sprites, palette) and GAE1 sound in gaelco2, from his
   [gaelco-fpga](https://github.com/jlrh/gaelco-fpga) Alligator Hunt core (GPLv3). The CPU, memory and inputs are
   JTFRAME; `gaelco2/ORIGIN.md` lists exactly what comes from where and what was changed.

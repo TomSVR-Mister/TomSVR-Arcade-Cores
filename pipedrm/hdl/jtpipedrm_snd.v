@@ -7,7 +7,8 @@
  *   I/O 04 W bank   16 R sound latch   17 W latch acknowledge   18-1b YM2610
  *   NMI while a latch byte is pending. INT = YM2610 IRQ, plus the "fake CRTC" interrupt MAME raises on this CPU at
  *   every vertical blank once the game has written GGA register 0b (fromance_gga_data_w, HOLD_LINE).
- * Hatris (YM2608) is not wired yet: its port map is 00-03 YM2608, 04 latch, 05 pending / acknowledge, no NMI. */
+ * Hatris (hatris_state::sound_portmap): 00-03 (mirror 08) YM2608 (jtpipedrm_opna), 04 R sound latch, 05 R latch
+ * pending / W acknowledge, no NMI (MAME: the game polls), no ROM bank. */
 module jtpipedrm_snd(
     input                rst,
     input                clk,
@@ -46,10 +47,19 @@ wire        mreq_n, iorq_n, rd_n, wr_n, m1_n, rfsh_n, ym_irq_n;
 wire        mem_acc  = ~mreq_n & rfsh_n;
 wire        io_acc   = ~iorq_n & m1_n;
 wire        ram_cs   = mem_acc & A[15:11]==5'b01111;
-wire        bank_cs  = io_acc & A[7:0]==8'h04;
-wire        latch_rd = io_acc & A[7:0]==8'h16;
-wire        latch_ack= io_acc & A[7:0]==8'h17;
-wire        fm_cs    = io_acc & A[7:2]==6'b0001_10;   // 18-1b
+wire        bank_cs  = io_acc & A[7:0]==8'h04 & ~hatris;
+wire        latch_rd = io_acc & (hatris ? A[7:0]==8'h04 : A[7:0]==8'h16) & ~rd_n;
+wire        pend_rd  = io_acc & hatris & A[7:0]==8'h05 & ~rd_n;
+wire        latch_ack= io_acc & (hatris ? A[7:0]==8'h05 : A[7:0]==8'h17) & ~wr_n;
+wire        fm_cs    = io_acc & ~hatris & A[7:2]==6'b0001_10;   // 18-1b
+wire        opna_cs  = io_acc &  hatris & A[7:4]==4'h0 & ~A[2]; // 00-03, 08-0b
+wire        opna_irq_n, opna_ready;
+wire [ 7:0] opna_dout;
+wire signed [15:0] opna_l, opna_r;
+wire [ 9:0] opna_psg, jt10_psg;
+wire [19:0] opna_aaddr;
+wire [23:0] opna_baddr;
+wire        opna_aroe_n, opna_broe_n;
 wire signed [15:0] fm_l, fm_r;
 wire [19:0] adpcma_addr;
 wire [23:0] adpcmb_addr;
@@ -57,12 +67,13 @@ wire [ 4:0] adpcma_bank;
 wire        adpcma_roe_n, adpcmb_roe_n;
 reg  [ 6:0] busy_cnt;
 reg         fmwr_l;
-wire        fm_wr   = fm_cs & ~wr_n;
+wire        fm_wr   = (fm_cs | opna_cs) & ~wr_n;
 wire        fm_busy = busy_cnt!=0;
 
 assign rom_cs   = mem_acc & ~ram_cs;
 assign rom_addr = A[15] ? { 1'b1, bank, A[14:0] } : { 2'd0, A[14:0] };
-assign fm       = (fm_l>>>1) + (fm_r>>>1);
+assign fm       = hatris ? (opna_l>>>1) + (opna_r>>>1) : (fm_l>>>1) + (fm_r>>>1);
+assign psg      = hatris ? opna_psg : jt10_psg;
 
 always @* begin
     cpu_din = 8'hff;
@@ -70,7 +81,9 @@ always @* begin
         ram_cs:   cpu_din = ram_dout;
         rom_cs:   cpu_din = rom_data;
         latch_rd: cpu_din = snd_latch;
+        pend_rd:  cpu_din = { 7'd0, snd_pending };
         fm_cs:    cpu_din = fm_dout;
+        opna_cs:  cpu_din = opna_dout;
         default:;
     endcase
 end
@@ -83,7 +96,7 @@ always @(posedge clk) begin
         crtc_irq    <= 0;
     end else begin
         if( bank_cs && !wr_n ) bank <= cpu_dout[0];
-        if( latch_ack && !wr_n ) snd_pending <= 0;
+        if( latch_ack ) snd_pending <= 0;
         if( snd_wr ) snd_pending <= 1;      // a main CPU write wins over a simultaneous acknowledge
         if( !lvbl && lvbl_l && crtc_irq_en ) crtc_irq <= 1;
         if( !m1_n && !iorq_n ) crtc_irq <= 0;
@@ -98,7 +111,7 @@ always @(posedge clk) begin
         fmwr_l   <= 0;
     end else begin
         fmwr_l <= fm_wr;
-        if( fmwr_l && !fm_wr && A[1:0]==2'b11 )
+        if( fmwr_l && !fm_wr && (hatris ? A[0] : A[1:0]==2'b11) )
             busy_cnt <= 7'd96;                       // 12 us at 8 MHz
         else if( fm_cen && busy_cnt!=0 )
             busy_cnt <= busy_cnt-7'd1;
@@ -106,12 +119,12 @@ always @(posedge clk) begin
 end
 
 jtframe_z80_devwait u_cpu(
-    .rst_n      ( ~rst      ),
+    .rst_n      ( ~rst & (~hatris | opna_ready) ),
     .clk        ( clk       ),
     .cen        ( cen       ),
     .cpu_cen    (           ),
-    .int_n      ( ym_irq_n & ~crtc_irq ),
-    .nmi_n      ( ~snd_pending ),
+    .int_n      ( (hatris ? opna_irq_n : ym_irq_n) & ~crtc_irq ),
+    .nmi_n      ( ~snd_pending | hatris ),
     .busrq_n    ( 1'b1      ),
     .m1_n       ( m1_n      ),
     .mreq_n     ( mreq_n    ),
@@ -138,10 +151,10 @@ jtframe_ram #(.AW(11)) u_ram(
     .q          ( ram_dout  )
 );
 
-assign pcma_cs   = ~adpcma_roe_n;
-assign pcma_addr = adpcma_addr[18:0];
-assign pcmb_cs   = ~adpcmb_roe_n;
-assign pcmb_addr = adpcmb_addr[18:0];
+assign pcma_cs   = hatris ? ~opna_aroe_n : ~adpcma_roe_n;
+assign pcma_addr = hatris ? opna_aaddr[18:0] : adpcma_addr[18:0];
+assign pcmb_cs   = hatris ? ~opna_broe_n : ~adpcmb_roe_n;
+assign pcmb_addr = hatris ? opna_baddr[18:0] : adpcmb_addr[18:0];
 
 jt10 u_jt10(
     .rst        ( rst       ),
@@ -167,11 +180,33 @@ jt10 u_jt10(
     .psg_C      (           ),
     .fm_left    ( fm_l      ),
     .fm_right   ( fm_r      ),
-    .psg_snd    ( psg       ),
+    .psg_snd    ( jt10_psg  ),
     .snd_right  (           ),
     .snd_left   (           ),
     .snd_sample (           ),
     .ch_enable  ( 6'h3f     )
+);
+jtpipedrm_opna u_opna(
+    .rst          ( rst          ),
+    .clk          ( clk          ),
+    .cen          ( fm_cen       ),
+    .din          ( cpu_dout     ),
+    .addr         ( A[1:0]       ),
+    .cs_n         ( ~opna_cs     ),
+    .wr_n         ( wr_n         ),
+    .dout         ( opna_dout    ),
+    .irq_n        ( opna_irq_n   ),
+    .ready        ( opna_ready   ),
+    .adpcma_addr  ( opna_aaddr   ),
+    .adpcma_bank  (              ),
+    .adpcma_roe_n ( opna_aroe_n  ),
+    .adpcma_data  ( pcma_data    ),
+    .adpcmb_addr  ( opna_baddr   ),
+    .adpcmb_roe_n ( opna_broe_n  ),
+    .adpcmb_data  ( pcmb_data    ),
+    .fm_left      ( opna_l       ),
+    .fm_right     ( opna_r       ),
+    .psg_snd      ( opna_psg     )
 );
 `else
 initial snd_pending = 0;

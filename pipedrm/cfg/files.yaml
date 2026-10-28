@@ -8,6 +8,10 @@ pipedrm:
     - jtpipedrm_gga.v
     - jtpipedrm_obj.v
     - jtpipedrm_objscan.v
+    - jtpipedrm_opna.v
+    - jtpipedrm_opn_top.v
+    - jtpipedrm_adpcm_drvB.v
+    - jtpipedrm_adpcmb_cnt.v
 jtframe:
   - from: cpu
     get:
