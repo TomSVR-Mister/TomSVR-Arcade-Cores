@@ -15,7 +15,7 @@ on:
         required: true
       qpf:
         description: "Quartus project name in that folder, without .qpf (e.g. MyCore)"
-        default: SNES
+        default: ""
         required: true
       ref:
         description: "branch or commit of the private repo"
