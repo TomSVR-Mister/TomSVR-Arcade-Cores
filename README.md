@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-29 MiSTer arcade cores and 280 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+30 MiSTer arcade cores and 283 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer, see below), but they are not part of jtcores and
