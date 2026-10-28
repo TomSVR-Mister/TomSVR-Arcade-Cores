@@ -2,7 +2,7 @@ name: Build a plain Quartus core from the private repo
 
 # Dispatch only: pushing never builds.
 # Dispatch only. Source comes from the PRIVATE repo (PRIVATE_SRC_TOKEN, read-only), only the <core>/ folder;
-#   gh workflow run build_private_qpf.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f core=nss -f qpf=SNES [-f ref=main] [-f seeds=1,2]
+#   gh workflow run build_private_qpf.yaml -R TomSVR-Mister/TomSVR-Arcade-Cores --ref main -f core=<folder> -f qpf=<project> [-f ref=main] [-f seeds=1,2]
 # Nothing about the core is published here: the build log stays in the runner (only pass/fail is printed), and the
 # rbf + reports are pushed to the PRIVATE repo, branch builds-<core>-<private sha7>[-s<seed>], with PRIVATE_PUSH_TOKEN
 # (fine-grained token, Contents read/write on TomSVR-Mister/SegaMega-Tech only). Without that secret nothing is kept.
@@ -10,11 +10,11 @@ on:
   workflow_dispatch:
     inputs:
       core:
-        description: "core folder in the private repo (e.g. nss)"
-        default: nss
+        description: "core folder in the private repo (e.g. x1)"
+        default: x1
         required: true
       qpf:
-        description: "Quartus project name in that folder, without .qpf (e.g. SNES)"
+        description: "Quartus project name in that folder, without .qpf (e.g. MyCore)"
         default: SNES
         required: true
       ref:
