@@ -274,6 +274,7 @@ SNES SNES
 	.ss_regs_sel(SS_DSP_REGS_SEL),
 	.ss_smp_sel(SS_SMP_SEL),
 	.ss_busy(SS_BUSY),
+	.apu_en(DBG_CPU_EN),   // NSS: the BIOS pause (port 01 bit 1) halts the sound CPU too, as MAME
 	.ss_wr(~PAWR_N),
 	.ss_di(SS_DO),
 	.ss_spc_do(SS_SPC_DI),

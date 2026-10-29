@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-32 MiSTer arcade cores and 303 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+32 MiSTer arcade cores and 305 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer and nss on SNES_MiSTer, see below), but they are not part of jtcores and
@@ -69,7 +69,7 @@ why); the patch is applied in memory by the MRA.
 | megaplay | Sega Mega Play: all 12 MAME sets (Sonic 1 and 2, Streets of Rage II, Golden Axe II, Gunstar Heroes, Shinobi III, Bio-hazard Battle ...) with the real Mega Play BIOS drawing its screens over the game, and the 4-slot board: up to 4 games on one menu (see [megatech/README_MegaPlay.md](megatech/README_MegaPlay.md)). Built in `megatech/` (MegaPlay.qpf) | megaplay.cpp |
 | missb | Miss Bubble II, Bubble Pong Pong | missb2.cpp |
 | nmg5 | Multi 5, Search Eye, Puzzle Club, Garogun Seroyang, 7 Ordi, Wonder Stick | nmg5.cpp |
-| nss | Nintendo Super System: 12 MRAs (Super Mario World, F-Zero, Contra III, ActRaiser, Super Tennis, The Addams Family, Lethal Weapon, Robocop 3 ...), one cartridge per MRA, with the real NSS BIOS running the cabinet (attract mode, game menu, credits, time limit) and its on-screen display drawn over the game (see [nss/README_TomSVR.md](nss/README_TomSVR.md)) | nss.cpp |
+| nss | Nintendo Super System: 14 MRAs, one per game (Super Mario World, F-Zero, Contra III, ActRaiser, Super Tennis, The Addams Family, Lethal Weapon, Robocop 3 ...) plus two with all three cartridge slots filled (F-Zero / Super Mario World / Super Tennis, and one with all 12 games where you pick each slot's game in the OSD), with the real NSS BIOS running the cabinet (attract mode, game menu, credits, time limit) and its on-screen display drawn over the game (see [nss/README_TomSVR.md](nss/README_TomSVR.md)) | nss.cpp |
 | othunder | Operation Thunderbolt (light gun: mouse, analog stick or Sinden; the core draws a crosshair) | othunder.cpp |
 | para | Paradise, Target Ball, Torus, Mad Ball, Penky | paradise.cpp |
 | pipedrm | Pipe Dream (Video System, 1990; World, US, Japan and Taiwan sets) and Hatris (Video System, 1990; US, Japan and show version), with the YM2608 sound chip built on jt12. Hatris also needs MAME's `ym2608.zip` (the chip's internal drum samples) | pipedrm.cpp |
