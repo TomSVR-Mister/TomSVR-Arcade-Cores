@@ -1,0 +1,43 @@
+<!-- DJ Boy (Japan, set 1) on the TomSVR DJ Boy / Air Buster core (MAME kaneko/djboy.cpp),
+     built on JTFRAME. Unofficial, MAME-based. The ROM is assembled from your own MAME zip, unmodified. -->
+<misterromdescription>
+    <name>DJ Boy (Japan, set 1) [TomSVR]</name>
+    <setname>djboyj</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1989</year>
+    <manufacturer>Kaneko (Sega license)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_djboy</rbf>
+    <joystick>8-way</joystick>
+    <region>Japan</region>
+    <rom index="0" zip="djboy.zip" md5="None">
+        <part>02 00 00 00 00 00 00 00</part>
+        <part name="djboyj/bs12.4b" crc="0971523e"/>
+        <part name="bs100.4d" crc="081e8af8"/>
+        <part name="djboyj/bs13.5y" crc="5c3f2f96"/>
+        <part name="bs101.6w" crc="a7c85577"/>
+        <part repeat="0x10000">00</part>
+        <part name="bs200.8c" crc="f6c19e51"/>
+        <part name="djboyj/bs-204.5j" crc="510244f0"/>
+        <part repeat="0x20000">00</part>
+        <part name="bs004.1s" crc="2f1392c3"/>
+        <part name="bs005.1u" crc="46b400c4"/>
+        <part name="bs000.1h" crc="be4bf805"/>
+        <part name="bs001.1f" crc="fdf36e6b"/>
+        <part name="bs002.1d" crc="c52fee7f"/>
+        <part name="bs003.1k" crc="ed89acb4" length="0x70000"/>
+        <part name="bs06.1b" crc="22c8aa08"/>
+        <part name="beast.9s" crc="ebe0f5f3"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="00,80">
+        <dip name="Service Mode" bits="2" ids="Off,On"/>
+        <dip name="Coin A" bits="4,5" ids="1C/1C,1C/2C,2C/1C,2C/3C"/>
+        <dip name="Coin B" bits="6,7" ids="1C/1C,1C/2C,2C/1C,2C/3C"/>
+        <dip name="Difficulty" bits="8,9" ids="Normal,Easy,Hard,Hardest"/>
+        <dip name="Bonus Levels (in thousands)" bits="10,11" ids="10/30/50/70/90,10 to 90 every 10,20/50,None"/>
+        <dip name="Lives" bits="12,13" ids="5,3,7,9"/>
+        <dip name="Demo Sounds" bits="14" ids="On,Off"/>
+    </switches>
+    <buttons names="Punch,Kick,Jump,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

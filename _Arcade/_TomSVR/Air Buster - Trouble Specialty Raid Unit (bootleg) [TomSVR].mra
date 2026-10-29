@@ -1,0 +1,49 @@
+<!-- Air Buster: Trouble Specialty Raid Unit (bootleg) on the TomSVR DJ Boy / Air Buster core (MAME kaneko/airbustr.cpp),
+     built on JTFRAME. Unofficial, MAME-based. The ROM is assembled from your own MAME zip, unmodified. -->
+<misterromdescription>
+    <name>Air Buster: Trouble Specialty Raid Unit (bootleg) [TomSVR]</name>
+    <setname>airbustrb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1990</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_djboy</rbf>
+    <joystick>8-way</joystick>
+    <region>World</region>
+    <rom index="0" zip="airbustr.zip" md5="None">
+        <part>01 00 00 00 00 00 00 00</part>
+        <part name="airbustrb/5.bin" crc="9e4216a2"/>
+        <part repeat="0x20000">00</part>
+        <part name="airbustrb/1.bin" crc="85464124"/>
+        <part repeat="0x20000">00</part>
+        <part name="pr-21.bin" crc="6e0a5df0"/>
+        <part name="airbustrb/4.bin" crc="21d9bfe3"/>
+        <part name="airbustrb/3.bin" crc="58cd19e2"/>
+        <part repeat="0x20000">00</part>
+        <interleave output="16">
+            <part name="airbustrb/7.bin" crc="2e3bf0a2" map="01"/>
+            <part name="airbustrb/9.bin" crc="2c23c646" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="airbustrb/6.bin" crc="0d6cd470" map="01"/>
+            <part name="airbustrb/8.bin" crc="b3372e51" map="10"/>
+        </interleave>
+        <part repeat="0x80000">00</part>
+        <part name="airbustrb/13.bin" crc="75dee86d"/>
+        <part name="airbustrb/12.bin" crc="c98a8333"/>
+        <part name="airbustrb/11.bin" crc="4e9baebd"/>
+        <part name="airbustrb/10.bin" crc="63dc8cd8"/>
+        <part name="pr-02.bin" crc="6bbd5e46"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Service Mode" bits="2" ids="On,Off"/>
+        <dip name="Coin A" bits="4,5" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="6,7" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Very Difficult,Difficult,Easy,Normal"/>
+        <dip name="Freeze" bits="11" ids="On,Off"/>
+        <dip name="Lives" bits="12,13" ids="7,5,4,3"/>
+        <dip name="Demo Sounds" bits="14" ids="Off,On"/>
+    </switches>
+    <buttons names="Shot,Bomb,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>

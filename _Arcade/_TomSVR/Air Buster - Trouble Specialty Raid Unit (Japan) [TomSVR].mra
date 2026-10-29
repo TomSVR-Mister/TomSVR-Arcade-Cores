@@ -1,0 +1,38 @@
+<!-- Air Buster: Trouble Specialty Raid Unit (Japan) on the TomSVR DJ Boy / Air Buster core (MAME kaneko/airbustr.cpp),
+     built on JTFRAME. Unofficial, MAME-based. The ROM is assembled from your own MAME zip, unmodified. -->
+<misterromdescription>
+    <name>Air Buster: Trouble Specialty Raid Unit (Japan) [TomSVR]</name>
+    <setname>airbustrj</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1990</year>
+    <manufacturer>Kaneko (Namco license)</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_djboy</rbf>
+    <joystick>8-way</joystick>
+    <region>Japan</region>
+    <rom index="0" zip="airbustr.zip" md5="None">
+        <part>05 00 00 00 00 00 00 00</part>
+        <part name="airbustrj/pr-14j.bin" crc="6b9805bd"/>
+        <part repeat="0x20000">00</part>
+        <part name="airbustrb/1.bin" crc="85464124"/>
+        <part repeat="0x20000">00</part>
+        <part name="pr-21.bin" crc="6e0a5df0"/>
+        <part name="pr-200.bin" crc="a4dd3390"/>
+        <part repeat="0x20000">00</part>
+        <part name="pr-000.bin" crc="8ca68f0d"/>
+        <part repeat="0x80000">00</part>
+        <part name="pr-001.bin" crc="7e6cb377"/>
+        <part name="pr-02.bin" crc="6bbd5e46"/>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="ff,ff">
+        <dip name="Service Mode" bits="2" ids="On,Off"/>
+        <dip name="Coin A" bits="4,5" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Coin B" bits="6,7" ids="2C/3C,2C/1C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="8,9" ids="Very Difficult,Difficult,Easy,Normal"/>
+        <dip name="Freeze" bits="11" ids="On,Off"/>
+        <dip name="Lives" bits="12,13" ids="7,5,4,3"/>
+        <dip name="Demo Sounds" bits="14" ids="Off,On"/>
+    </switches>
+    <buttons names="Shot,Bomb,Unused,Start,Coin,Core credits" default="A,B,X,Start,Select,-" count="3"/>
+</misterromdescription>
