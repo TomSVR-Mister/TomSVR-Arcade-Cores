@@ -203,13 +203,19 @@ assign p03 = p03_r;
 assign coin_cnt = cc_r;
 assign slot = p01_r[3:2];
 
-// NMI: pulse on the SNES vblank rising edge while enabled (MAME nss_vblank_irq)
+// NMI: pulse at the END of the SNES vblank while enabled. MAME pulses it at the vblank start, but then the BIOS
+// start-up races: it enables NMI at 02EF, sends the OSD set-up (about 65 lines), waits for a vsync, and only then
+// (031A) loads I, which its NMI handler counts down as a software watchdog (I >= 80h: JP 0). Two NMIs in that
+// window (about 1 start in 4 with the NMI 11 lines before vsync) make I wrap to FFh, and since JP 0 does not
+// clear I, every restart dies the same way: a black screen until a hardware reset. The Z80 /NMI input is
+// falling-edge triggered, so an active-high vblank wired to it fires at the vblank end; there the window never
+// holds two NMIs. (Found with a start-phase sweep of the BIOS in simulation, matching the PCs seen on MiSTer.)
 reg vbl_d;
 reg [3:0] nmi_cnt;
 always @(posedge clk) begin
     vbl_d <= snes_vblank;
     if (reset) begin nmi_n <= 1; nmi_cnt <= 0; end
-    else if (snes_vblank & ~vbl_d & nmi_en) begin nmi_n <= 0; nmi_cnt <= 4'd15; end
+    else if (~snes_vblank & vbl_d & nmi_en) begin nmi_n <= 0; nmi_cnt <= 4'd15; end
     else if (zcen && nmi_cnt != 0) nmi_cnt <= nmi_cnt - 1'd1;
     else if (nmi_cnt == 0) nmi_n <= 1;
 end
@@ -279,6 +285,9 @@ always @(posedge clk) begin
         p01_r <= 8'h00; p03_r <= 0; cc_r <= 0; nmi_en <= 0; wp_en <= 0; joy_flag <= 1; p02_r <= 8'hff;
     end else begin
         if (snes_joy_read) joy_flag <= 0;
+`ifdef SIM_IOLOG
+        if (io_we) $display("IOW %0t %04x %02x pc=%04x nmi=%b", $time, A, zdo, pc_r, nmi_n);
+`endif
         if (io_we) case (A[2:0])
             3'd0: begin nmi_en <= zdo[0]; wp_en <= zdo[2]; end
             3'd1: p01_r <= zdo;

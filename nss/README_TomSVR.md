@@ -70,10 +70,13 @@ MAME zips in `games/mame`: `nss.zip` (BIOS), `m50458.zip` (the OSD chip's charac
 - The SNES cartridge coprocessors (SuperFX, SA-1, ...), MSU-1 and save states of SNES_MiSTer are left out: no NSS
   game uses them, and the board needs the room.
 
-- **Start-up:** the board starts once MiSTer has sent everything (ROMs, DIP switches, saved settings). The BIOS
-  can still hang right after it starts (a timing race in its own start-up code); the core sees that the BIOS
-  never got to the cartridge check and restarts the board, so a game can take a few seconds longer to appear.
-  The OSD option Hardware > Start-up check can turn the retry into an on-screen debug readout instead.
+- **Z80 NMI at the end of vblank:** the NMI source on the board is not documented. MAME fires it at the start of
+  the SNES vblank, but then the BIOS's own start-up hangs about one start in four: it counts NMIs in the Z80 I
+  register as a software watchdog, and two NMIs before it sets I make it restart forever (a black screen until
+  Reset). The Z80's /NMI input reacts to a falling edge, so a vblank signal wired straight to it fires at the
+  vblank end; with that, the BIOS starts every time (checked in simulation for every start position in the frame).
+- **Start-up check:** as a backstop the core restarts the board if the BIOS hasn't reached its cartridge check
+  3 seconds after starting. The OSD option Hardware > Start-up check can show an on-screen debug readout instead.
 
 ## How it was built
 
