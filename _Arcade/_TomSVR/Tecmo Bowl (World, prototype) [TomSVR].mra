@@ -1,0 +1,93 @@
+<!-- Tecmo Bowl (World, prototype) on the TomSVR Tecmo Bowl core (MAME tecmo/tbowl.cpp), built on JTFRAME.
+     Unofficial, MAME-based. The ROM is assembled from your own MAME zip, unmodified.
+     Four players: coin = Select, start = Start, two buttons. OSD "Screens": both monitors side by side, or one. -->
+<misterromdescription>
+    <name>Tecmo Bowl (World, prototype) [TomSVR]</name>
+    <setname>tbowlp</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0264</mameversion>
+    <year>1987</year>
+    <manufacturer>Tecmo</manufacturer>
+    <players>4</players>
+    <rbf>TomSVR_tbowl</rbf>
+    <joystick>8-way</joystick>
+    <region>World</region>
+    <rom index="0" zip="tbowl.zip" md5="None">
+        <part>00 00 00 00 00 00 00 00</part>
+        <part name="4.b11" crc="db8a4f5d"/>
+        <part repeat="0x8000">FF</part>
+        <part name="6206b-5.b13" crc="133c5c11"/>
+        <part name="tbowlp/sub_pro_10-29.h5" crc="1933a3f0"/>
+        <part name="tbowlp/sub_data_10-25.h7" crc="7277c852"/>
+        <part name="tbowlp/6206_sound_10-25.f11" crc="2158472d"/>
+        <part repeat="0x8000">FF</part>
+        <part name="6206a-3.l18" crc="3aa24744"/>
+        <part name="6206a-2.l16" crc="1e9e5936"/>
+        <part repeat="0x10000">FF</part>
+        <interleave output="16">
+            <part name="6206b-9.e6" crc="975ded4c" map="01"/>
+            <part name="6206b-7.e2" crc="d139c397" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-13.l6" crc="4ad72c16" map="01"/>
+            <part name="6206b-11.l2" crc="06bf07bb" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-8.e4" crc="6389c719" map="01"/>
+            <part name="6206b-8.e1" crc="b9615ffa" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-12.l4" crc="7d0030f6" map="01"/>
+            <part name="6206b-10.l1" crc="9b4fa82e" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="14.13l" crc="f9cf60b9" map="01"/>
+            <part name="15.15l" crc="a23f6c53" map="10"/>
+        </interleave>
+        <part repeat="0x70000">FF</part>
+        <interleave output="16">
+            <part name="6206c-23.d16" crc="97fba168" map="01"/>
+            <part name="6206c-19.b16" crc="71795604" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206c-22.d14" crc="cf660ebc" map="01"/>
+            <part name="6206c-18.b14" crc="0684e188" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206c-21.d13" crc="41b2a910" map="01"/>
+            <part name="6206c-17.b13" crc="de16bc10" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="tbowlp/sp_6_10-16.d11" crc="3c5654a9" map="01"/>
+            <part name="tbowlp/sp_7_10-16.b11" crc="807af46a" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-9.e6" crc="975ded4c" map="01"/>
+            <part name="6206b-7.e2" crc="d139c397" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-13.l6" crc="4ad72c16" map="01"/>
+            <part name="6206b-11.l2" crc="06bf07bb" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-8.e4" crc="6389c719" map="01"/>
+            <part name="6206b-8.e1" crc="b9615ffa" map="10"/>
+        </interleave>
+        <interleave output="16">
+            <part name="6206b-12.l4" crc="7d0030f6" map="01"/>
+            <part name="6206b-10.l1" crc="9b4fa82e" map="10"/>
+        </interleave>
+    </rom>
+    <switches page_id="1" page_name="Switches" base="16" default="bf,ff,fb">
+        <dip name="Coinage" bits="0,2" ids="8C/1C,7C/1C,6C/1C,5C/1C,4C/1C,3C/1C,2C/1C,1C/1C"/>
+        <dip name="Time (Players)" bits="3,7" ids="7:00,6:00,5:00,4:30,3:40,3:20,3:00,2:50,2:40,2:30,2:20,2:10,2:00,1:55,1:50,1:45,1:40,1:35,1:25,1:20,1:15,1:10,1:05,1:00,0:55,0:50,0:45,0:40,0:35,0:30,0:25,1:00 (b)"/>
+        <dip name="Difficulty" bits="8,9" ids="Hardest,Hard,Easy,Normal"/>
+        <dip name="Extra Time (Players)" bits="10,11" ids="0:30,0:20,0:10,None"/>
+        <dip name="Timer Speed" bits="12,13" ids="Slowest,Slow,Fast,Normal"/>
+        <dip name="Demo Sounds" bits="14" ids="Off,On"/>
+        <dip name="Hi-Score Reset" bits="15" ids="Off,On"/>
+        <dip name="Time (Quarter)" bits="16,17" ids="8:00,5:00,3:00,4:00"/>
+        <dip name="Bonus Frequency" bits="18,19" ids="Most,More,Normal,Least"/>
+    </switches>
+    <buttons names="Button 1,Button 2,Start,Coin,Core credits" default="A,B,Start,Select,-" count="2"/>
+</misterromdescription>
