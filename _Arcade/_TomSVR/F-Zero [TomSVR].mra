@@ -19,17 +19,33 @@
         <dip bits="6" name="Cart DIP 7" ids="Off,On"/>
         <dip bits="7" name="Cart DIP 8" ids="Off,On"/>
     </switches>
-    <rom index="0" zip="nss_fzer.zip|nss.zip" md5="None">
-        <part>1A 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
-        <part repeat="0x1F0">00</part>
-        <part name="nss-fz-0.ic2" crc="e9b3cdf1"/>
+    <rom index="0" zip="nss_fzer.zip|nss.zip|m50458.zip" md5="None">
+        <part zip="nss_fzer.zip" name="nss-fz-0.ic2" crc="e9b3cdf1"/>
     </rom>
     <rom index="5" zip="nss_fzer.zip|nss.zip|m50458.zip" md5="None">
-        <part name="nss-ic14.02.ic14"/>
-        <part name="fz.ic7" crc="48ae570d" offset="0x6000" length="0x2000"/>
-        <part name="security.prm" crc="9650a7d0"/>
-        <part repeat="0x1FF0">FF</part>
-        <part name="m50458_char.bin" crc="011cc342"/>
+        <part zip="nss.zip" name="nss-ic14.02.ic14" crc="e06cb58f"/>
+        <part zip="m50458.zip" name="m50458_char.bin" crc="011cc342"/>
+        <part repeat="0xE00">00</part>
+        <part>01 04 0A 01 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>04 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="nss_fzer.zip" name="security.prm" crc="9650a7d0"/>
+        <part repeat="0xB0">00</part>
+        <part repeat="0x1E40">00</part>
+        <part zip="nss_fzer.zip" name="fz.ic7" crc="48ae570d" offset="0x6000" length="0x2000"/>
     </rom>
     <nvram index="9" size="256"/>
     <buttons names="A,B,X,Y,L,R,Select,Start,Coin,Instructions,Page Up,Page Down,Game 1,Game 2,Game 3,Service,Restart" default="A,B,X,Y,L,R,R2,Start,Select,L2,-,-,-,-,-,-,-"/>

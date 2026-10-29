@@ -19,18 +19,34 @@
         <dip bits="6" name="Cart DIP 7" ids="Off,On"/>
         <dip bits="7" name="Cart DIP 8" ids="Off,On"/>
     </switches>
-    <rom index="0" zip="nss_skin.zip|nss.zip" md5="None">
-        <part>0A 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
-        <part repeat="0x1F0">00</part>
-        <part name="skins.ic3" crc="ee1bb84d"/>
-        <part name="skins.ic2" crc="365fd19e"/>
+    <rom index="0" zip="nss_skin.zip|nss.zip|m50458.zip" md5="None">
+        <part zip="nss_skin.zip" name="skins.ic3" crc="ee1bb84d"/>
+        <part zip="nss_skin.zip" name="skins.ic2" crc="365fd19e"/>
     </rom>
     <rom index="5" zip="nss_skin.zip|nss.zip|m50458.zip" md5="None">
-        <part name="nss-ic14.02.ic14"/>
-        <part name="skins.ic8" crc="9f33d5ce" offset="0x6000" length="0x2000"/>
-        <part name="security.prm" crc="86f8cd1d"/>
-        <part repeat="0x1FF0">FF</part>
-        <part name="m50458_char.bin" crc="011cc342"/>
+        <part zip="nss.zip" name="nss-ic14.02.ic14" crc="e06cb58f"/>
+        <part zip="m50458.zip" name="m50458_char.bin" crc="011cc342"/>
+        <part repeat="0xE00">00</part>
+        <part>01 08 0A 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>08 FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="nss_skin.zip" name="security.prm" crc="86f8cd1d"/>
+        <part repeat="0xB0">00</part>
+        <part repeat="0x1E40">00</part>
+        <part zip="nss_skin.zip" name="skins.ic8" crc="9f33d5ce" offset="0x6000" length="0x2000"/>
     </rom>
     <nvram index="9" size="256"/>
     <buttons names="A,B,X,Y,L,R,Select,Start,Coin,Instructions,Page Up,Page Down,Game 1,Game 2,Game 3,Service,Restart" default="A,B,X,Y,L,R,R2,Start,Select,L2,-,-,-,-,-,-,-"/>
