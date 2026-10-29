@@ -1,19 +1,20 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-33 MiSTer arcade cores and 309 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+34 MiSTer arcade cores and 324 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
-MegaDrive_MiSTer and nss on SNES_MiSTer, see below), but they are not part of jtcores and
+MegaDrive_MiSTer, nss and snesb on SNES_MiSTer, see below), but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
 naming. If an official or board-verified core for any of these games comes along, use that one instead; this
 project will drop its version.
 
 ## How accurate they are
 
-- Each core except megatech and nss is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295,
+- Each core except megatech, nss and snesb is built on **JTFRAME** and jotego's CPU and sound chip modules (fx68k, T80, jt6295,
   jtopl, jt12, jt51, jt5205, jteeprom, jt5911, jt8051), all unchanged. megatech runs the cartridges on
   **MegaDrive_MiSTer** (Nuked-MD) and adds the Mega-Tech arcade board around it. nss runs the games on **SNES_MiSTer** and adds the NSS
-  board (BIOS Z80, security PROM, EEPROM, clock and the M50458 OSD chip) around it.
+  board (BIOS Z80, security PROM, EEPROM, clock and the M50458 OSD chip) around it. snesb runs the bootleg games on
+  **SNES_MiSTer** and adds each bootleg board's ROM descrambling, coin/DIP inputs and protection.
 - The board logic on top of that (memory maps, video, sprites, how the chips are wired) was written from the
   **MAME drivers**. No PCBs or schematics were used.
 - They were checked by comparing simulation frames against MAME and by playing them on MiSTer hardware. So they
@@ -75,6 +76,7 @@ why); the patch is applied in memory by the MRA.
 | pipedrm | Pipe Dream (Video System, 1990; World, US, Japan and Taiwan sets) and Hatris (Video System, 1990; US, Japan and show version), with the YM2608 sound chip built on jt12. Hatris also needs MAME's `ym2608.zip` (the chip's internal drum samples) | pipedrm.cpp |
 | playmark | Big Twin, Excelsior, Hot Mind, Hard Times, Lucky Boom | playmark.cpp |
 | semicom | SemiCom games: Hyper Pacman, Cookie & Bibi 2 and 3, Toppy & Rappy, Puzzle Break, Su Ho Seong, Twinkle, New HyperMan 3-in-1, Ma Cheon Ru, More More / More More Plus, Final Tetris | snowbros.cpp |
+| snesb | SNES arcade bootlegs: 15 MRAs (Killer Instinct, Final Fight 2 and 3, Wild Guns, Gundam Wing - Endless Duel, TMNT Mutant Warriors, Venom & Spider-Man, Sonic Blast Man II, Ghost Chaser Densei, Rushing Beat Shura, Iron, Legend) running on SNES_MiSTer, with each board's ROM scrambling undone while loading and its coin, DIP switch and protection hardware (see [snesb/README_TomSVR.md](snesb/README_TomSVR.md)) | snesb.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix (including the 8031 MCU bootleg), Perestroika Girls | superqix.cpp |
 | tbowl | Tecmo Bowl (Tecmo, 1987; two World sets, prototype and Japan), up to four players on two monitors: shown side by side or one monitor at a time, chosen in the OSD ("Screens") | tbowl.cpp |
@@ -125,7 +127,8 @@ monitors are shown side by side).
   source (Mega Play board after MAME megaplay.cpp, BSD-3-Clause, David Haywood), and so is mdboot (bootleg boards
   after MAME megadriv_acbl.cpp, BSD-3-Clause, David Haywood, Stephane Humbert).
 - **srg320 and the MiSTer-devel contributors**: [SNES_MiSTer](https://github.com/MiSTer-devel/SNES_MiSTer), GPL-3,
-  the base of nss. **nocash (Martin Korth)**: the fullsnes NSS documentation; **DogP**: his NSS research.
+  the base of nss and snesb. **Tomasz Slanina, Peter Ferrie, Stephane Humbert**: MAME snesb.cpp (the bootleg
+  boards' scrambling and protection). **nocash (Martin Korth)**: the fullsnes NSS documentation; **DogP**: his NSS research.
 - **The MAME team**, whose drivers document these boards.
 
 GPL-3.0-or-later (see `LICENSE`), as required by JTFRAME. The MCL86 and KF8288 files keep their MIT licence,

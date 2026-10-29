@@ -1,0 +1,4 @@
+Imported from MiSTer-devel/SNES_MiSTer bdcd33c (2026-10-23), GPL-3.0. Base for the TomSVR SNES arcade bootleg core
+(MAME nintendo/snesb.cpp, later snesb51.cpp). Changes: rtl/sb_load.sv (ROM descramble while loading), rtl/sb_board.sv
+(board I/O and protection), hooks in SNES.sv and rtl/main.v (marked TomSVR), cartridge coprocessors disabled,
+sys/pll_q20.qip for Quartus 20.1.
