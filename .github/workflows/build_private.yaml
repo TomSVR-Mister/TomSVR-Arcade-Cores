@@ -58,6 +58,8 @@ jobs:
           git submodule update --init modules/fx68k modules/jt6295 modules/jtopl modules/jt5205 modules/jt12 modules/jteeprom modules/jt51 modules/jtkcpu modules/jt007232
           git -C modules/jt12 submodule update --init
           cp -r ../mine/${{ inputs.core }} cores/${{ inputs.core }}
+          # optional JTFRAME changes a core needs (e.g. tc87 aspect ratio), kept next to its config
+          if [ -f cores/${{ inputs.core }}/cfg/jtframe.patch ]; then patch -p1 < cores/${{ inputs.core }}/cfg/jtframe.patch; fi
           # TomSVR menu background instead of the JT logo (jtcore links hdl/*.hex over jtframe's own)
           cp ../pub_mine/logo/logodata.hex ../pub_mine/logo/logomap.hex cores/${{ inputs.core }}/hdl/
 
