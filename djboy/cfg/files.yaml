@@ -1,0 +1,35 @@
+djboy:
+  - get:
+    - jtdjboy_game.v
+    - jtdjboy_main.v
+    - jtdjboy_sub.v
+    - jtdjboy_snd.v
+    - jtdjboy_beast.v
+    - jtdjboy_calc.v
+    - jtdjboy_video.v
+    - jtdjboy_tile.v
+    - jtdjboy_obj.v
+    - jtdjboy_8051_regs.v
+jtframe:
+  - from: cpu
+    get:
+      - jtframe_z80.yaml
+      - jtframe_8751mcu.v
+  - from: ram
+    get:
+      - jtframe_dual_ram.v
+      - jtframe_ram.v
+      - jtframe_ram_rst.v
+# jt8051 without jt8051_regs.v: hdl/jtdjboy_8051_regs.v is a fixed copy
+jt8051:
+  - get:
+      - jt8051.v
+      - jt8051_ctrl.v
+      - jt8051_alu.v
+      - jt8051_periph.v
+      - jt8051_serial.v
+    ucode:
+      src: "8051.yaml"
+      output: "jt8051"
+jt12:
+jt6295:

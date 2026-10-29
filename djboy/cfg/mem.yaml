@@ -1,0 +1,39 @@
+params:
+  - { name: SUB_OFFSET, value: "`SUB_START>>1" }
+  - { name: SND_OFFSET, value: "`SND_START>>1" }
+  - { name: OKI_OFFSET, value: "`OKI_START>>1" }
+
+clocks:
+  clk:
+    - freq: 6000000
+      outputs:
+        - cen6
+        - cen3
+        - cen1p5
+  clk24:
+    - freq: 6000000
+      outputs:
+        - cen_mcu
+        - cen_mcu_nc
+
+audio:
+  rsum: 10k
+  channels:
+    # MAME djboy: YM2203 all outputs 0.40, OKI L/R 0.50 each; airbustr: SSG 0.25 x3, FM 0.50, OKI 0.80
+    - { name: fm,  module: jt03_fm,  rsum: 10k }
+    - { name: psg, module: jt03_psg, rsum: 16k }
+    - { name: pcm, data_width: 14, stereo: true, vpp: 1.0, rout: 100k, rsum: 8k }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 18, data_width: 8 }
+      - { name: sub,  addr_width: 18, data_width: 8, offset: SUB_OFFSET }
+      - { name: snd,  addr_width: 17, data_width: 8, offset: SND_OFFSET }
+      - { name: oki0, addr_width: 18, data_width: 8, offset: OKI_OFFSET }
+      - { name: oki1, addr_width: 18, data_width: 8, offset: OKI_OFFSET }
+    - buses:
+      - { name: scr0, addr_width: 20, data_width: 32 }
+      - { name: scr1, addr_width: 20, data_width: 32 }
+    - buses:
+      - { name: obj,  addr_width: 21, data_width: 32 }

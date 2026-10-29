@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-30 MiSTer arcade cores and 283 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+32 MiSTer arcade cores and 303 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer and nss on SNES_MiSTer, see below), but they are not part of jtcores and
@@ -53,6 +53,7 @@ why); the patch is applied in memory by the MRA.
 | bottom9 | Bottom of the Ninth (Konami, 1989; versions T and N) and Main Stadium (Konami, 1989; Japan), with the K051316 zoom layer and two K007232 sample chips | bottom9.cpp |
 | chqflag | Chequered Flag (Konami, 1988; steering by joystick or analog stick) | chqflag.cpp |
 | comad | Comad Gals Panic clones (Fantasia (940803 PCB), Fantasia II, Fantasy '95, Hot Night, Miss World '96 / 2002, Super Miss World, Super Model I/II, WOW New Fantasia, Zip & Zap, Gals Hustler, Pocket Gals V.I.P.). Fantasia (940803 PCB), WOW New Fantasia, Super Model I/II and Super Miss World are also published elsewhere; we added them because in our testing that other core shows visual bugs in these games | expro02.cpp |
+| djboy | DJ Boy (Kaneko, 1989; World, US and Japan sets) and Air Buster: Trouble Specialty Raid Unit (Kaneko, 1990; World, Japan and bootleg), with the Kaneko Pandora sprite chip, the DJ Boy "BEAST" 80C51 protection MCU and the Air Buster CALC1 chip | djboy.cpp, airbustr.cpp |
 | dynduke | Dynamite Duke, The Double Dynamites | dynduke.cpp |
 | esd | Multi Champ, Multi Champ Deluxe, Head Panic, Deluxe 5, Tang Tang, Jumping Pop | esd16.cpp |
 | funybubl | Funny Bubble | funybubl.cpp |
@@ -102,6 +103,8 @@ used to compare against MAME.
   (comad from JTGALS, jpop from JTKIWI, missb from JTBUBL). galpin reuses parts of JTGAIDEN, dynduke the Seibu
   sound from JTTOKI, and xexex the Konami sprite and sound latch models from JTSIMSON / JTRIDERS. bottom9 uses his Konami
   K052109/K051962/K051960 tile and sprite models (JTALIENS), the K051316 register map (JTAJAX) and jt007232.
+  djboy runs the DJ Boy protection MCU on his jt8051, with one fix of our own in a renamed copy of its register file
+  (`djboy/hdl/jtdjboy_8051_regs.v`: bit instructions such as JBC on the accumulator cleared the whole register).
 - **Jorge Cwik**: fx68k. **T80** authors: Z80.
 - **Ted Fried (MicroCore Labs)**: MCL86 8088, packaged by Marcus Andrade (openGateware); **Kitune-san**: KF8288.
   Both MIT licensed, used in hotblk.
