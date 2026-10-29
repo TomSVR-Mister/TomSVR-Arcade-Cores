@@ -1,0 +1,23 @@
+// Board without the 80186 sound board, for fast runs. From sim/:
+//   vlib work && vlog -mfcu -sv -suppress 2244 +define+SIM_NO_SOUND -f flist_board_nosnd.txt
+//   vsim -c work.leland_board_tb -do "run -all; quit"
+../rtl/tv80/rtl/core/tv80_alu.v
+../rtl/tv80/rtl/core/tv80_reg.v
+../rtl/tv80/rtl/core/tv80_mcode.v
+../rtl/tv80/rtl/core/tv80_core.v
+../rtl/cpu/tv80s_ce.v
+../rtl/mem/sdram_banked.sv
+../rtl/video/leland_vram_port.sv
+../rtl/leland_board_pkg.sv
+../rtl/mem/rom_line_cache.sv
+../rtl/leland_board.sv
+../rtl/cpu/leland_master.sv
+../rtl/cpu/leland_slave.sv
+../rtl/cpu/leland_master_ataxx.sv
+../rtl/cpu/leland_slave_ataxx.sv
+../rtl/video/leland_video.sv
+../rtl/mem/leland_dpram.sv
+../rtl/mem/leland_eeprom_93c46.sv
+../rtl/mem/leland_eeprom_93c56.sv
+mt48lc16m16a2.v
+leland_board_tb.sv

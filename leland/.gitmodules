@@ -1,0 +1,6 @@
+[submodule "rtl/tv80"]
+	path = rtl/tv80
+	url = https://github.com/hutch31/tv80
+[submodule "rtl/jt51"]
+	path = rtl/jt51
+	url = https://github.com/jotego/jt51

@@ -1,0 +1,23 @@
+// Ataxx bring-up bench, no sound board, Verilator (from sim/):
+//   verilator --binary --timing -Wno-fatal -DSIM_NO_SOUND -DRUN_LEN_MS=30 --top-module leland_board_ax_tb -f flist_ax_verilator.txt --Mdir verilator/obj_ax -j 16
+//   ./verilator/obj_ax/Vleland_board_ax_tb
+../rtl/tv80/rtl/core/tv80_alu.v
+../rtl/tv80/rtl/core/tv80_reg.v
+../rtl/tv80/rtl/core/tv80_mcode.v
+../rtl/tv80/rtl/core/tv80_core.v
+../rtl/cpu/tv80s_ce.v
+../rtl/mem/sdram_banked.sv
+../rtl/video/leland_vram_port.sv
+../rtl/leland_board_pkg.sv
+../rtl/mem/rom_line_cache.sv
+../rtl/leland_board.sv
+../rtl/cpu/leland_master.sv
+../rtl/cpu/leland_slave.sv
+../rtl/cpu/leland_master_ataxx.sv
+../rtl/cpu/leland_slave_ataxx.sv
+../rtl/video/leland_video.sv
+../rtl/mem/leland_dpram.sv
+../rtl/mem/leland_eeprom_93c46.sv
+../rtl/mem/leland_eeprom_93c56.sv
+mt48lc16m16a2_vl.v
+hud_diag_tb.sv

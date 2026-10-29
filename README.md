@@ -1,9 +1,9 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-34 MiSTer arcade cores and 324 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+35 MiSTer arcade cores and 335 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
-MegaDrive_MiSTer, nss and snesb on SNES_MiSTer, see below), but they are not part of jtcores and
+MegaDrive_MiSTer, nss and snesb on SNES_MiSTer, leland on the official Leland core, see below), but they are not part of jtcores and
 jotego does not support them. To avoid confusion, the release files carry a `TomSVR` tag rather than jotego's `jt`
 naming. If an official or board-verified core for any of these games comes along, use that one instead; this
 project will drop its version.
@@ -64,6 +64,7 @@ why); the patch is applied in memory by the MRA.
 | hdoll | Honey Doll | snowbros.cpp |
 | hotblk | Hot Blocks - Tetrix II | hotblock.cpp |
 | jpop | Jumping Pop (Nics) | tnzs.cpp |
+| leland | Leland sports pack on the official Leland core: Viper (trackball), John Elway's Team Quarterback, All American Football and Quarterback (up to 4 players, turned upright on HDMI), World Soccer Finals (4 players). 11 MRAs (see [leland/README_TomSVR.md](leland/README_TomSVR.md)) | leland.cpp |
 | madd | Mad Donna, Komo Como | oneshot.cpp |
 | mdboot | Mega Drive arcade bootlegs: all 16 working MAME sets (Aladdin, Bare Knuckle I/II/III, Sonic 2, Jurassic Park, Mortal Kombat 3, Super Street Fighter II, Sunset Riders, Contra, the Gunstar Heroes 3-in-1 ...) with each board's coin, DIP switch and protection hardware (see [megatech/README_MDBoot.md](megatech/README_MDBoot.md)). Built in `megatech/` (MDBoot.qpf) | megadriv_acbl.cpp |
 | megatech | Sega Mega-Tech: 48 MRAs (38 Mega Drive and 10 Master System cartridges: Golden Axe, Streets of Rage, Sonic 1 and 2, The Revenge of Shinobi, Ghouls'n Ghosts, Out Run, Fantasy Zone ...), one cartridge per MRA, with the real Mega-Tech BIOS running the menu screen, coin timer, TIME UP and test menu; both monitors side by side; settings saved. Built from the board's schematics and decoded PAL chips, with timing measured from real cabinet footage (see [megatech/README_TomSVR.md](megatech/README_TomSVR.md)) | megatech.cpp |
@@ -95,7 +96,8 @@ MAME and stays on a blank screen. Reports are welcome as GitHub issues
 ## Building from source
 
 `megatech/` is a standalone Quartus project (`MegaDrive.qpf`, based on MegaDrive_MiSTer); its MRAs come from
-`tools/megatech_build.py`. Every other folder (`esd/`, `para/` ...) is a JTFRAME core. Copy it into `cores/` of
+`tools/megatech_build.py`. `leland/` is a standalone Quartus project too (`Leland.qpf`, a fork of the official Leland core); its MRAs come
+from `tools/leland_build.py`. Every other folder (`esd/`, `para/` ...) is a JTFRAME core. Copy it into `cores/` of
 [jotego/jtcores](https://github.com/jotego/jtcores) at commit `bfced64` and build with jotego's normal flow, or run
 the `build.yaml` GitHub Actions workflow in this repo. `tools/` holds the MRA generators and the simulation helpers
 used to compare against MAME. tbowl also needs its `cfg/jtframe.patch` applied to JTFRAME (it sets the 8:3 aspect ratio when both
@@ -109,6 +111,8 @@ monitors are shown side by side).
   K052109/K051962/K051960 tile and sprite models (JTALIENS), the K051316 register map (JTAJAX) and jt007232.
   djboy runs the DJ Boy protection MCU on his jt8051, with one fix of our own in a renamed copy of its register file
   (`djboy/hdl/jtdjboy_8051_regs.v`: bit instructions such as JBC on the accumulator cleared the whole register).
+- **shimian5**: the official MiSTer Leland core ([Arcade-Leland_MiSTer](https://github.com/MiSTer-devel/Arcade-Leland_MiSTer),
+  GPL-3), which the leland core forks unchanged apart from the added games and screen rotation.
 - **Jorge Cwik**: fx68k. **T80** authors: Z80.
 - **Ted Fried (MicroCore Labs)**: MCL86 8088, packaged by Marcus Andrade (openGateware); **Kitune-san**: KF8288.
   Both MIT licensed, used in hotblk.
