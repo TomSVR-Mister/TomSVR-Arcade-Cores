@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-32 MiSTer arcade cores and 305 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+33 MiSTer arcade cores and 309 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer and nss on SNES_MiSTer, see below), but they are not part of jtcores and
@@ -77,6 +77,7 @@ why); the patch is applied in memory by the MRA.
 | semicom | SemiCom games: Hyper Pacman, Cookie & Bibi 2 and 3, Toppy & Rappy, Puzzle Break, Su Ho Seong, Twinkle, New HyperMan 3-in-1, Ma Cheon Ru, More More / More More Plus, Final Tetris | snowbros.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix (including the 8031 MCU bootleg), Perestroika Girls | superqix.cpp |
+| tbowl | Tecmo Bowl (Tecmo, 1987; two World sets, prototype and Japan), up to four players on two monitors: shown side by side or one monitor at a time, chosen in the OSD ("Screens") | tbowl.cpp |
 | wrally | World Rally (Gaelco, 1993) | wrally.cpp |
 | xexex | Xexex, Orius | xexex.cpp |
 | ys16 | Paparazzi, Shocking, Bomb Kick, Magic Bubble | yunsun16.cpp |
@@ -95,7 +96,8 @@ MAME and stays on a blank screen. Reports are welcome as GitHub issues
 `tools/megatech_build.py`. Every other folder (`esd/`, `para/` ...) is a JTFRAME core. Copy it into `cores/` of
 [jotego/jtcores](https://github.com/jotego/jtcores) at commit `bfced64` and build with jotego's normal flow, or run
 the `build.yaml` GitHub Actions workflow in this repo. `tools/` holds the MRA generators and the simulation helpers
-used to compare against MAME.
+used to compare against MAME. tbowl also needs its `cfg/jtframe.patch` applied to JTFRAME (it sets the 8:3 aspect ratio when both
+monitors are shown side by side).
 
 ## Credits and licence
 

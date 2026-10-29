@@ -1,0 +1,34 @@
+CORENAME=JTTBOWL
+
+# Video: two 256 x 224 monitors (MAME rows 16-239), 384 x 264 per monitor line at 6 MHz (59.2 Hz).
+# The core draws a 512 pixel wide virtual line (left monitor = 0-255, right = 256-511). OSD "Screens":
+#   side by side = 512 x 224 at 12 MHz, left / right monitor = 256 x 224 at 6 MHz. Same line and frame rate.
+# The game module makes pxl_cen / pxl2_cen itself (no JTFRAME_PXLCLK).
+JTFRAME_COLORW=4
+JTFRAME_WIDTH=512
+JTFRAME_HEIGHT=224
+JTFRAME_BUTTONS=2
+JTFRAME_HEADER=8
+JTFRAME_CREDITS
+# aspect ratio follows the Screens option (needs cfg/jtframe_dip.patch on jtframe)
+JTFRAME_ARX=8
+JTFRAME_ARY=3
+TBOWL_DUALAR
+CORE_OSD=OLM,Screens,Side by side,Left monitor,Right monitor;
+
+# SDRAM layout (download offsets, after the 8-byte header)
+#   bank 0: 000000 main Z80 (128 kB, MAME region)  020000 sub Z80 (128 kB)  040000 sound Z80 (32 kB)
+#           050000 ADPCM (128 kB: MSM 1, MSM 2)
+#   bank 1: 080000 bg tiles (512 kB)  100000 characters (64 kB)
+#   bank 2: 180000 sprites (512 kB)
+#   bank 3: 200000 bg tiles again (512 kB, second bg layer)
+SUB_START=0x020000
+SND_START=0x040000
+PCM_START=0x050000
+CHAR_START=0x100000
+JTFRAME_BA1_START=0x080000
+JTFRAME_BA2_START=0x180000
+JTFRAME_BA3_START=0x200000
+
+[mist|sidi]
+JTFRAME_SKIP

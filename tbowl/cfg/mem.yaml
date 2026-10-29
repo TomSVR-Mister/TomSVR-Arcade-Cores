@@ -1,0 +1,42 @@
+params:
+  - { name: SUB_OFFSET,  value: "`SUB_START>>1" }
+  - { name: SND_OFFSET,  value: "`SND_START>>1" }
+  - { name: PCM_OFFSET,  value: "`PCM_START>>1" }
+  - { name: CHAR_OFFSET, value: "(`CHAR_START-`JTFRAME_BA1_START)>>1" }
+
+clocks:
+  clk:
+    - freq: 8000000
+      outputs:
+        - cen8
+    - freq: 4000000
+      outputs:
+        - cen4
+    - freq: 384000
+      outputs:
+        - cen384
+
+audio:
+  rsum: 10k
+  channels:
+    # MAME tbowl: both YM3812 0.80, both MSM5205 0.50
+    - { name: fm0,  module: jtopl2, rsum: 12k }
+    - { name: fm1,  module: jtopl2, rsum: 12k }
+    - { name: pcm0, module: jt5205, rsum: 20k }
+    - { name: pcm1, module: jt5205, rsum: 20k }
+
+sdram:
+  banks:
+    - buses:
+      - { name: main, addr_width: 17, data_width: 8 }
+      - { name: sub,  addr_width: 17, data_width: 8, offset: SUB_OFFSET }
+      - { name: snd,  addr_width: 15, data_width: 8, offset: SND_OFFSET }
+      - { name: pcm0, addr_width: 17, data_width: 8, offset: PCM_OFFSET }
+      - { name: pcm1, addr_width: 17, data_width: 8, offset: PCM_OFFSET }
+    - buses:
+      - { name: bg0,  addr_width: 19, data_width: 32 }
+      - { name: txt,  addr_width: 16, data_width: 32, offset: CHAR_OFFSET }
+    - buses:
+      - { name: obj,  addr_width: 19, data_width: 32 }
+    - buses:
+      - { name: bg1,  addr_width: 19, data_width: 32 }
