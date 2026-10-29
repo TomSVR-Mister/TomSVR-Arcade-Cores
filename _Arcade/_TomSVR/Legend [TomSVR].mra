@@ -1,0 +1,84 @@
+<!-- MAME legendsb (nintendo/snesb.cpp): Legend (SNES bootleg). MAME status: imperfect_sound, imperfect_graphics . -->
+<misterromdescription>
+    <name>Legend [TomSVR]</name>
+    <setname>legendsb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_snesb</rbf>
+    <joystick>8</joystick>
+    <switches page_id="1" page_name="Switches" base="16" default="77,FF">
+        <dip name="Coinage" bits="0,2" ids="1C/1C,4C/1C,3C/1C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,5" ids="00h,08h,10h,18h,20h,Hard,Normal,Easy"/>
+        <dip name="Lives" bits="6,7" ids="4,3,2,1"/>
+    </switches>
+    <rom index="0" zip="legendsb.zip" md5="None">
+        <part>0A 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>03 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 7F FC 19 00 7F FD 80 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>01 02 03 04 05 05 05 05 05 05 05 05 05 05 05 05</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>88 C6 FA 00 1F 22 D6 FF 3C D4 C5 FF 79 89 59 FF</part>
+        <part>F1 70 B1 FF 3A 53 78 FF 00 00 00 00 00 00 00 00</part>
+        <part>00 10 20 30 40 50 60 70 80 90 A0 B0 C0 D0 E0 F0</part>
+        <part>00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</part>
+        <part>00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</part>
+        <part>10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F</part>
+        <part>20 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F</part>
+        <part>30 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F</part>
+        <part>40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F</part>
+        <part>50 51 52 53 54 55 56 57 58 59 5A 5B 5C 5D 5E 5F</part>
+        <part>60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F</part>
+        <part>70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F</part>
+        <part>00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F</part>
+        <part>10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F</part>
+        <part>20 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F</part>
+        <part>30 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x0" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x8000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x10000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x18000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x20000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x28000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x30000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x38000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x40000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x48000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x50000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x58000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x60000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x68000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x70000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x78000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x0" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x8000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x10000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x18000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x20000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x28000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x30000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x38000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x40000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x48000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x50000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x58000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x60000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x68000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u36" crc="c33a5362" offset="0x70000" length="0x8000"/>
+        <part zip="legendsb.zip" name="u37" crc="bbcb643f" offset="0x78000" length="0x8000"/>
+    </rom>
+    <buttons names="A,B,X,Y,L,R,Select,Start,Coin" default="A,B,X,Y,L,R,R2,Start,Select"/>
+</misterromdescription>

@@ -1,0 +1,55 @@
+<!-- MAME venom (nintendo/snesb.cpp): Venom &amp; Spider-Man - Separation Anxiety (SNES bootleg). MAME status: imperfect_sound, imperfect_graphics . -->
+<misterromdescription>
+    <name>Venom &amp; Spider-Man - Separation Anxiety [TomSVR]</name>
+    <setname>venom</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1997</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_snesb</rbf>
+    <joystick>8</joystick>
+    <switches page_id="1" page_name="Switches" base="16" default="7F,FF">
+        <dip name="Coinage" bits="0,2" ids="1C/1C,4C/1C,3C/1C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Lives" bits="6,7" ids="4,3,2,1"/>
+    </switches>
+    <rom index="0" zip="venom.zip" md5="None">
+        <part>0C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>03 00 02 00 00 00 00 00 78 10 00 21 78 12 00 03</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 7F FC 98 00 7F FD FF 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>01 02 03 04 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>88 C6 FA 00 15 33 DC FF F2 57 06 00 07 6B 2D FF</part>
+        <part>6B E4 83 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>60 45 04 64 24 00 40 44 01 65 61 21 05 20 41 25</part>
+        <part>0A 92 80 8A 88 00 02 82 10 9A 1A 18 90 08 12 98</part>
+        <part>00 21 02 23 04 25 06 27 08 29 0A 2B 0C 2D 0E 2F</part>
+        <part>20 01 22 03 24 05 26 07 28 09 2A 0B 2C 0D 2E 0F</part>
+        <part>10 31 12 33 14 35 16 37 18 39 1A 3B 1C 3D 1E 3F</part>
+        <part>30 11 32 13 34 15 36 17 38 19 3A 1B 3C 1D 3E 1F</part>
+        <part>40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F</part>
+        <part>50 51 52 53 54 55 56 57 58 59 5A 5B 5C 5D 5E 5F</part>
+        <part>60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F</part>
+        <part>70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F</part>
+        <part>32 35 3A 28 2A 0C 36 38 29 39 04 2C 21 23 3D 2D</part>
+        <part>3C 02 17 31 00 2E 0A 2F 25 26 27 30 33 01 18 19</part>
+        <part>10 11 24 16 1B 0D 0E 12 13 05 22 34 1C 06 07 37</part>
+        <part>08 3B 09 14 15 1D 0B 0F 1E 1F 2B 1A 03 20 3F 3E</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="venom.zip" name="u31.bin" crc="d1034a76" offset="0x0" length="0x100000"/>
+        <part zip="venom.zip" name="u32.bin" crc="fbe865b0" offset="0x0" length="0x100000"/>
+        <part zip="venom.zip" name="u33.bin" crc="ed874ca2" offset="0x0" length="0x80000"/>
+        <part zip="venom.zip" name="u34.bin" crc="7a09c9e0" offset="0x0" length="0x80000"/>
+    </rom>
+    <buttons names="A,B,X,Y,L,R,Select,Start,Coin" default="A,B,X,Y,L,R,R2,Start,Select"/>
+</misterromdescription>

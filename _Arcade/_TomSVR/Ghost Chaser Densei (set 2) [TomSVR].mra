@@ -1,0 +1,57 @@
+<!-- MAME denseib2 (nintendo/snesb.cpp): Ghost Chaser Densei (SNES bootleg, set 2). MAME status: imperfect_sound, imperfect_graphics . -->
+<misterromdescription>
+    <name>Ghost Chaser Densei (set 2) [TomSVR]</name>
+    <setname>denseib2</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1996</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_snesb</rbf>
+    <joystick>8</joystick>
+    <switches page_id="1" page_name="Switches" base="16" default="77,FF">
+        <dip name="Coinage" bits="0,2" ids="1C/1C,4C/1C,3C/1C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,4" ids="Hard,Hard,Normal,Easy"/>
+        <dip name="Mode" bits="7" ids="Normal,Battle"/>
+        <dip name="Suffered Damages" bits="8,10" ids="x7.5,x6.5,x5.5,x4.5,x3.5,x2.5,x1.5,Normal"/>
+    </switches>
+    <rom index="0" zip="denseib2.zip|denseib.zip" md5="None">
+        <part>0B 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>03 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 FF FC 40 00 FF FD F7 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>01 02 03 04 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>88 C6 FA 00 2E 8F 45 FF 1A 5C 3E 00 E1 7A 0B FF</part>
+        <part>D4 33 D4 FF 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>03 04 85 01 81 87 07 05 86 00 02 82 84 83 06 80</part>
+        <part>30 40 58 10 18 78 70 50 68 00 20 28 48 38 60 08</part>
+        <part>1B 15 08 1F 06 02 13 0A 1D 04 0E 00 17 0C 11 19</part>
+        <part>16 0D 1C 07 10 03 1A 0B 12 05 0F 18 1E 01 14 09</part>
+        <part>3B 35 28 3F 26 22 33 2A 3D 24 2E 20 37 2C 31 39</part>
+        <part>36 2D 3C 27 30 23 3A 2B 32 25 2F 38 3E 21 34 29</part>
+        <part>40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F</part>
+        <part>50 51 52 53 54 55 56 57 58 59 5A 5B 5C 5D 5E 5F</part>
+        <part>60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F</part>
+        <part>70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F</part>
+        <part>32 35 3A 28 2A 0C 36 38 29 39 04 2C 21 23 3D 2D</part>
+        <part>3C 02 17 31 00 2E 0A 2F 25 26 27 30 33 01 18 19</part>
+        <part>10 11 24 16 1B 0D 0E 12 13 05 22 34 1C 06 07 37</part>
+        <part>08 3B 09 14 15 1D 0B 0F 1E 1F 2B 1A 03 20 3F 3E</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="denseib.zip" name="u31.bin" crc="834723a8" offset="0x0" length="0x80000"/>
+        <part zip="denseib.zip" name="u32.bin" crc="9748e86b" offset="0x0" length="0x80000"/>
+        <part zip="denseib.zip" name="u33.bin" crc="abcc6b61" offset="0x0" length="0x80000"/>
+        <part zip="denseib.zip" name="u34.bin" crc="0a16ac96" offset="0x0" length="0x80000"/>
+    </rom>
+    <buttons names="A,B,X,Y,L,R,Select,Start,Coin" default="A,B,X,Y,L,R,R2,Start,Select"/>
+</misterromdescription>

@@ -1,0 +1,58 @@
+<!-- MAME tmntmwb (nintendo/snesb.cpp): Teenage Mutant Ninja Turtles - Mutant Warriors (SNES bootleg). MAME status: imperfect_sound, imperfect_graphics . -->
+<misterromdescription>
+    <name>Teenage Mutant Ninja Turtles - Mutant Warriors [TomSVR]</name>
+    <setname>tmntmwb</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1997</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_snesb</rbf>
+    <joystick>8</joystick>
+    <switches page_id="1" page_name="Switches" base="16" default="BF,3F">
+        <dip name="Coinage" bits="0,2" ids="1C/1C,4C/1C,3C/1C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,5" ids="00h,08h,10h,Harder,Hard,Normal,Easy,Easier"/>
+        <dip name="Game Time" bits="6,7" ids="Infinite,30,60,99"/>
+        <dip name="Unlock Bosses" bits="10,12" ids="00h,04h,Both,0Ch,10h,14h,Rat King,None"/>
+        <dip name="Speed" bits="14,15" ids="Normal,Fastest,Faster,Fast"/>
+    </switches>
+    <rom index="0" zip="tmntmwb.zip" md5="None">
+        <part>0B 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>07 08 02 00 00 00 00 00 78 10 00 FF 00 00 00 01</part>
+        <part>71 03 CD 8C 71 03 CE 8C 70 65 F0 31 70 65 F1 31</part>
+        <part>71 32 CC 5A 71 32 CD 5A 70 10 F1 47 70 10 F2 47</part>
+        <part>00 7F FC 72 00 7F FD FF 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>01 02 03 04 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>88 C6 FA 00 A5 8E C5 FF 30 AB EC FF BB E2 12 00</part>
+        <part>47 39 2B FF 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>41 08 58 40 50 59 49 48 19 00 01 11 18 51 09 10</part>
+        <part>84 20 26 04 06 A6 A4 24 A2 00 80 82 22 86 A0 02</part>
+        <part>2B 35 08 2F 16 12 23 1A 3D 04 1E 00 27 0C 31 39</part>
+        <part>26 0D 1C 37 10 33 2A 3B 22 05 3F 18 2E 01 14 09</part>
+        <part>0B 15 28 0F 36 32 03 3A 1D 24 3E 20 07 2C 11 19</part>
+        <part>06 2D 3C 17 30 13 0A 1B 02 25 1F 38 0E 21 34 29</part>
+        <part>40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F</part>
+        <part>50 51 52 53 54 55 56 57 58 59 5A 5B 5C 5D 5E 5F</part>
+        <part>60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F</part>
+        <part>70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F</part>
+        <part>32 35 3A 28 2A 0C 36 38 29 39 04 2C 21 23 3D 2D</part>
+        <part>3C 02 17 31 00 2E 0A 2F 25 26 27 30 33 01 18 19</part>
+        <part>10 11 24 16 1B 0D 0E 12 13 05 22 34 1C 06 07 37</part>
+        <part>08 3B 09 14 15 1D 0B 0F 1E 1F 2B 1A 03 20 3F 3E</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="tmntmwb.zip" name="u14" crc="d2bdc126" offset="0x0" length="0x80000"/>
+        <part zip="tmntmwb.zip" name="u15" crc="50f9acb1" offset="0x0" length="0x80000"/>
+        <part zip="tmntmwb.zip" name="u16" crc="2a7f40f3" offset="0x0" length="0x80000"/>
+        <part zip="tmntmwb.zip" name="u17" crc="09817173" offset="0x0" length="0x80000"/>
+    </rom>
+    <buttons names="A,B,X,Y,L,R,Select,Start,Coin" default="A,B,X,Y,L,R,R2,Start,Select"/>
+</misterromdescription>

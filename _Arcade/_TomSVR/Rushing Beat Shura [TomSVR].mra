@@ -1,0 +1,56 @@
+<!-- MAME rushbets (nintendo/snesb.cpp): Rushing Beat Shura (SNES bootleg). MAME status: imperfect_sound, imperfect_graphics . -->
+<misterromdescription>
+    <name>Rushing Beat Shura [TomSVR]</name>
+    <setname>rushbets</setname>
+    <rotation>horizontal</rotation>
+    <mameversion>0288</mameversion>
+    <year>1997</year>
+    <manufacturer>bootleg</manufacturer>
+    <players>2</players>
+    <rbf>TomSVR_snesb</rbf>
+    <joystick>8</joystick>
+    <switches page_id="1" page_name="Switches" base="16" default="77,FF">
+        <dip name="Coinage" bits="0,2" ids="1C/1C,4C/1C,3C/1C,2C/1C,1C/4C,1C/3C,1C/2C,1C/1C"/>
+        <dip name="Difficulty" bits="3,5" ids="00h,08h,10h,18h,20h,Hard,Normal,Easy"/>
+        <dip name="Lives" bits="6,7" ids="4,3,2,1"/>
+    </switches>
+    <rom index="0" zip="rushbets.zip" md5="None">
+        <part>0B 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>09 05 02 00 5B 8E 3C 00 78 50 00 0F 00 00 00 01</part>
+        <part>75 AF 49 E3 75 A0 5A F4 75 A1 6B 05 75 A2 7C 16</part>
+        <part>75 A3 8D 27 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 FF FC EC 00 FF FD 80 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>01 02 03 04 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>88 C6 FA 00 0A 3B 1F FF 60 FD 45 FF E9 2E 98 00</part>
+        <part>93 91 B3 FF 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>84 10 92 80 82 96 94 90 16 00 04 06 12 86 14 02</part>
+        <part>28 01 61 20 60 69 29 21 49 00 08 48 41 68 09 40</part>
+        <part>1B 15 08 1F 06 02 13 0A 1D 04 0E 00 17 0C 11 19</part>
+        <part>16 0D 1C 07 10 03 1A 0B 12 05 0F 18 1E 01 14 09</part>
+        <part>3B 35 28 3F 26 22 33 2A 3D 24 2E 20 37 2C 31 39</part>
+        <part>36 2D 3C 27 30 23 3A 2B 32 25 2F 38 3E 21 34 29</part>
+        <part>40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F</part>
+        <part>50 51 52 53 54 55 56 57 58 59 5A 5B 5C 5D 5E 5F</part>
+        <part>60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F</part>
+        <part>70 71 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F</part>
+        <part>32 35 3A 28 2A 0C 36 38 29 39 04 2C 21 23 3D 2D</part>
+        <part>3C 02 17 31 00 2E 0A 2F 25 26 27 30 33 01 18 19</part>
+        <part>10 11 24 16 1B 0D 0E 12 13 05 22 34 1C 06 07 37</part>
+        <part>08 3B 09 14 15 1D 0B 0F 1E 1F 2B 1A 03 20 3F 3E</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</part>
+        <part zip="rushbets.zip" name="ic19.bin" crc="8aa0ad59" offset="0x0" length="0x80000"/>
+        <part zip="rushbets.zip" name="ic20.bin" crc="a8afe28b" offset="0x0" length="0x80000"/>
+        <part zip="rushbets.zip" name="ic21.bin" crc="2f6e8711" offset="0x0" length="0x80000"/>
+        <part zip="rushbets.zip" name="ic22.bin" crc="95a234d2" offset="0x0" length="0x80000"/>
+    </rom>
+    <buttons names="A,B,X,Y,L,R,Select,Start,Coin" default="A,B,X,Y,L,R,R2,Start,Select"/>
+</misterromdescription>
