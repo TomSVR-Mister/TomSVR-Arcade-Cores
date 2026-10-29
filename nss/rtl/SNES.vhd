@@ -99,6 +99,7 @@ entity SNES is
 
 		SS_ADDR     : in std_logic_vector(8 downto 0);
 		SS_BUSY     : in std_logic;
+		APU_EN      : in std_logic := '1';  -- NSS (TomSVR): 0 = sound CPU and DSP paused with the main CPU
 		SS_REGS_SEL : in std_logic;
 		SS_SMP_SEL  : in std_logic;
 		SS_WR       : in std_logic;
@@ -402,7 +403,7 @@ begin
 		SS_DO		=> SS_SMP_DO
 	);
 
-	DSP_EN <= ENABLE and not (SS_BUSY and SPC_S0); -- Pause DSP on State 0 during Save state
+	DSP_EN <= ENABLE and APU_EN and not (SS_BUSY and SPC_S0); -- Pause DSP on State 0 during Save state; NSS pause (APU_EN)
 
 	-- DSP 
 	DSP: entity work.DSP 

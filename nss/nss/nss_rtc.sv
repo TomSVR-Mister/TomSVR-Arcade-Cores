@@ -19,8 +19,10 @@ module nss_rtc (
     output reg        dout
 );
 
-reg [7:0] sec, min, hour, day, mon, year;
-reg [3:0] wday;
+// a valid date from power-up (the multi-cartridge BIOS goes to its OPERATION MODE screen on an invalid clock);
+// replaced by the MiSTer RTC once that arrives
+reg [7:0] sec = 8'h00, min = 8'h00, hour = 8'h12, day = 8'h01, mon = 8'h01, year = 8'h26;
+reg [3:0] wday = 4'd4;
 reg [1:0] mode;
 reg       sysr;
 reg [3:0] cntrl1, cntrl2;

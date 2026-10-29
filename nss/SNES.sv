@@ -133,6 +133,9 @@ always @(posedge CLK_50M) begin
 	end
 end
 
+wire        nss_cart_ok;                                   // NSS: cartridge in the selected slot (see NSS below)
+wire  [3:0] nss_cart_pos, nss_cart_rom_n, nss_cart_ram_n;
+wire  [7:0] nss_p01, nss_p03;
 wire reset = RESET | buttons[1] | status[0] | cart_download | spc_download | bk_loading | clearing_ram | msu_data_download | nss_download | nss_nv_dl;
 // NSS: the BIOS holds the SNES in reset (port 01 bit 0) and pauses its CPU (bit 1)
 wire snes_reset = reset | ~nss_p01[0];
@@ -162,6 +165,14 @@ parameter CONF_STR = {
 	"P1OJK,Stereo Mix,None,25%,50%,100%;",
 	"P1-;",
 	"P1O[58],Timer/Menu Overlay,On,Off;",
+	"P2O[76],Start-up check,Retry,Show debug;",
+	"P3,Cartridge slots (on reset);",
+	"P3-;",
+	"P3O[67:64],Slot 1,Default,Empty,ActRaiser,Addams Family,Amazing Tennis,Contra III,F-Zero,Lethal Weapon,NCAA Basketball,Robocop 3,Skins Game,Super Mario World,Super Soccer,Super Tennis;",
+	"P3O[71:68],Slot 2,Default,Empty,ActRaiser,Addams Family,Amazing Tennis,Contra III,F-Zero,Lethal Weapon,NCAA Basketball,Robocop 3,Skins Game,Super Mario World,Super Soccer,Super Tennis;",
+	"P3O[75:72],Slot 3,Default,Empty,ActRaiser,Addams Family,Amazing Tennis,Contra III,F-Zero,Lethal Weapon,NCAA Basketball,Robocop 3,Skins Game,Super Mario World,Super Soccer,Super Tennis;",
+	"P3-;",
+	"P3R0,Reset;",
 	"P2,Hardware;",
 	"P2-;",
 	"P2OU,Audio Clock,Real,Typical;",
@@ -174,7 +185,7 @@ parameter CONF_STR = {
 };
 
 wire  [1:0] buttons;
-wire [63:0] status;
+wire [127:0] status;
 wire [15:0] status_menumask = {ss_allow ,en216p, !GUN_MODE, ~turbo_allow, ~gg_available, ~GSU_ACTIVE, ~bk_ena};
 wire        forced_scandoubler;
 reg  [31:0] sd_lba;
@@ -230,7 +241,7 @@ hps_io #(.CONF_STR(CONF_STR), .WIDE(1)) hps_io
 
 	.status(status),
 	.status_menumask(status_menumask),
-	.status_in(cart_download ? {status[63:53], ss_slot, status[50:5],1'b0,status[3:0]} : {status[63:53], ss_slot, status[50:32],1'b0,status[30:0]}),
+	.status_in({status[127:53], ss_slot, status[50:0]}),
 	.status_set(cart_download | status0_fall | ss_status),
 
 	.info_req(ss_info_req),
@@ -307,54 +318,16 @@ end
 
 //////////////////////////  ROM DETECT  /////////////////////////////////
 
-reg        PAL;
-reg  [7:0] rom_type;
+// NSS: every cartridge is LoROM, NTSC. ROM and RAM sizes come from the board's game table for the cartridge in
+// the selected slot (the SNES is held in reset while the BIOS switches slots).
+wire       PAL = 1'b0;
+wire [7:0] rom_type = 8'd0;
 reg [23:0] rom_mask, ram_mask;
 reg  [3:0] ram_size;
 always @(posedge clk_sys) begin
-	reg [3:0] rom_size;
-	reg       rom_region = 0;
-
-	if (cart_download) begin
-		if(ioctl_wr) begin
-			if (ioctl_addr == 0) begin
-				rom_size <= 4'hC;
-				ram_size <= 4'h0;
-				if(!LHRom_type && ioctl_dout[7:0]) {ram_size,rom_size} <= ioctl_dout[7:0];
-
-				case(LHRom_type)
-					1: rom_type <= 0;
-					2: rom_type <= 0;
-					3: rom_type <= 1;
-					4: rom_type <= 2;
-					default: rom_type <= ioctl_dout[15:8];
-				endcase
-			end
-
-			if (ioctl_addr == 2) begin
-				rom_region <= ioctl_dout[8];
-			end
-
-			if(LHRom_type == 2) begin
-				if(ioctl_addr == ('h7FD6+'h200)) rom_size <= ioctl_dout[11:8];
-				if(ioctl_addr == ('h7FD8+'h200)) ram_size <= ioctl_dout[3:0];
-			end
-			else if(LHRom_type == 3) begin
-				if(ioctl_addr == ('hFFD6+'h200)) rom_size <= ioctl_dout[11:8];
-				if(ioctl_addr == ('hFFD8+'h200)) ram_size <= ioctl_dout[3:0];
-			end
-			else if(LHRom_type == 4) begin
-				if(ioctl_addr == ('h40FFD6+'h200)) rom_size <= ioctl_dout[11:8];
-				if(ioctl_addr == ('h40FFD8+'h200)) ram_size <= ioctl_dout[3:0];
-			end
-
-			rom_mask <= (24'd1024 << rom_size) - 1'd1;
-			ram_mask <= ram_size ? (24'd1024 << ram_size) - 1'd1 : 24'd0;
-		end
-	end
-	else begin
-		PAL <= (!status[15:14]) ? rom_region : status[15];
-	end
+	rom_mask <= (24'd1024 << nss_cart_rom_n) - 1'd1;
+	ram_mask <= nss_cart_ram_n ? (24'd1024 << nss_cart_ram_n) - 1'd1 : 24'd0;
+	ram_size <= nss_cart_ram_n;
 end
 
 reg spc_mode = 0;
@@ -680,7 +653,7 @@ wire        SDRAM_SNI_RD;
 wire        SDRAM_SNI_WR;
 wire        SDRAM_SNI_READY;
 
-wire[24:0] cart_addr_download = ioctl_addr-10'd512;
+wire[24:0] cart_addr_download = ioctl_addr;   // NSS: the games at position * 1 MB, no header
 wire[23:0] ssbin_addr_download = { 8'hFF, ioctl_addr[15:0] };
 wire[23:0] addr_download = ssbin_download ? ssbin_addr_download : cart_addr_download[23:0];
 
@@ -719,7 +692,7 @@ sdram sdram
 	.init(0), //~clock_locked),
 	.clk(clk_mem),
 	
-	.addr0(sdram_download_en ? sdram_download_addr : ROM_ADDR),
+	.addr0(sdram_download_en ? sdram_download_addr : {nss_cart_pos, ROM_ADDR[19:0]}),
 	.din0(sdram_download_en ? sdram_download_data : ROM_D),
 	.dout0(ROM_Q),
 
@@ -808,7 +781,7 @@ dpram_dif #(16,8,15,16) aram
 	.wren_b(spc_download ? ioctl_wr : mem_fill_we)
 );
 
-localparam  BSRAM_BITS = 13; // NSS (TomSVR): 8 Kbyte, the largest NSS cart SRAM (Super Mario All-Stars); was 256 Kbyte
+localparam  BSRAM_BITS = 15; // NSS (TomSVR): 8 Kbyte, the largest NSS cart SRAM (Super Mario All-Stars); was 256 Kbyte
 wire [19:0] BSRAM_ADDR;
 wire        BSRAM_CE_N;
 wire        BSRAM_OE_N, BSRAM_WE_N;
@@ -823,7 +796,7 @@ dpram_dif #(BSRAM_BITS,8,BSRAM_BITS-1,16) bsram
 	.clock(clk_sys),
 
 	//Thrash the BSRAM upon ROM loading
-	.address_a(clearing_ram ? mem_fill_addr[BSRAM_BITS-1:0] : BSRAM_SNI_READY ? BSRAM_SNI_ADDR : BSRAM_ADDR[BSRAM_BITS-1:0]),
+	.address_a(clearing_ram ? mem_fill_addr[BSRAM_BITS-1:0] : BSRAM_SNI_READY ? BSRAM_SNI_ADDR : {nss_p01[3:2], BSRAM_ADDR[12:0]}),   // NSS: 8 KB per slot
 	.data_a(clearing_ram ? 8'hFF : BSRAM_SNI_READY ? BSRAM_SNI_D : BSRAM_D),
 	.wren_a(clearing_ram ? mem_fill_we : BSRAM_SNI_READY ? BSRAM_SNI_WR : ~BSRAM_CE_N & ~BSRAM_WE_N),
 	.q_a(BSRAM_Q),
@@ -902,17 +875,21 @@ video_mixer #(.LINE_LENGTH(1040), .GAMMA(1)) video_mixer
 
 wire nss_download = ioctl_download & (ioctl_index == 8'd5);
 wire nss_nv_dl    = ioctl_download & (ioctl_index == 8'd9);
-reg  [7:0] nss_dsw;
-always @(posedge clk_sys) if (ioctl_wr && ioctl_index == 8'd254 && !ioctl_addr[24:1]) nss_dsw <= ioctl_dout[7:0];
+reg  [7:0] nss_dsw_s[3];
+always @(posedge clk_sys) if (ioctl_wr && ioctl_index == 8'd254) begin
+	if (ioctl_addr == 0) begin nss_dsw_s[0] <= ioctl_dout[7:0]; nss_dsw_s[1] <= ioctl_dout[15:8]; end
+	if (ioctl_addr == 2) nss_dsw_s[2] <= ioctl_dout[7:0];
+end
+wire [7:0] nss_dsw = nss_p01[3:2] == 2'd3 ? 8'hff : nss_dsw_s[nss_p01[3:2]];   // each cartridge's own DIP switches
 
 // WIDE ioctl -> bytes
 reg        nss_dl_wr, nss_dl_hi;
-reg [16:0] nss_dl_addr;
+reg [17:0] nss_dl_addr;
 reg  [7:0] nss_dl_data, nss_dl_next;
 always @(posedge clk_sys) begin
 	nss_dl_wr <= 0;
 	if (nss_download & ioctl_wr) begin
-		nss_dl_wr <= 1; nss_dl_addr <= ioctl_addr[16:0]; nss_dl_data <= ioctl_dout[7:0];
+		nss_dl_wr <= 1; nss_dl_addr <= ioctl_addr[17:0]; nss_dl_data <= ioctl_dout[7:0];
 		nss_dl_next <= ioctl_dout[15:8]; nss_dl_hi <= 1;
 	end else if (nss_dl_hi) begin
 		nss_dl_hi <= 0; nss_dl_wr <= 1; nss_dl_addr <= nss_dl_addr + 1'd1; nss_dl_data <= nss_dl_next;
@@ -921,7 +898,6 @@ end
 
 wire [15:0] nss_nv_dout;
 wire        nss_nv_chg;
-wire  [7:0] nss_p01, nss_p03;
 wire  [2:0] nss_osd_rgb;
 wire        nss_osd_fg, nss_osd_raster;
 wire [15:0] nss_osd_r0, nss_osd_r7;
@@ -963,15 +939,70 @@ end
 // first, and in between the Z80 would run an empty BIOS (and could scribble on the EEPROM)
 reg nss_loaded = 0;
 always @(posedge clk_sys) if (nss_download) nss_loaded <= 1;
+// one clean start after MiSTer has sent everything (ROMs, DIP switches, NVRAM): the board stays in reset until
+// ~0.2 s after the last ioctl transfer. On MiSTer a game whose NVRAM file didn't exist yet (so no NVRAM transfer and
+// no second reset after the ROMs) often came up black; with the NVRAM transfer's extra reset it always started.
+reg [22:0] nss_settle = '1;
+always @(posedge clk_sys) begin
+	if (ioctl_download) nss_settle <= '1;
+	else if (nss_settle) nss_settle <= nss_settle - 1'd1;
+end
+
+// The board reset is registered: the T80's reset is asynchronous, and the old combinational OR of the reset
+// sources could glitch it in mid-run (suspected cause of random black starts on MiSTer).
+reg nss_rst = 1;
+always @(posedge clk_sys) nss_rst <= reset | ~nss_loaded | nss_download | (nss_settle != 0) | nss_retry;
+
+// Start-up check: every BIOS scans the three slots (port 01 slot bits 2 and 3) within about a second of starting.
+// If that hasn't happened 3 s after a reset, the board is reset again (up to 3 times): on MiSTer some first starts
+// stayed black with no sound, and a manual Reset always fixed them.
+reg [26:0] nss_alive_t;
+reg        nss_seen;
+reg  [1:0] nss_tries;
+reg  [9:0] nss_retry_c;
+reg        nss_dbg_on;      // debug: the stuck BIOS's PC, port 01 and port 03 shown top left (OSD "Start-up check")
+reg [31:0] nss_dbg;
+wire [15:0] nss_dbg_pc;
+wire       nss_retry = nss_retry_c != 0;
+always @(posedge clk_sys) begin
+	if (nss_retry_c) nss_retry_c <= nss_retry_c - 1'd1;
+	if (reset | ~nss_loaded | nss_download | (nss_settle != 0)) begin
+		nss_alive_t <= 0; nss_seen <= 0; nss_tries <= 0; nss_dbg_on <= 0;
+	end else if (nss_rst | nss_retry) begin
+		nss_alive_t <= 0; nss_seen <= 0;
+	end else begin
+		if (nss_p01[3:2] != 2'd0) nss_seen <= 1;
+		if (~nss_seen) begin
+			if (nss_alive_t == 27'd64431810) begin   // 3 s
+				nss_alive_t <= 0;
+				if (status[76]) begin nss_dbg_on <= 1; nss_dbg <= {nss_dbg_pc, nss_p01, nss_p03}; end
+				else if (nss_tries != 2'd3) begin nss_retry_c <= '1; nss_tries <= nss_tries + 1'd1; end
+			end else nss_alive_t <= nss_alive_t + 1'd1;
+		end
+	end
+end
+
+// Game 1-3: the cabinet's game buttons. Outside a paid game (BIOS joypad cut-off, port 01 bit 7 = 0) the pad's
+// A / B / X buttons also act as Game 1 / 2 / 3, so a pad without extra buttons can pick a game on the menu.
+wire       nss_free = ~nss_p01[7];
+wire [2:0] nss_game = {joy0[18] | joy1[18] | (nss_free & (joy0[6] | joy1[6])),
+                       joy0[17] | joy1[17] | (nss_free & (joy0[5] | joy1[5])),
+                       joy0[16] | joy1[16] | (nss_free & (joy0[4] | joy1[4]))};
 
 nss_board nss_board
 (
 	.clk(clk_sys),
-	.reset(reset | ~nss_loaded | nss_download),
+	.reset(nss_rst),
 
 	.dl_wr(nss_dl_wr),
 	.dl_addr(nss_dl_addr),
 	.dl_data(nss_dl_data),
+
+	.slot_pick(status[75:64]),
+	.cart_ok(nss_cart_ok),
+	.cart_pos(nss_cart_pos),
+	.cart_rom_n(nss_cart_rom_n),
+	.cart_ram_n(nss_cart_ram_n),
 
 	.nv_wr(nss_nv_dl & ioctl_wr),
 	.nv_addr(ioctl_addr[7:1]),
@@ -991,7 +1022,7 @@ nss_board nss_board
 
 	.pad({joy0[5], joy0[4], joy0[2], joy0[3], joy0[1], joy0[0]}),
 	.panel({joy0[20] | joy1[20], joy0[14] | joy1[14], joy0[15] | joy1[15], joy0[13] | joy1[13],
-	        joy0[18] | joy1[18], joy0[17] | joy1[17], joy0[16] | joy1[16]}),
+	        nss_game}),
 	.coin({joy0[19] | joy1[19], joy1[12], joy0[12]}),
 
 	.osd_ce(nss_ce),
@@ -1002,7 +1033,7 @@ nss_board nss_board
 	.osd_raster(nss_osd_raster),
 	.osd_reg0(nss_osd_r0),
 	.osd_reg7(nss_osd_r7),
-	.dbg_pc()
+	.dbg_pc(nss_dbg_pc)
 );
 
 // Video mix. M50458 pins: P1 = blanking (reg 0 bit 1: automatic = OSD dots; else manual level bit 7),
@@ -1014,9 +1045,34 @@ wire [2:0] osd_pin  = {nss_osd_r0[2] ? nss_osd_rgb[2] : nss_osd_r0[8],
                        nss_osd_r0[3] ? nss_osd_rgb[1] : nss_osd_r0[9],
                        nss_osd_r0[4] ? nss_osd_rgb[0] : nss_osd_r0[10]};   // {B,G,R}
 wire       osd_show = nss_p03[6] & osd_blnk & ~(status[58] & nss_osd_r0[1]);
+// debug digits: 8 hex digits, 3x5 font, each font dot 16 master clocks x 8 lines, from line 80 / dot 64
+reg  [8:0] nss_line;
+always @(posedge clk_sys) if (VBlank & ~vb_d) nss_line <= 0; else if (HBlank & ~hb_d) nss_line <= nss_line + 1'd1;
+wire [10:0] dbg_x = nss_hc - 11'd404;            // active line starts 340 clocks after the blank, digits 64 in
+wire [8:0]  dbg_y = nss_line - 9'd80;              // well inside the picture (the top lines are cropped on HDMI)
+wire [2:0]  dbg_d = dbg_x[8:6];                   // digit 0-7
+wire [3:0]  dbg_n = nss_dbg[31 - {dbg_d, 2'b00} -: 4];
+wire [1:0]  dbg_c = dbg_x[5:4];                   // font column 0-2 (3 = gap)
+wire [2:0]  dbg_r = dbg_y[5:3];                   // font row 0-4 (8 lines per dot)
+reg  [14:0] dbg_glyph;
+always @(*) case (dbg_n)
+	4'h0: dbg_glyph = 15'b111_101_101_101_111; 4'h1: dbg_glyph = 15'b010_110_010_010_111;
+	4'h2: dbg_glyph = 15'b111_001_111_100_111; 4'h3: dbg_glyph = 15'b111_001_111_001_111;
+	4'h4: dbg_glyph = 15'b101_101_111_001_001; 4'h5: dbg_glyph = 15'b111_100_111_001_111;
+	4'h6: dbg_glyph = 15'b111_100_111_101_111; 4'h7: dbg_glyph = 15'b111_001_001_001_001;
+	4'h8: dbg_glyph = 15'b111_101_111_101_111; 4'h9: dbg_glyph = 15'b111_101_111_001_111;
+	4'ha: dbg_glyph = 15'b111_101_111_101_101; 4'hb: dbg_glyph = 15'b110_101_110_101_110;
+	4'hc: dbg_glyph = 15'b111_100_100_100_111; 4'hd: dbg_glyph = 15'b110_101_101_101_110;
+	4'he: dbg_glyph = 15'b111_100_111_100_111; 4'hf: dbg_glyph = 15'b111_100_111_100_100;
+endcase
+wire dbg_pix = nss_dbg_on && dbg_x < 11'd512 && dbg_y < 9'd40 && dbg_c != 2'd3 &&
+               dbg_glyph[14 - (dbg_r * 3 + dbg_c)];
+
 reg  [7:0] nss_r, nss_g, nss_b;
 always @(posedge clk_sys) begin
-	if (osd_show) begin
+	if (dbg_pix) begin
+		nss_r <= 8'hff; nss_g <= 8'hff; nss_b <= 8'h00;
+	end else if (osd_show) begin
 		nss_r <= {8{osd_pin[0]}}; nss_g <= {8{osd_pin[1]}}; nss_b <= {8{osd_pin[2]}};
 	end else if (nss_p03[7]) begin
 		nss_r <= R; nss_g <= G; nss_b <= B;
