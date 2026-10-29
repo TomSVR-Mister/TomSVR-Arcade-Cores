@@ -1,0 +1,62 @@
+<misterromdescription>
+	<name>World Soccer Finals (rev 3) [TomSVR]</name>
+	<mameversion>0264</mameversion>
+	<setname>wsf3</setname>
+	<parent>wsf</parent>
+	<year>1990</year>
+	<manufacturer>Leland Corporation</manufacturer>
+	<category>Sports</category>
+	<rbf>TomSVR_leland</rbf>
+	<rotation>horizontal</rotation>
+	<rom index="0" address="0x30000000" zip="wsf3.zip|wsf.zip" md5="None" type="merged">
+		<part>4C 01 05 0B 0A 2E 00 00 00 00 00 00 00 00 00 00</part>
+		<part name="e-302-30022-03.u64" crc="2e7faa96" length="0x20000"/>
+		<part name="e-302-30023-03.u65" crc="7146328f" length="0x20000"/>
+		<part repeat="0x40000">00</part>
+		<interleave output="16">
+			<part name="e-302-30009-01.u68" crc="f2fbfc15" length="0x10000" map="01"/>
+			<part name="e-302-30010-01.u69" crc="b4ed2d3b" length="0x10000" map="10"/>
+		</interleave>
+		<part repeat="0x60000">00</part>
+		<part name="e-302-30001-01.u151" crc="31c63af5" length="0x20000"/>
+		<part name="e-302-30002-01.u152" crc="a53e88a6" length="0x20000"/>
+		<part name="e-302-30003-01.u153" crc="12afad1d" length="0x20000"/>
+		<part name="e-302-30004-01.u154" crc="b8b3d59c" length="0x20000"/>
+		<part name="e-302-30005-01.u155" crc="505724b9" length="0x20000"/>
+		<part name="e-302-30006-01.u156" crc="c86b5c4d" length="0x20000"/>
+		<part name="e-302-30007-01.u157" crc="451321ae" length="0x20000"/>
+		<part name="e-302-30008-01.u158" crc="4d23836f" length="0x20000"/>
+		<part repeat="0x80000">00</part>
+		<part name="e-302-30021-01.u8" crc="bb91dc10" length="0x20000"/>
+		<part repeat="0x60000">00</part>
+		<part repeat="0x20000">00</part>
+		<interleave output="16">
+			<part name="e-302-30020-01.u6" crc="532c02bf" length="0x20000" map="01"/>
+			<part name="e-302-30017-01.u3" crc="39ec13c1" length="0x20000" map="10"/>
+		</interleave>
+		<interleave output="16">
+			<part name="e-302-30019-01.u5" crc="2881f73b" length="0x20000" map="01"/>
+			<part name="e-302-30018-01.u4" crc="1ec16735" length="0x20000" map="10"/>
+		</interleave>
+		<part repeat="0x20000">00</part>
+		<interleave output="16">
+			<part name="e-302-30019-01.u5" crc="2881f73b" length="0x20000" map="01"/>
+			<part name="e-302-30018-01.u4" crc="1ec16735" length="0x20000" map="10"/>
+		</interleave>
+		<interleave output="64">
+			<part name="e-302-30011-02.u145" crc="6153569b" length="0x10000" map="00000001"/>
+			<part name="e-302-30012-02.u146" crc="52d65e21" length="0x10000" map="00000010"/>
+			<part name="e-302-30013-02.u147" crc="b3afda12" length="0x10000" map="00000100"/>
+			<part name="e-302-30014-01.u148" crc="624e6c64" length="0x10000" map="00001000"/>
+			<part name="e-302-30015-01.u149" crc="5d9064f2" length="0x10000" map="00010000"/>
+			<part name="e-302-30016-01.u150" crc="d76389cd" length="0x10000" map="00100000"/>
+			<part name="e-302-30011-02.u145" crc="6153569b" length="0x10000" map="01000000"/>
+			<part name="e-302-30011-02.u145" crc="6153569b" length="0x10000" map="10000000"/>
+		</interleave>
+		<part repeat="0x280000">00</part>
+		<part name="eeprom-wsf.bin" crc="5bd0633d" length="0x100"/>
+	</rom>
+	<!-- Four players (controllers 1-4). Coin = Select, Start = Start. Operator menu: OSD "Service Menu". -->
+	<buttons names="Kick,Pass,Start,Coin" default="A,B,Start,Select" count="4"/>
+	<nvram index="4" size="256"/>
+</misterromdescription>

@@ -1,0 +1,65 @@
+<misterromdescription>
+	<name>Quarterback (rev 2) [TomSVR]</name>
+	<mameversion>0264</mameversion>
+	<setname>quarterba</setname>
+	<parent>quarterb</parent>
+	<year>1987</year>
+	<manufacturer>Leland Corporation</manufacturer>
+	<category>Sports</category>
+	<rbf>TomSVR_leland</rbf>
+	<rotation>vertical (ccw)</rotation>
+	<rom index="0" address="0x30000000" zip="quarterba.zip|quarterb.zip" md5="None" type="merged">
+		<part>4C 01 03 0C 08 80 00 00 00 00 00 00 00 00 00 00</part>
+		<part name="03-15219-02.u49t" crc="7fbe1e5a" length="0x10000"/>
+		<part name="03-15218-02.u48t" crc="6fbd4b27" length="0x10000"/>
+		<part repeat="0xE0000">00</part>
+		<part name="03-15200-01.u3" crc="83297861" length="0x4000"/>
+		<part repeat="0xC000">00</part>
+		<part name="03-15201-01.u4" crc="af8dbdab" offset="0x0" length="0x2000"/>
+		<part name="03-15202-01.u5" crc="3eeecb3d" offset="0x0" length="0x2000"/>
+		<part name="03-15203-01.u6" crc="b9c5b663" offset="0x0" length="0x2000"/>
+		<part name="03-15204-01.u7" crc="c68821b7" offset="0x0" length="0x2000"/>
+		<part name="03-15205-01.u8" crc="2be843a9" offset="0x0" length="0x2000"/>
+		<part name="03-15206-01.u9" crc="6bf8d4ab" offset="0x0" length="0x2000"/>
+		<part name="03-15201-01.u4" crc="af8dbdab" offset="0x2000" length="0x2000"/>
+		<part name="03-15202-01.u5" crc="3eeecb3d" offset="0x2000" length="0x2000"/>
+		<part name="03-15203-01.u6" crc="b9c5b663" offset="0x2000" length="0x2000"/>
+		<part name="03-15204-01.u7" crc="c68821b7" offset="0x2000" length="0x2000"/>
+		<part name="03-15205-01.u8" crc="2be843a9" offset="0x2000" length="0x2000"/>
+		<part name="03-15206-01.u9" crc="6bf8d4ab" offset="0x2000" length="0x2000"/>
+		<part repeat="0x1D8000">00</part>
+		<part repeat="0x40000">00</part>
+		<interleave output="16">
+			<part name="03-15225-01.u62t" crc="f8c20496" length="0x10000" map="01"/>
+			<part name="03-15222-01.u45t" crc="722d1a19" length="0x10000" map="10"/>
+		</interleave>
+		<interleave output="16">
+			<part name="03-15224-01.u61t" crc="7ce3c3b7" length="0x10000" map="01"/>
+			<part name="03-15221-01.u44t" crc="bc6abaaf" length="0x10000" map="10"/>
+		</interleave>
+		<part repeat="0x60000">00</part>
+		<interleave output="16">
+			<part name="03-15223-01.u60t" crc="c0ee425d" length="0x10000" map="01"/>
+			<part name="03-15220-01.u43t" crc="ccb6c8d7" length="0x10000" map="10"/>
+		</interleave>
+		<part name="03-15215-01.u93" crc="4fb678d7" length="0x4000"/>
+		<part name="03-15215-01.u93" crc="4fb678d7" length="0x4000"/>
+		<part name="03-15216-01.u94" crc="7b57a44c" length="0x4000"/>
+		<part name="03-15216-01.u94" crc="7b57a44c" length="0x4000"/>
+		<part name="03-15217-01.u95" crc="29bc33fd" length="0x4000"/>
+		<part name="03-15217-01.u95" crc="29bc33fd" length="0x4000"/>
+		<part repeat="0x1E8000">00</part>
+		<part name="03-15210-01.u70" crc="a5aea20e" length="0x4000"/>
+		<part name="03-15214-01.u92" crc="36f261ca" length="0x4000"/>
+		<part name="03-15209-01.u69" crc="0f5d74a4" length="0x4000"/>
+		<part repeat="0x4000">00</part>
+		<part name="03-15208-01.u68" crc="0319aec7" length="0x4000"/>
+		<part name="03-15212-01.u90" crc="38b298d6" length="0x4000"/>
+		<part name="03-15207-01.u67" crc="5ff86aad" length="0x4000"/>
+		<part repeat="0xE4000">00</part>
+		<part name="eeprom-quarterb.bin" crc="99d8c2ef" length="0x80"/>
+	</rom>
+	<!-- Two players. Pass/aim with the analog stick or D-pad. Coin = Select, Start = Start. Operator menu: OSD "Service Menu". -->
+	<buttons names="Pass,Start,Coin" default="A,Start,Select" count="2"/>
+	<nvram index="4" size="128"/>
+</misterromdescription>

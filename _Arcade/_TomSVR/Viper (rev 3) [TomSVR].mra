@@ -1,0 +1,56 @@
+<misterromdescription>
+	<name>Viper (rev 3) [TomSVR]</name>
+	<mameversion>0264</mameversion>
+	<setname>viper</setname>
+	<year>1988</year>
+	<manufacturer>Leland Corporation</manufacturer>
+	<category>Shooter</category>
+	<rbf>TomSVR_leland</rbf>
+	<rotation>horizontal</rotation>
+	<rom index="0" address="0x30000000" zip="viper.zip" md5="None" type="merged">
+		<part>4C 01 03 06 07 80 00 00 00 00 00 00 00 00 00 00</part>
+		<part name="03-15617-03.u49t" crc="7e4688a6" length="0x10000"/>
+		<part name="03-15616-03.u48t" crc="3fe2f0bf" length="0x10000"/>
+		<part repeat="0xE0000">00</part>
+		<part name="03-15600-02.u3" crc="0f57f68a" length="0x2000"/>
+		<part repeat="0xE000">00</part>
+		<part name="03-15612-02.u2t" crc="4043d4ee" length="0x10000"/>
+		<part name="03-15613-02.u3t" crc="213bc02b" length="0x10000"/>
+		<part name="03-15614-02.u4t" crc="ce0b95b4" length="0x10000"/>
+		<part repeat="0x1C0000">00</part>
+		<part repeat="0x40000">00</part>
+		<interleave output="16">
+			<part name="03-15623-02.u62t" crc="2921d8f9" length="0x10000" map="01"/>
+			<part name="03-15620-02.u45t" crc="7380ece1" length="0x10000" map="10"/>
+		</interleave>
+		<interleave output="16">
+			<part name="03-15622-02.u61t" crc="32dfda37" length="0x10000" map="01"/>
+			<part name="03-15619-02.u44t" crc="c8507cc2" length="0x10000" map="10"/>
+		</interleave>
+		<part repeat="0x60000">00</part>
+		<interleave output="16">
+			<part name="03-15621-02.u60t" crc="cb468f2b" length="0x10000" map="01"/>
+			<part name="03-15618-02.u43t" crc="5562e0c3" length="0x10000" map="10"/>
+		</interleave>
+		<part name="03-15609-01.u93" crc="08ad92e9" length="0x4000"/>
+		<part name="03-15609-01.u93" crc="08ad92e9" length="0x4000"/>
+		<part name="03-15610-01.u94" crc="d4e56dfb" length="0x4000"/>
+		<part name="03-15610-01.u94" crc="d4e56dfb" length="0x4000"/>
+		<part name="03-15611-01.u95" crc="3a2c46fb" length="0x4000"/>
+		<part name="03-15611-01.u95" crc="3a2c46fb" length="0x4000"/>
+		<part repeat="0x1E8000">00</part>
+		<part name="03-15604-01.u70" crc="7e3b0cce" length="0x4000"/>
+		<part name="03-15608-01.u92" crc="a9bde0ef" length="0x4000"/>
+		<part name="03-15603-01.u69" crc="aecc9516" length="0x4000"/>
+		<part name="03-15607-01.u91" crc="14f06f88" length="0x4000"/>
+		<part name="03-15602-01.u68" crc="4ef613ad" length="0x4000"/>
+		<part name="03-15606-01.u90" crc="3c2e8e76" length="0x4000"/>
+		<part name="03-15601-01.u67" crc="dc7006cd" length="0x4000"/>
+		<part name="03-15605-01.u89" crc="4aa9c788" length="0x4000"/>
+		<part repeat="0xE0000">00</part>
+		<part name="eeprom-viper.bin" crc="1c1e7a49" length="0x80"/>
+	</rom>
+	<!-- Trackball: analog stick, D-pad, spinner or mouse. Coin = Select, Start = Start. Operator menu: OSD "Service Menu". -->
+	<buttons names="Fire,Bomb,Start,Coin" default="A,B,Start,Select" count="2"/>
+	<nvram index="4" size="128"/>
+</misterromdescription>

@@ -1,0 +1,57 @@
+<misterromdescription>
+	<name>All American Football (rev C) [TomSVR]</name>
+	<mameversion>0264</mameversion>
+	<setname>aafbc</setname>
+	<parent>aafb</parent>
+	<year>1989</year>
+	<manufacturer>Leland Corporation</manufacturer>
+	<category>Sports</category>
+	<rbf>TomSVR_leland</rbf>
+	<rotation>vertical (ccw)</rotation>
+	<rom index="0" address="0x30000000" zip="aafbc.zip|aafb.zip" md5="None" type="merged">
+		<part>4C 01 03 09 08 80 00 00 00 00 00 00 00 00 00 00</part>
+		<part name="02-24014-02.u58t" crc="25cc4ccc" length="0x10000"/>
+		<part name="02-24015-02.u59t" crc="bfa1b56f" length="0x10000"/>
+		<part repeat="0xE0000">00</part>
+		<part name="02-24000-02.u3" crc="52df0354" length="0x2000"/>
+		<part repeat="0xE000">00</part>
+		<part name="02-24001-02.u2t" crc="9b20697d" length="0x10000"/>
+		<part name="02-24002-02.u3t" crc="bbb92184" length="0x10000"/>
+		<part name="02-15603-01.u4t" crc="cdc9c09d" length="0x10000"/>
+		<part name="02-15604-01.u5t" crc="3c03e92e" length="0x10000"/>
+		<part name="02-15605-01.u6t" crc="cdf7d19c" length="0x10000"/>
+		<part name="02-15606-01.u7t" crc="8eeb007c" length="0x10000"/>
+		<part name="02-24002-02.u8t" crc="3d9747c9" length="0x10000"/>
+		<part repeat="0x180000">00</part>
+		<part repeat="0x40000">00</part>
+		<interleave output="16">
+			<part name="02-24016-01.u13" crc="6997025f" length="0x10000" map="01"/>
+			<part name="02-24019-01.u25" crc="9e344768" length="0x10000" map="10"/>
+		</interleave>
+		<interleave output="16">
+			<part name="02-24017-01.u14" crc="a48bd721" length="0x10000" map="01"/>
+			<part name="02-24020-01.u26" crc="0788f2a5" length="0x10000" map="10"/>
+		</interleave>
+		<part repeat="0x60000">00</part>
+		<interleave output="16">
+			<part name="02-24018-01.u15" crc="76eb6077" length="0x10000" map="01"/>
+			<part name="02-24021-01.u27" crc="94081899" length="0x10000" map="10"/>
+		</interleave>
+		<part name="02-24011-02.u93" crc="71f4425b" length="0x8000"/>
+		<part name="02-24012-02.u94" crc="b2499547" length="0x8000"/>
+		<part name="02-24013-02.u95" crc="0a604e0d" length="0x8000"/>
+		<part repeat="0x1E8000">00</part>
+		<part name="02-24007-01.u70" crc="40e46aa4" length="0x4000"/>
+		<part name="02-24010-01.u92" crc="78705f42" length="0x4000"/>
+		<part name="02-24006-01.u69" crc="6a576aa9" length="0x4000"/>
+		<part name="02-24009-02.u91" crc="b857a1ad" length="0x4000"/>
+		<part name="02-24005-02.u68" crc="8ea75319" length="0x4000"/>
+		<part name="02-24008-01.u90" crc="4538bc58" length="0x4000"/>
+		<part name="02-24004-02.u67" crc="cd7a3338" length="0x4000"/>
+		<part repeat="0xE4000">00</part>
+		<part name="eeprom-aafb.bin" crc="119fb1e7" length="0x80"/>
+	</rom>
+	<!-- Four players (controllers 1-4). Pass/aim with the analog stick or D-pad. Coin = Select, Start = Start. Operator menu: OSD "Service Menu". -->
+	<buttons names="Pass,Start,Coin" default="A,Start,Select" count="4"/>
+	<nvram index="4" size="128"/>
+</misterromdescription>
