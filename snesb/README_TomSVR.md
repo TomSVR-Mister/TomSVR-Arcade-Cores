@@ -1,13 +1,14 @@
 # TomSVR_snesb: SNES arcade bootlegs for MiSTer
 
 Unofficial MiSTer core for the arcade bootleg boards that run hacked Super Nintendo games (MAME driver
-`nintendo/snesb.cpp`), released as TomSVR_snesb. 15 MRAs:
+`nintendo/snesb.cpp`), released as TomSVR_snesb. 16 MRAs:
 
 | Game | MAME set |
 |---|---|
 | Killer Instinct | kinstb |
 | Final Fight 2 | ffight2b |
 | Final Fight 3 (set 1, set 2) | ffight3b, ffight3b2 |
+| International Superstar Soccer Deluxe | issdxb |
 | Iron (bootleg of Iron Commando) | iron |
 | Ghost Chaser Densei (set 1, set 2) | denseib, denseib2 |
 | Gundam Wing - Endless Duel (set 1, set 2) | endless, endlessa |
@@ -43,7 +44,10 @@ switches, and answers the game's protection checks. The games themselves run on 
 - **Legend**: MAME marks one of its ROMs as a bad dump (combined from several bad dumps).
 - **Final Fight 3**: MAME does not emulate its protection and patches it out of the game code; this core applies the
   same patch.
-- Not in this release: International Superstar Soccer Deluxe (still being fixed), Pirates of Dark Water (its board
+- **International Superstar Soccer Deluxe**: after Start the game picks the menu choices by itself (Open Game,
+  single match) and chooses the opponent if you wait on team select. MAME does exactly the same; the arcade
+  bootleg sells one match per credit.
+- Not in this release: Pirates of Dark Water (its board
   adds a 68000), and the boards with an 8051 overlay (Mortal Kombat 3, Killer Instinct with overlay, the 4-slot
   switchers, MAME `snesb51.cpp`).
 

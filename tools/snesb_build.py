@@ -224,7 +224,11 @@ SETS = {
     'issdxb': dict(hirom=0, scr='init_issdxb', n=0x200000, bit20=True,
                    banks=bank4(bs(4, 5, 1, 6, 0, 3, 7, 2), bs(0, 2, 3, 7, 4, 5, 6, 1), bs(5, 7, 6, 4, 1, 0, 2, 3), bs(6, 3, 0, 1, 2, 4, 5, 7),
                                xors=(0xff, 0xff, 0, 0xff)), patch={0x7ffc: 0x00, 0x7ffd: 0x80}, **EXTRA,
-                   consts=[(0x5b0956, 0xd3), (0x5b134a, 0x69), (0x5b2c8f, 0xb6)], counter=0x6a6d1d, ram=(0x781000, 0x14)),
+                   consts=[(0x5b0956, 0xd3), (0x5b134a, 0x69), (0x5b2c8f, 0xb6),
+                           # the game reads these as 16-bit words; MAME maps only the low byte, so the high
+                           # byte is open bus = 5B (the bank byte just fetched). The ROM there broke kick-off.
+                           (0x5b0957, 0x5b), (0x5b134b, 0x5b), (0x5b2c90, 0x5b)],
+                   counter=0x6a6d1d, ram=(0x781000, 0x14)),
 }
 SETS['ffight3b2'] = SETS['ffight3b']
 SETS['endlessa'] = SETS['endless']

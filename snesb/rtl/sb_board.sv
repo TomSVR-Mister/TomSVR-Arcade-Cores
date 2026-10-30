@@ -113,14 +113,19 @@ always @(posedge clk) begin
 	end else if (~wr_n && (in0 || in1)) ram[ram_a] <= cpu_do;
 end
 
-// read counter: the value seen is count + 1, the count advances at the end of each read
+// read counter: the value seen is count + 1, the count advances once per read (MAME prot_cnt_r).
+// The core's CPURD_N is gated with the CPU clock enable and pulses several times within one bus cycle, so the
+// count steps when the CPU leaves the counter address after reading it, not on every CPURD_N edge
+// (counting edges made ISS Deluxe see 5 steps per read and hang at kick-off).
 reg  [7:0] cnt;
-reg        rd_n_d;
+reg        cnt_rd;
 wire       cnt_sel = flags[3] && ca == cnt_addr;
 always @(posedge clk) begin
-	rd_n_d <= rd_n;
-	if (reset) cnt <= 0;
-	else if (rd_n & ~rd_n_d & cnt_sel) cnt <= cnt + 1'd1;
+	if (reset) begin cnt <= 0; cnt_rd <= 0; end
+	else begin
+		if (cnt_sel & ~rd_n) cnt_rd <= 1;
+		if (cnt_rd & ~cnt_sel) begin cnt_rd <= 0; cnt <= cnt + 1'd1; end
+	end
 end
 
 wire io  = flags[0] && ca[23:8] == 16'h7700;

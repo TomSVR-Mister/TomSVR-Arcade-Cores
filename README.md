@@ -1,6 +1,6 @@
 # Unofficial MiSTer arcade cores (TomSVR)
 
-35 MiSTer arcade cores and 335 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
+35 MiSTer arcade cores and 336 MRAs for 1980s and 1990s arcade boards that have no other MiSTer core.
 
 **These are not jotego cores.** Most are built on jotego's JTFRAME framework (megatech, megaplay and mdboot are built on
 MegaDrive_MiSTer, nss and snesb on SNES_MiSTer, leland on the official Leland core, see below), but they are not part of jtcores and
@@ -77,7 +77,7 @@ why); the patch is applied in memory by the MRA.
 | pipedrm | Pipe Dream (Video System, 1990; World, US, Japan and Taiwan sets) and Hatris (Video System, 1990; US, Japan and show version), with the YM2608 sound chip built on jt12. Hatris also needs MAME's `ym2608.zip` (the chip's internal drum samples) | pipedrm.cpp |
 | playmark | Big Twin, Excelsior, Hot Mind, Hard Times, Lucky Boom | playmark.cpp |
 | semicom | SemiCom games: Hyper Pacman, Cookie & Bibi 2 and 3, Toppy & Rappy, Puzzle Break, Su Ho Seong, Twinkle, New HyperMan 3-in-1, Ma Cheon Ru, More More / More More Plus, Final Tetris | snowbros.cpp |
-| snesb | SNES arcade bootlegs: 15 MRAs (Killer Instinct, Final Fight 2 and 3, Wild Guns, Gundam Wing - Endless Duel, TMNT Mutant Warriors, Venom & Spider-Man, Sonic Blast Man II, Ghost Chaser Densei, Rushing Beat Shura, Iron, Legend) running on SNES_MiSTer, with each board's ROM scrambling undone while loading and its coin, DIP switch and protection hardware (see [snesb/README_TomSVR.md](snesb/README_TomSVR.md)) | snesb.cpp |
+| snesb | SNES arcade bootlegs: 16 MRAs (Killer Instinct, Final Fight 2 and 3, International Superstar Soccer Deluxe, Wild Guns, Gundam Wing - Endless Duel, TMNT Mutant Warriors, Venom & Spider-Man, Sonic Blast Man II, Ghost Chaser Densei, Rushing Beat Shura, Iron, Legend) running on SNES_MiSTer, with each board's ROM scrambling undone while loading and its coin, DIP switch and protection hardware (see [snesb/README_TomSVR.md](snesb/README_TomSVR.md)) | snesb.cpp |
 | splash | Splash!, New Splash, Painted Lady, The Return of Lady Frog | splash.cpp |
 | sqix | Super Qix (including the 8031 MCU bootleg), Perestroika Girls | superqix.cpp |
 | tbowl | Tecmo Bowl (Tecmo, 1987; two World sets, prototype and Japan), up to four players on two monitors: shown side by side or one monitor at a time, chosen in the OSD ("Screens") | tbowl.cpp |
